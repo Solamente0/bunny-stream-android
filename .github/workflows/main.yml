@@ -1,0 +1,115 @@
+name: Deploy App
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+  workflow_dispatch:
+
+jobs:
+  lint_check:
+    name: Lint check
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Lint check
+        run: ./gradlew detekt
+        
+  unit_tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+
+  instrumentation_tests:
+    name: Instrumentation tests
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        api-level: [29]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+        
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck
+        
+  build:
+    name: Build app
+    needs: [ lint_check, unit_tests, instrumentation_tests ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Build Release APK
+        run: ./gradlew :app:assembleDebug
+
+  distribute:
+    name: Distribute
+    needs: [ build ]
+    runs-on: ubuntu-latest 
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug
+
+      - name: Upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: Testers
+          file: app/build/outputs/apk/debug/app-debug.apk
