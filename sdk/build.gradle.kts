@@ -1,10 +1,15 @@
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("io.gitlab.arturbosch.detekt")
+    id("org.openapi.generator")
 }
 
 android {
+
+    sourceSets["main"].java.srcDirs("$buildDir/generated/api")
+
     namespace = "net.bunnystream.androidsdk"
     compileSdk = 33
 
@@ -37,6 +42,12 @@ detekt {
     config.from("$rootDir/sdk/detekt.yml")
 }
 
+openApiGenerate {
+    generatorName.set("kotlin")
+    inputSpec.set("$rootDir/sdk/openapi/api.json")
+    outputDir.set("$buildDir/generated/api")
+}
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
@@ -45,4 +56,15 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn(tasks.openApiGenerate)
 }
