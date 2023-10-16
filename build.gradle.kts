@@ -4,4 +4,5 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.8.10" apply false
     id("com.android.library") version "8.1.2" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.1" apply false
+    id("org.openapi.generator") version "5.3.0" apply false
 }
