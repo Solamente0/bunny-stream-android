@@ -1522,9 +1522,12 @@
             "format": "int32"
           },
           "status": {
-            "type": "integer",
             "description": "The status of the video. Created = 0, Uploaded = 1, Processing = 2, Transcoding = 3, Finished = 4, Error = 5, UploadFailed = 6",
-            "format": "int32"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VideoModelStatus"
+              }
+            ]
           },
           "framerate": {
             "type": "number",
