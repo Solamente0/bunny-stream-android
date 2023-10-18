@@ -46,6 +46,10 @@ openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set("$rootDir/sdk/openapi/api.json")
     outputDir.set("$buildDir/generated/api")
+    configOptions.set(mapOf(
+        "dateLibrary" to "string",
+       // "serializationLibrary" to "kotlinx_serialization"
+    ))
 }
 
 dependencies {
@@ -63,6 +67,11 @@ dependencies {
 
     implementation("com.squareup.moshi:moshi:1.14.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
