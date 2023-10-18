@@ -1,5 +1,5 @@
 package net.bunnystream.androidsdk
 
 object BunnyStreamSdk {
-    val name = "BunnyStreamSdk"
+    const val name = "BunnyStreamSdk"
 }
