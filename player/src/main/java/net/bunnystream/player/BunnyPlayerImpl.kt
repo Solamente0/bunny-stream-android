@@ -3,9 +3,11 @@ package net.bunnystream.player
 import net.bunnystream.player.common.PlaybackStateListener
 import net.bunnystream.player.common.VideoQuality
 
-class BunnyPlayerImpl(
-    private val builder: BunnyPlayer.Builder,
-): BunnyPlayer {
+class BunnyPlayerImpl: BunnyPlayer {
+
+    override fun loadVideo(url: String) {
+        TODO("Not yet implemented")
+    }
 
     override fun release() {
         TODO("Not yet implemented")
@@ -23,7 +25,7 @@ class BunnyPlayerImpl(
         TODO("Not yet implemented")
     }
 
-    override fun seekTo(position: Long) {
+    override fun seekTo(positionMs: Long) {
         TODO("Not yet implemented")
     }
 

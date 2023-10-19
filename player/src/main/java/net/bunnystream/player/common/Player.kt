@@ -7,71 +7,59 @@ interface Player {
     /* Releases the resources held by the player, such as codecs. */
     fun release()
 
-    interface PlaybackControl {
+    /* Starts or resumes playback. */
+    fun play()
 
-        /* Starts or resumes playback. */
-        fun play()
+    /* Pauses playback. */
+    fun pause()
 
-        /* Pauses playback. */
-        fun pause()
+    /* Stops playback and resets the player to its initial state. */
+    fun stop()
 
-        /* Stops playback and resets the player to its initial state. */
-        fun stop()
+    /* Seeks to a specified position in the video. */
+    fun seekTo(positionMs: Long)
 
-        /* Seeks to a specified position in the video. */
-        fun seekTo(position: Long)
-    }
+    /*  Sets the volume. Volume should be a float value between 0 (mute) and 1 (maximum volume). */
+    fun setVolume(@FloatRange(from = 0.0, to = 1.0) volume: Float)
 
-    interface VolumeControl {
+    /* Returns the current volume. */
+    @FloatRange(from = 0.0, to = 1.0)
+    fun getVolume(): Float
 
-        /*  Sets the volume. Volume should be a float value between 0 (mute) and 1 (maximum volume). */
-        fun setVolume(@FloatRange(from = 0.0, to = 1.0) volume: Float)
+    /* Mutes the player. */
+    fun mute()
 
-        /* Returns the current volume. */
-        @FloatRange(from = 0.0, to = 1.0)
-        fun getVolume(): Float
+    /* Unmutes the player. */
+    fun unmute()
 
-        /* Mutes the player. */
-        fun mute()
+    /* Returns whether the player is currently playing. */
+    fun isPlaying(): Boolean
 
-        /* Unmutes the player. */
-        fun unmute()
-    }
+    /* Returns the duration of the video. */
+    fun getDuration(): Long
 
-    interface VideoInformation {
+    /* Returns the current playback position. */
+    fun getCurrentPosition(): Long
 
-        /* Returns whether the player is currently playing. */
-        fun isPlaying(): Boolean
+    /* Returns the percentage of the video that has been buffered. */
+    fun getBufferedPercentage(): Int
 
-        /* Returns the duration of the video. */
-        fun getDuration(): Long
+    /* ets a listener to be notified of playback state changes and errors. */
+    fun setPlaybackStateListener(listener: PlaybackStateListener)
 
-        /* Returns the current playback position. */
-        fun getCurrentPosition(): Long
+    /* Returns the current playback state. */
+    fun getPlaybackState()
 
-        /* Returns the percentage of the video that has been buffered. */
-        fun getBufferedPercentage(): Int
+    /* Sets the desired quality/resolution. */
+    fun setVideoQuality(videoQuality: VideoQuality)
 
-        /* ets a listener to be notified of playback state changes and errors. */
-        fun setPlaybackStateListener(listener: PlaybackStateListener)
+    /* Returns a list of available qualities/resolutions. */
+    fun getAvailableVideoQualities(): VideoQuality
 
-        /* Returns the current playback state. */
-        fun getPlaybackState()
-    }
+    /* Sets whether the player should be in fullscreen mode. */
+    fun setFullscreen(fullscreen: Boolean)
 
-    interface VideoControl {
-
-        /* Sets the desired quality/resolution. */
-        fun setVideoQuality(videoQuality: VideoQuality)
-
-        /* Returns a list of available qualities/resolutions. */
-        fun getAvailableVideoQualities(): VideoQuality
-
-        /* Sets whether the player should be in fullscreen mode. */
-        fun setFullscreen(fullscreen: Boolean)
-
-        /* Sets the aspect ratio of the video. */
-        fun setAspectRatio(aspectRatio: Float)
-    }
+    /* Sets the aspect ratio of the video. */
+    fun setAspectRatio(aspectRatio: Float)
 
 }
