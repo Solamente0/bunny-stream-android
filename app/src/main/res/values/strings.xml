@@ -9,4 +9,5 @@
     <string name="screen_library">Library</string>
     <string name="dialog_title_error">Error</string>
     <string name="dialog_button_ok">OK</string>
+    <string name="button_upload_video">Upload video</string>
 </resources>

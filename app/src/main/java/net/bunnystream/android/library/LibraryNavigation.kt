@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import net.bunnystream.android.App
 import net.bunnystream.android.di.Di
 import net.bunnystream.android.ui.AppState
 
@@ -23,7 +24,7 @@ fun NavGraphBuilder.libraryScreen(
         LibraryRoute(
             appState = appState,
             navigateToSettings = navigateToSettings,
-            localPrefs = Di.localPrefs
+            localPrefs = App.di.localPrefs
         )
     }
 }
