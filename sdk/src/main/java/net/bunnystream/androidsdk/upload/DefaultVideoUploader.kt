@@ -4,14 +4,16 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
-import arrow.core.Either
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.bunnystream.androidsdk.upload.model.FileInfo
 import net.bunnystream.androidsdk.upload.model.HttpStatusCodes
 import net.bunnystream.androidsdk.upload.model.UploadError
+import net.bunnystream.androidsdk.upload.service.UploadListener
+import net.bunnystream.androidsdk.upload.service.UploadRequest
 import net.bunnystream.androidsdk.upload.service.UploadService
 import org.openapitools.client.apis.ManageVideosApi
 import org.openapitools.client.infrastructure.ClientException
@@ -23,40 +25,40 @@ class DefaultVideoUploader(
     private val context: Context,
     private val videoUploadService: UploadService,
     ioDispatcher: CoroutineDispatcher,
-    mainDispatcher: CoroutineDispatcher,
 ) : VideoUploader {
 
     companion object {
-        private const val TAG = "VideoUploader"
+        private const val TAG = "DefaultVideoUploader"
     }
 
     private val videosApi = ManageVideosApi()
-    private val scope = CoroutineScope(ioDispatcher)
-    private val mainScope = CoroutineScope(mainDispatcher)
 
-    private val uploadsInProgress: MutableMap<String, Job> = mutableMapOf()
+    private val supervisorJob = SupervisorJob()
+    private val exceptionHandler = CoroutineExceptionHandler { context, exception ->
+        exception.printStackTrace()
+        Log.d(TAG, "CoroutineExceptionHandler: context=$context exception=$exception")
+    }
+    private val scope = CoroutineScope(ioDispatcher + exceptionHandler + supervisorJob)
 
-    override fun uploadVideo(libraryId: Long, videoUri: Uri, listener: VideoUploadListener) {
+    private val lock = Any()
+    private val uploadsInProgress: MutableMap<String, UploadRequest> = mutableMapOf()
 
-        val inputStream = context.contentResolver.openInputStream(videoUri)
-
-        if(inputStream == null) {
-            mainScope.launch {
-                listener.onVideoUploadError(UploadError.ErrorReadingFile)
-            }
-            return
-        }
+    override fun uploadVideo(libraryId: Long, videoUri: Uri, listener: UploadListener) {
+        Log.d(TAG, "uploadVideo libraryId=$libraryId videoUri=$videoUri")
 
         val fileInfo = getFileInfo(videoUri)
 
-        Log.d(TAG, "fileInfo: $fileInfo")
+        if(fileInfo == null) {
+            listener.onUploadError(UploadError.ErrorReadingFile)
+            return
+        }
 
-        val title = fileInfo?.fileName ?: UUID.randomUUID().toString()
+        Log.d(TAG, "fileInfo: $fileInfo")
 
         scope.launch {
             val videoId: String?
             try {
-                videoId = createVideo(libraryId, title)
+                videoId = createVideo(libraryId, fileInfo.fileName)
             } catch (e: Exception) {
                 Log.e(TAG, "could not create video: ${e.message}")
                 e.printStackTrace()
@@ -72,49 +74,50 @@ class DefaultVideoUploader(
                     is ServerException -> UploadError.ServerError
                     else ->  UploadError.UnknownError(e.message ?: e.toString())
                 }
-
-                mainScope.launch {
-                    listener.onVideoUploadError(error)
-                }
+                listener.onUploadError(error)
                 return@launch
             }
 
             if(videoId.isNullOrEmpty()) {
-                mainScope.launch {
-                    listener.onVideoUploadError(UploadError.ErrorCreating)
-                }
+                listener.onUploadError(UploadError.ErrorCreating)
                 return@launch
             }
 
             val uploadId = UUID.randomUUID().toString()
 
-            val uploadJob = scope.launch {
+            val request = videoUploadService.upload(
+                libraryId, videoId, fileInfo, object : UploadListener {
+                    override fun onProgressUpdated(percentage: Int) {
+                        Log.d(TAG, "onProgressUpdated: $percentage")
+                        listener.onProgressUpdated(percentage)
+                    }
 
-                val response = videoUploadService.upload(
-                    "https://video.bunnycdn.com/library/$libraryId/videos/$videoId",
-                    inputStream
-                ) { progress ->
-                    mainScope.launch {
-                        listener.onUploadProgress(progress)
+                    override fun onUploadDone() {
+                        Log.d(TAG, "onUploadDone")
+                        listener.onUploadDone()
+                    }
+
+                    override fun onUploadStarted(uploadId: String) {
+                        Log.d(TAG, "onUploadStarted uploadId=$uploadId")
+                    }
+
+                    override fun onUploadError(error: UploadError) {
+                        Log.d(TAG, "onUploadError: $error")
+                        listener.onUploadError(error)
+                    }
+
+                    override fun onUploadCancelled() {
+                        Log.d(TAG, "onUploadCancelled")
+                        listener.onUploadCancelled()
                     }
                 }
+            )
 
-                when(response){
-                    is Either.Right -> mainScope.launch {
-                        listener.onVideoUploadDone()
-                    }
-                    is Either.Left -> mainScope.launch {
-                        listener.onVideoUploadError(response.value)
-                    }
+            if(request != null) {
+                synchronized(lock) {
+                    uploadsInProgress[uploadId] = request
+                    listener.onUploadStarted(uploadId)
                 }
-
-                uploadsInProgress.remove(uploadId)
-                Log.d(TAG, "uploadsInProgress: $uploadsInProgress")
-            }
-
-            synchronized(uploadsInProgress) {
-                uploadsInProgress[uploadId] = uploadJob
-                mainScope.launch { listener.onVideoUploadStarted(uploadId) }
             }
 
             Log.d(TAG, "uploadsInProgress: $uploadsInProgress")
@@ -123,10 +126,21 @@ class DefaultVideoUploader(
 
     override fun cancelUpload(uploadId: String) {
         Log.d(TAG, "cancelUpload: $uploadId")
-        synchronized(uploadsInProgress) {
-            uploadsInProgress.remove(uploadId)?.cancel()
+
+        val request: UploadRequest?
+
+        synchronized(lock) {
+            request = uploadsInProgress.remove(uploadId)
         }
-        Log.d(TAG, "uploadsInProgress: $uploadsInProgress")
+
+        if(request == null){
+            Log.w(TAG, "Cannot cancel, upload ID $uploadId not found")
+            return
+        }
+
+        scope.launch { request.cancel() }
+
+        scope.launch { deleteVideo(request.libraryId, request.videoId) }
     }
 
     private fun createVideo(
@@ -148,7 +162,25 @@ class DefaultVideoUploader(
         return result.guid
     }
 
+    @Suppress("PrintStackTrace")
+    private fun deleteVideo(libraryId: Long, videoId: String) {
+        Log.d(TAG, "deleteVideo libraryId=$libraryId videoId=$videoId")
+        try {
+            val result = videosApi.videoDeleteVideo(libraryId, videoId)
+            if(result.success) {
+                Log.d(TAG, "Video deleted")
+            } else {
+                Log.e(TAG, "Error deleting video: $result")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "deleteVideo exception: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
     private fun getFileInfo(uri: Uri): FileInfo? {
+
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return null
 
         val cursor = context.contentResolver.query(uri, null, null, null, null) ?: return null
 
@@ -160,7 +192,7 @@ class DefaultVideoUploader(
             val name = it.getString(nameIndex)
             val size = it.getLong(sizeIndex)
 
-            return FileInfo(name, size)
+            return FileInfo(name, size, inputStream)
         }
     }
 }

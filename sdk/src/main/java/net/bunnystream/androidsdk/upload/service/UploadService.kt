@@ -1,7 +1,6 @@
 package net.bunnystream.androidsdk.upload.service
 
-import arrow.core.Either
-import net.bunnystream.androidsdk.upload.model.UploadError
+import net.bunnystream.androidsdk.upload.model.FileInfo
 import java.io.InputStream
 
 /**
@@ -11,12 +10,16 @@ interface UploadService {
 
     /**
      * Uploads content in for of [InputStream] to provided url
-     * @param target URL
-     * @param inputStream content to be uploaded
-     * @param onProgress function that's called when progress changes
-     * @return [Either] containing error if upload fails or [Any] on success
+     * @param libraryId target library ID
+     * @param videoId target video ID
+     * @param fileInfo details about the file to be uploaded, see [FileInfo]
+     * @param listener interface to get notified about upload status changes, see [UploadListener]
+     * @return [UploadRequest] containing info about submitted upload
      */
     suspend fun upload(
-        url: String, inputStream: InputStream, onProgress: (Int) -> Unit
-    ): Either<UploadError, Any>
+        libraryId: Long,
+        videoId: String,
+        fileInfo: FileInfo,
+        listener: UploadListener
+    ): UploadRequest
 }
