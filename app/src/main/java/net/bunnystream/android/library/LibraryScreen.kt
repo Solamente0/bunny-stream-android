@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
@@ -47,13 +48,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.bunnystream.android.R
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
+import net.bunnystream.android.library.model.VideoStatus
 import net.bunnystream.android.library.model.VideoUploadUiState
 import net.bunnystream.android.settings.LocalPrefs
 import net.bunnystream.android.ui.AppState
@@ -89,6 +93,8 @@ fun LibraryRoute(
         LocalLifecycleOwner.current
     )
 
+    var deleteVideo by remember { mutableStateOf<Video?>(null) }
+
     if(errorState != null) {
         AlertDialog(
             icon = {
@@ -106,6 +112,40 @@ fun LibraryRoute(
                     onClick = viewModel::onErrorDismissed
                 ) {
                     Text(text = stringResource(id = R.string.dialog_button_ok))
+                }
+            },
+        )
+    }
+
+    deleteVideo?.let {
+        AlertDialog(
+            icon = {
+                Icon(Icons.Filled.Warning, contentDescription = null)
+            },
+            title = {
+                Text(text = stringResource(id = R.string.dialog_delete_video))
+            },
+            text = {
+                Text(text = it.name)
+            },
+            onDismissRequest = {
+                deleteVideo = null
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { deleteVideo = null }
+                ) {
+                    Text(text = stringResource(id = R.string.dialog_button_cancel))
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onDeleteVideo(it)
+                        deleteVideo = null
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.dialog_button_delete))
                 }
             },
         )
@@ -131,7 +171,10 @@ fun LibraryRoute(
         onTusUploadOptionChanged = {
             viewModel.onTusUploadOptionChanged(it)
         },
-        useTusUpload = viewModel.useTusUpload
+        useTusUpload = viewModel.useTusUpload,
+        onDeleteVideoClicked = {
+            deleteVideo = it
+        }
     )
 }
 
@@ -141,7 +184,7 @@ private fun LibraryScreen(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
     showAccessKeyNeeded: Boolean,
-    onLoadLibraryClicked: (String) -> Unit,
+    onLoadLibraryClicked: (Long) -> Unit,
     libraryId: Long,
     uiState: LibraryUiState,
     onUploadVideoClicked: () -> Unit,
@@ -149,7 +192,8 @@ private fun LibraryScreen(
     onDismissUploadErrorClicked: () -> Unit,
     onCancelUploadClicked: () -> Unit,
     onTusUploadOptionChanged: (Boolean) -> Unit,
-    useTusUpload: Boolean
+    useTusUpload: Boolean,
+    onDeleteVideoClicked: (Video) -> Unit,
 ) {
 
     var libId by remember { mutableStateOf(libraryId.toString()) }
@@ -197,12 +241,13 @@ private fun LibraryScreen(
                         OutlinedTextField(
                             modifier = modifier.weight(1F),
                             value = libId,
-                            onValueChange = { libId = it },
-                            label = { Text(stringResource(id = R.string.hint_library_id)) }
+                            onValueChange = { if(it.isDigitsOnly()) { libId = it } },
+                            label = { Text(stringResource(id = R.string.hint_library_id)) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
 
                         Button(
-                            onClick = { onLoadLibraryClicked(libId) },
+                            onClick = { onLoadLibraryClicked(libId.toLong()) },
                             modifier = modifier
                                 .align(CenterVertically)
                                 .padding(start = 10.dp)
@@ -216,7 +261,12 @@ private fun LibraryScreen(
                             .fillMaxWidth()
                             .weight(1F)){
                             when (uiState) {
-                                LibraryUiState.LibraryUiEmpty -> { }
+                                LibraryUiState.LibraryUiEmpty -> {
+                                    Text(
+                                        modifier = modifier.align(Center),
+                                        text = stringResource(id = R.string.label_no_videos)
+                                    )
+                                }
                                 is LibraryUiState.LibraryUiLoaded -> {
                                     LazyColumn(
                                         modifier = Modifier
@@ -227,9 +277,9 @@ private fun LibraryScreen(
                                             items = uiState.videos,
                                             key = { video -> video.id }
                                         ){
-                                            Text(
-                                                modifier = Modifier.padding(10.dp),
-                                                text = it.name
+                                            VideoItem(
+                                                video = it,
+                                                onDeleteVideoClicked = { onDeleteVideoClicked(it) }
                                             )
                                         }
                                     }
@@ -257,6 +307,51 @@ private fun LibraryScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun VideoItem(
+    video: Video,
+    onDeleteVideoClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier.padding(vertical = 10.dp)) {
+        Column(modifier = modifier.weight(1F).align(CenterVertically)) {
+            Text(
+                modifier = modifier,
+                text = video.name
+            )
+            Text(
+                modifier = modifier,
+                text = video.status.name
+            )
+            Text(
+                modifier = modifier,
+                text = video.duration
+            )
+        }
+
+        IconButton(
+            modifier = modifier.align(CenterVertically),
+            onClick = onDeleteVideoClicked
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Clear,
+                contentDescription = null
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun VideoItemPreview(){
+    BunnyStreamTheme {
+        VideoItem(
+            video = Video("1", "Video 1", "1m", VideoStatus.FINISHED),
+            onDeleteVideoClicked = {}
+        )
     }
 }
 
@@ -409,9 +504,9 @@ private fun AccessKey(
 private fun LibraryScreenPreview() {
 
     val videos = listOf(
-        Video("1", "Video 1", "1m"),
-        Video("2", "Video 2", "1m"),
-        Video("3", "Video 3", "1m")
+        Video("1", "Video 1", "1m", VideoStatus.FINISHED),
+        Video("2", "Video 2", "1m", VideoStatus.FINISHED),
+        Video("3", "Video 3", "1m", VideoStatus.FINISHED)
     )
 
     BunnyStreamTheme {
@@ -427,6 +522,7 @@ private fun LibraryScreenPreview() {
             onCancelUploadClicked = {},
             onTusUploadOptionChanged = {},
             useTusUpload = true,
+            onDeleteVideoClicked = {}
         )
     }
 }

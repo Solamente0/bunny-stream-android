@@ -20,6 +20,8 @@ class BunnyStreamSdk(context: Context, accessKey: String) : StreamSdk {
         ApiClient.apiKey["AccessKey"] = accessKey
     }
 
+    override val isInitialized = accessKey.isNotEmpty()
+
     private val prefs = context.getSharedPreferences(TUS_PREFS_FILE, Context.MODE_PRIVATE)
 
     private val ktorClient = initHttpClient(accessKey)
