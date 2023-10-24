@@ -1,9 +1,9 @@
 package net.bunnystream.android.library
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.bunnystream.android.di.Di
+import net.bunnystream.android.App
 import net.bunnystream.android.library.model.Error
-import net.bunnystream.android.library.model.LibraryUiEmpty
-import net.bunnystream.android.library.model.LibraryUiLoaded
-import net.bunnystream.android.library.model.LibraryUiLoading
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
+import net.bunnystream.android.library.model.VideoUploadUiState
+import net.bunnystream.androidsdk.upload.VideoUploadListener
+import net.bunnystream.androidsdk.upload.model.UploadError
 import java.util.UUID
 
 class LibraryViewModel : ViewModel() {
@@ -31,31 +31,62 @@ class LibraryViewModel : ViewModel() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val prefs = Di.localPrefs
+    private val prefs = App.di.localPrefs
 
-    private val mutableUiState: MutableStateFlow<LibraryUiState> = MutableStateFlow(LibraryUiEmpty)
+    private val mutableUiState: MutableStateFlow<LibraryUiState> = MutableStateFlow(LibraryUiState.LibraryUiEmpty)
     val uiState = mutableUiState.asStateFlow()
+
+    private val mutableUploadUiState: MutableStateFlow<VideoUploadUiState> = MutableStateFlow(VideoUploadUiState.NotUploading)
+    val uploadUiState = mutableUploadUiState.asStateFlow()
 
     private val mutableErrorState: MutableSharedFlow<Error?> = MutableSharedFlow()
     val errorState = mutableErrorState.asSharedFlow()
 
     private var loadedVideos: List<Video> = listOf()
+    private var uploadInProgressId: String? = null
+
+    private val uploadListener = object : VideoUploadListener{
+        override fun onVideoUploadError(error: UploadError) {
+            Log.d(TAG, "onVideoUploadError: $error")
+            mutableUploadUiState.value = VideoUploadUiState.UploadError(error.toString())
+            uploadInProgressId = null
+        }
+
+        override fun onVideoUploadDone() {
+            Log.d(TAG, "onVideoUploadDone")
+            loadLibrary(libraryId.toString())
+            mutableUploadUiState.value = VideoUploadUiState.NotUploading
+            uploadInProgressId = null
+        }
+
+        override fun onVideoUploadStarted(uploadId: String) {
+            Log.d(TAG, "onVideoUploadStarted: uploadId=$uploadId")
+            uploadInProgressId = uploadId
+        }
+
+        override fun onUploadProgress(percentage: Int) {
+            Log.d(TAG, "onUploadProgress: percentage=$percentage")
+            mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage)
+        }
+    }
 
     var libraryId by mutableLongStateOf(prefs.libraryId)
         private set
 
-    fun loadLibrary(libraryId: String) {
+    init {
+        Log.d(TAG, "<init> $this")
+        App.di.videoUploadService.uploadListener = uploadListener
+    }
 
-        mutableUiState.value = LibraryUiLoading
+    fun loadLibrary(libraryId: String) {
+        mutableUiState.value = LibraryUiState.LibraryUiLoading
 
         this.libraryId = libraryId.toLong()
         prefs.libraryId = this.libraryId
 
-        val videosApi = Di.getBunnyStreamSdk(prefs.accessKey).videosApi
-
         scope.launch {
             try {
-                val response = videosApi.videoList(
+                val response = App.di.streamSdk.videosApi.videoList(
                     libraryId = libraryId.toLong(),
                     page = null,
                     itemsPerPage = null,
@@ -72,13 +103,12 @@ class LibraryViewModel : ViewModel() {
                     )
                 } ?: listOf()
 
-                mutableUiState.value = LibraryUiLoaded(loadedVideos)
+                mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
 
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to fetch videos")
                 e.printStackTrace()
-
-                mutableUiState.value = LibraryUiLoaded(loadedVideos)
+                mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
                 mutableErrorState.emit(Error(e.message ?: e.toString()))
             }
         }
@@ -86,5 +116,25 @@ class LibraryViewModel : ViewModel() {
 
     fun onErrorDismissed() = viewModelScope.launch {
         mutableErrorState.emit(null)
+    }
+
+    fun uploadVideo(videoUri: Uri) {
+        mutableUploadUiState.value = VideoUploadUiState.Preparing
+        App.di.videoUploadService.uploadListener = uploadListener
+        App.di.videoUploadService.uploadVideo(libraryId, videoUri)
+    }
+
+    fun clearUploadError() {
+        mutableUploadUiState.value = VideoUploadUiState.NotUploading
+    }
+
+    fun cancelUpload(){
+        uploadInProgressId?.let {
+            App.di.streamSdk.videoUploader.cancelUpload(it)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }
