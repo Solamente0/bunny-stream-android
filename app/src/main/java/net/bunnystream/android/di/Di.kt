@@ -19,9 +19,12 @@ class Di(private val context: Context) {
 
     var videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
 
+    var tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
+
     fun updateAccessKey(accessKey: String) {
         localPrefs.accessKey = accessKey
         streamSdk = BunnyStreamSdk(context, localPrefs.accessKey)
         videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
+        tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
     }
 }

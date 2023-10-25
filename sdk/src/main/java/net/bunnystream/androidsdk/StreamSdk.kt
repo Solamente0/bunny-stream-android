@@ -23,4 +23,10 @@ interface StreamSdk {
      * @see VideoUploader
      */
     val videoUploader: VideoUploader
+
+    /**
+     * Component for managing TUS video uploads
+     * @see VideoUploader
+     */
+    val tusVideoUploader: VideoUploader
 }

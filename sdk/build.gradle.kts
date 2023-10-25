@@ -8,6 +8,10 @@ plugins {
 
 android {
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     sourceSets["main"].java.srcDirs("$buildDir/generated/api")
 
     namespace = "net.bunnystream.androidsdk"
@@ -15,6 +19,9 @@ android {
 
     defaultConfig {
         minSdk = 24
+
+        buildConfigField("String", "TUS_UPLOAD_ENDPOINT", "\"https://video.bunnycdn.com/tusupload\"")
+        buildConfigField("String", "BASE_API", "\"https://video.bunnycdn.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -79,6 +86,9 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.2")
 
     implementation("io.arrow-kt:arrow-core:1.2.0")
+
+    implementation("io.tus.java.client:tus-java-client:0.5.0")
+    implementation("io.tus.android.client:tus-android-client:0.1.11")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

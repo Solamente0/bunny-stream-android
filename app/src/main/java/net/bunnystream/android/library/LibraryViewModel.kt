@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +20,7 @@ import net.bunnystream.android.library.model.Error
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
 import net.bunnystream.android.library.model.VideoUploadUiState
-import net.bunnystream.androidsdk.upload.VideoUploadListener
+import net.bunnystream.androidsdk.upload.service.UploadListener
 import net.bunnystream.androidsdk.upload.model.UploadError
 import java.util.UUID
 
@@ -45,32 +46,41 @@ class LibraryViewModel : ViewModel() {
     private var loadedVideos: List<Video> = listOf()
     private var uploadInProgressId: String? = null
 
-    private val uploadListener = object : VideoUploadListener{
-        override fun onVideoUploadError(error: UploadError) {
+    private val uploadListener = object : UploadListener {
+        override fun onUploadError(error: UploadError) {
             Log.d(TAG, "onVideoUploadError: $error")
             mutableUploadUiState.value = VideoUploadUiState.UploadError(error.toString())
             uploadInProgressId = null
         }
 
-        override fun onVideoUploadDone() {
+        override fun onUploadDone() {
             Log.d(TAG, "onVideoUploadDone")
             loadLibrary(libraryId.toString())
             mutableUploadUiState.value = VideoUploadUiState.NotUploading
             uploadInProgressId = null
         }
 
-        override fun onVideoUploadStarted(uploadId: String) {
+        override fun onUploadStarted(uploadId: String) {
             Log.d(TAG, "onVideoUploadStarted: uploadId=$uploadId")
             uploadInProgressId = uploadId
         }
 
-        override fun onUploadProgress(percentage: Int) {
+        override fun onProgressUpdated(percentage: Int) {
             Log.d(TAG, "onUploadProgress: percentage=$percentage")
             mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage)
+        }
+
+        override fun onUploadCancelled() {
+            Log.d(TAG, "onVideoUploadCancelled")
+            mutableUploadUiState.value = VideoUploadUiState.NotUploading
+            uploadInProgressId = null
         }
     }
 
     var libraryId by mutableLongStateOf(prefs.libraryId)
+        private set
+
+    var useTusUpload by mutableStateOf(false)
         private set
 
     init {
@@ -119,9 +129,16 @@ class LibraryViewModel : ViewModel() {
     }
 
     fun uploadVideo(videoUri: Uri) {
+        Log.d(TAG, "uploadVideo uri=$videoUri useTusUpload=$useTusUpload")
         mutableUploadUiState.value = VideoUploadUiState.Preparing
-        App.di.videoUploadService.uploadListener = uploadListener
-        App.di.videoUploadService.uploadVideo(libraryId, videoUri)
+
+        if(useTusUpload) {
+            App.di.tusVideoUploadService.uploadListener = uploadListener
+            App.di.tusVideoUploadService.uploadVideo(libraryId, videoUri)
+        } else {
+            App.di.videoUploadService.uploadListener = uploadListener
+            App.di.videoUploadService.uploadVideo(libraryId, videoUri)
+        }
     }
 
     fun clearUploadError() {
@@ -129,9 +146,19 @@ class LibraryViewModel : ViewModel() {
     }
 
     fun cancelUpload(){
+        Log.d(TAG, "cancelUpload: uploadInProgressId=$uploadInProgressId")
         uploadInProgressId?.let {
-            App.di.streamSdk.videoUploader.cancelUpload(it)
+            if(useTusUpload) {
+                App.di.tusVideoUploadService.cancelUpload(it)
+            } else {
+                App.di.videoUploadService.cancelUpload(it)
+            }
         }
+    }
+
+    fun onTusUploadOptionChanged(enabled: Boolean) {
+        Log.d(TAG, "onTusUploadOptionChanged enabled=$enabled")
+        useTusUpload = enabled
     }
 
     override fun onCleared() {
