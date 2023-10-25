@@ -9,13 +9,13 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.upload.model.FileInfo
 import net.bunnystream.androidsdk.upload.model.HttpStatusCodes
 import net.bunnystream.androidsdk.upload.model.UploadError
 import net.bunnystream.androidsdk.upload.service.UploadListener
 import net.bunnystream.androidsdk.upload.service.UploadRequest
 import net.bunnystream.androidsdk.upload.service.UploadService
-import org.openapitools.client.apis.ManageVideosApi
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
 import org.openapitools.client.models.CreateVideoModel

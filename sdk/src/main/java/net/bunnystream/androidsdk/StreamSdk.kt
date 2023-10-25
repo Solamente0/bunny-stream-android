@@ -1,11 +1,10 @@
 package net.bunnystream.androidsdk
 
+import net.bunnystream.androidsdk.api.ManageCollectionsApi
+import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.upload.VideoUploader
-import org.openapitools.client.apis.ManageCollectionsApi
-import org.openapitools.client.apis.ManageVideosApi
 
 interface StreamSdk {
-
     /**
      * Check if AccessKey has been provided
      */

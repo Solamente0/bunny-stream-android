@@ -45,20 +45,6 @@ android {
     }
 }
 
-detekt {
-    config.from("$rootDir/sdk/detekt.yml")
-}
-
-openApiGenerate {
-    generatorName.set("kotlin")
-    inputSpec.set("$rootDir/sdk/openapi/api.json")
-    outputDir.set("$buildDir/generated/api")
-    configOptions.set(mapOf(
-        "dateLibrary" to "string",
-        "serializationLibrary" to "gson"
-    ))
-}
-
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
@@ -91,6 +77,32 @@ dependencies {
     implementation("io.tus.android.client:tus-android-client:0.1.11")
 }
 
+detekt {
+    config.from("$rootDir/sdk/detekt.yml")
+}
+
+val specs = File("$rootDir/sdk/openapi").walk().map {
+    Pair(it.name, it.path)
+}.toMap().filter { it.key != "openapi" }
+
+specs.forEach {
+    tasks.create("openApiGenerate-${it.key}", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+        generatorName.set("kotlin")
+        inputSpec.set(it.value)
+        outputDir.set("$buildDir/generated/api")
+        apiPackage.set("net.bunnystream.androidsdk.api")
+
+        configOptions.set(mapOf(
+            "dateLibrary" to "string",
+            "serializationLibrary" to "gson"
+        ))
+    }
+}
+
+tasks.register("openApiGenerateAll") {
+    dependsOn(specs.map { "openApiGenerate-${it.key}" })
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn(tasks.openApiGenerate)
+    dependsOn("openApiGenerateAll")
 }
