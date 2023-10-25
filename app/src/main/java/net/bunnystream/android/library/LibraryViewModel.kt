@@ -175,7 +175,6 @@ class LibraryViewModel : ViewModel() {
                     Log.e(TAG, "Couldn't delete video: $result")
                     mutableErrorState.emit(Error("${result.statusCode} ${result.message}"))
                 }
-
             } catch (e: Exception) {
                 Log.e(TAG, "Error deleting video: ${e.message}")
                 e.printStackTrace()
@@ -208,8 +207,13 @@ class LibraryViewModel : ViewModel() {
                 6  -> VideoStatus.UPLOAD_FAILED
                 else  -> VideoStatus.ERROR
             },
-            thumbnail = thumbnailFileName
+            thumbnail = getVideoThumbnail(guid, thumbnailFileName)
         )
+    }
+
+    private fun getVideoThumbnail(videoId: String?, thumbnailFileName: String?): String? {
+        videoId ?: return null
+        return "${prefs.cdnHostname}/$videoId/$thumbnailFileName"
     }
 
     override fun onCleared() {

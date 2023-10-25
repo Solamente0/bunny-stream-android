@@ -1,6 +1,6 @@
 package net.bunnystream.android.settings
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,7 +36,9 @@ fun SettingsRoute(
         modifier = modifier,
         onBackClicked = { appState.navController.popBackStack() },
         accessKey = viewModel.accessKey,
-        onAccessKeyUpdated = { viewModel.updateAccessKey(it) }
+        onAccessKeyUpdated = { viewModel.updateAccessKey(it) },
+        cdnHostname = viewModel.cdnHostname,
+        onCdnHostnameUpdated = { viewModel.updateCdnHostname(it) }
     )
 }
 
@@ -46,7 +48,9 @@ private fun SettingsScreen(
     modifier: Modifier = Modifier,
     onBackClicked: () -> Unit,
     accessKey: String,
-    onAccessKeyUpdated: (String) -> Unit
+    onAccessKeyUpdated: (String) -> Unit,
+    cdnHostname: String,
+    onCdnHostnameUpdated: (String) -> Unit
 ) {
 
     Scaffold(
@@ -70,12 +74,12 @@ private fun SettingsScreen(
                             )
                         }
                     },
-                    )
+                )
             }
         },
     ) { innerPadding ->
 
-        Box(
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding),
@@ -88,6 +92,15 @@ private fun SettingsScreen(
                 onValueChange = onAccessKeyUpdated,
                 label = { Text(stringResource(id = R.string.hint_access_key)) }
             )
+
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                value = cdnHostname,
+                onValueChange = onCdnHostnameUpdated,
+                label = { Text(stringResource(id = R.string.hint_cdn_hostname)) }
+            )
         }
     }
 }
@@ -99,7 +112,9 @@ private fun SettingsScreenPreview() {
         SettingsScreen(
             onBackClicked = {},
             accessKey = "",
-            onAccessKeyUpdated = {}
+            onAccessKeyUpdated = {},
+            cdnHostname = "",
+            onCdnHostnameUpdated = {}
         )
     }
 }

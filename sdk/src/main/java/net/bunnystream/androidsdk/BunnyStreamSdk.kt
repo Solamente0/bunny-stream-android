@@ -2,12 +2,12 @@ package net.bunnystream.androidsdk
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
+import net.bunnystream.androidsdk.api.ManageCollectionsApi
+import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.ktor.initHttpClient
 import net.bunnystream.androidsdk.upload.DefaultVideoUploader
 import net.bunnystream.androidsdk.upload.service.basic.BasicUploaderService
 import net.bunnystream.androidsdk.upload.service.tus.TusUploaderService
-import org.openapitools.client.apis.ManageCollectionsApi
-import org.openapitools.client.apis.ManageVideosApi
 import org.openapitools.client.infrastructure.ApiClient
 
 class BunnyStreamSdk(context: Context, accessKey: String) : StreamSdk {
