@@ -1,9 +1,9 @@
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("io.gitlab.arturbosch.detekt")
     id("org.openapi.generator")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -75,6 +75,8 @@ dependencies {
 
     implementation("io.tus.java.client:tus-java-client:0.5.0")
     implementation("io.tus.android.client:tus-android-client:0.1.11")
+
+    dokkaPlugin("org.jetbrains.dokka:android-documentation-plugin:1.9.10")
 }
 
 detekt {
@@ -105,4 +107,27 @@ tasks.register("openApiGenerateAll") {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn("openApiGenerateAll")
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(file("../docs"))
+    moduleName.set("Bunny Stream Android SDK")
+    dokkaSourceSets {
+        configureEach {
+            displayName.set("SDK")
+            suppressGeneratedFiles.set(false)
+            perPackageOption {
+                matchingRegex.set("kotlin($|\\.).*")
+                skipDeprecated.set(false)
+                reportUndocumented.set(true)
+                includeNonPublic.set(false)
+            }
+
+            // Suppress a package
+            perPackageOption {
+                matchingRegex.set(".*.internal.*")
+                suppress.set(true)
+            }
+        }
+    }
 }
