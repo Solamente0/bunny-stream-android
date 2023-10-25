@@ -19,10 +19,14 @@ import net.bunnystream.android.App
 import net.bunnystream.android.library.model.Error
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
+import net.bunnystream.android.library.model.VideoStatus
 import net.bunnystream.android.library.model.VideoUploadUiState
-import net.bunnystream.androidsdk.upload.service.UploadListener
 import net.bunnystream.androidsdk.upload.model.UploadError
+import net.bunnystream.androidsdk.upload.service.UploadListener
+import org.openapitools.client.models.VideoModel
 import java.util.UUID
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class LibraryViewModel : ViewModel() {
 
@@ -55,7 +59,7 @@ class LibraryViewModel : ViewModel() {
 
         override fun onUploadDone() {
             Log.d(TAG, "onVideoUploadDone")
-            loadLibrary(libraryId.toString())
+            loadLibrary(libraryId)
             mutableUploadUiState.value = VideoUploadUiState.NotUploading
             uploadInProgressId = null
         }
@@ -86,35 +90,30 @@ class LibraryViewModel : ViewModel() {
     init {
         Log.d(TAG, "<init> $this")
         App.di.videoUploadService.uploadListener = uploadListener
+
+        if(libraryId != -1L && App.di.streamSdk.isInitialized) {
+            loadLibrary(libraryId)
+        }
     }
 
-    fun loadLibrary(libraryId: String) {
+    fun loadLibrary(libraryId: Long) {
         mutableUiState.value = LibraryUiState.LibraryUiLoading
 
-        this.libraryId = libraryId.toLong()
+        this.libraryId = libraryId
         prefs.libraryId = this.libraryId
 
         scope.launch {
             try {
                 val response = App.di.streamSdk.videosApi.videoList(
-                    libraryId = libraryId.toLong(),
+                    libraryId = libraryId,
                     page = null,
                     itemsPerPage = null,
                     search = null,
                     collection = null,
                     orderBy = null
                 )
-
-                loadedVideos = response.items?.map {
-                    Video(
-                        id = it.guid ?: UUID.randomUUID().toString(),
-                        name = it.title ?: "N/A",
-                        duration = it.length.toString(),
-                    )
-                } ?: listOf()
-
-                mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
-
+                loadedVideos = response.items?.map { it.toVideo() } ?: listOf()
+                notifyVideosUpdated()
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to fetch videos")
                 e.printStackTrace()
@@ -159,6 +158,58 @@ class LibraryViewModel : ViewModel() {
     fun onTusUploadOptionChanged(enabled: Boolean) {
         Log.d(TAG, "onTusUploadOptionChanged enabled=$enabled")
         useTusUpload = enabled
+    }
+
+    fun onDeleteVideo(video: Video) {
+        Log.d(TAG, "onDeleteVideo video=$video")
+        scope.launch {
+            try {
+                val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
+
+                if(result.success) {
+                    Log.d(TAG, "Video deleted")
+
+                    loadedVideos -= video
+                    notifyVideosUpdated()
+                } else {
+                    Log.e(TAG, "Couldn't delete video: $result")
+                    mutableErrorState.emit(Error("${result.statusCode} ${result.message}"))
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting video: ${e.message}")
+                e.printStackTrace()
+                mutableErrorState.emit(Error("Error deleting video: ${e.message}"))
+            }
+        }
+    }
+
+    private fun notifyVideosUpdated(){
+        if(loadedVideos.isEmpty()) {
+            mutableUiState.value = LibraryUiState.LibraryUiEmpty
+        } else {
+            mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
+        }
+    }
+
+    private fun VideoModel.toVideo(): Video {
+        return Video(
+            id = guid ?: UUID.randomUUID().toString(),
+            name = title ?: "N/A",
+            duration = length.toDuration(DurationUnit.SECONDS).toString(),
+            status =  when(status?.value){
+                null -> VideoStatus.ERROR
+                0  -> VideoStatus.CREATED
+                1  -> VideoStatus.UPLOADED
+                2  -> VideoStatus.PROCESSING
+                3  -> VideoStatus.TRANSCODING
+                4  -> VideoStatus.FINISHED
+                5  -> VideoStatus.ERROR
+                6  -> VideoStatus.UPLOAD_FAILED
+                else  -> VideoStatus.ERROR
+            },
+            thumbnail = thumbnailFileName
+        )
     }
 
     override fun onCleared() {
