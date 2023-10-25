@@ -7,6 +7,11 @@ import org.openapitools.client.apis.ManageVideosApi
 interface StreamSdk {
 
     /**
+     * Check if AccessKey has been provided
+     */
+    val isInitialized: Boolean
+
+    /**
      * API endpoints for managing video collections
      * @see ManageCollectionsApi
      */
