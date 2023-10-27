@@ -25,7 +25,7 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageButton
-                android:id="@id/exo_play_pause"
+                android:id="@+id/bunny_play_pause"
                 style="@style/BunnyStyleControls.Button.PlayPause" />
 
         </FrameLayout>
@@ -45,20 +45,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageButton
-                    android:id="@+id/bunny_play_pause"
-                    style="@style/BunnyStyleControls.Button.Play"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <Button
+                <TextView
                     android:id="@id/exo_rew_with_amount"
                     style="@style/BunnyStyleControls.Button.Rewind"
-                    app:layout_constraintStart_toEndOf="@id/bunny_play_pause"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="10"/>
 
-                <Button
+                <TextView
                     android:id="@id/exo_ffwd_with_amount"
                     style="@style/BunnyStyleControls.Button.FastForward"
                     app:layout_constraintStart_toEndOf="@id/exo_rew_with_amount"
@@ -75,16 +69,8 @@
                 <ImageButton
                     android:id="@+id/bunny_volume"
                     style="@style/BunnyStyleControls.Button.Volume"
-                    app:layout_constraintEnd_toStartOf="@id/volume_bar"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <SeekBar
-                    android:id="@+id/volume_bar"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     app:layout_constraintEnd_toStartOf="@id/exo_settings"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageButton
                     android:id="@id/exo_settings"

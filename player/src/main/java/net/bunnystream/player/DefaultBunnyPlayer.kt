@@ -2,6 +2,7 @@ package net.bunnystream.player
 
 import net.bunnystream.player.common.PlaybackState
 import net.bunnystream.player.common.VideoQuality
+import net.bunnystream.player.model.BunnyPlayerIconSet
 import net.bunnystream.player.ui.BunnyVideoPlayer
 
 class DefaultBunnyPlayer(

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -13,11 +14,13 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import net.bunnystream.player.R
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
+import net.bunnystream.player.model.BunnyPlayerIconSet
 
 class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
+    private val iconSet: BunnyPlayerIconSet? = DEFAULT_ICON_SET,
 ) : ConstraintLayout(context, attrs, defStyleAttr),
     DefaultLifecycleObserver {
 
@@ -26,33 +29,31 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     private var exoPlayer: ExoPlayer? = null
     private var currentVolume: Float = 0f
 
-    val playButton by lazy {
+    private val playButton by lazy {
         binding.playerView.findViewById<ImageButton>(R.id.bunny_play_pause)
     }
-    val playPauseButton by lazy {
-        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_play_pause)
+    private val rewindButton by lazy {
+        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_rew_with_amount)
     }
-    val rewindButton by lazy {
-        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_rew_with_amount)
+    private val forwardButton by lazy {
+        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_ffwd_with_amount)
     }
-    val forwardButton by lazy {
-        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_ffwd_with_amount)
-    }
-    val settingsButton by lazy {
+    private val settingsButton by lazy {
         binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_settings)
     }
-    val volumeButton by lazy {
+    private val volumeButton by lazy {
         binding.playerView.findViewById<ImageButton>(R.id.bunny_volume)
     }
-    val streamingButton by lazy {
+    private val streamingButton by lazy {
         binding.playerView.findViewById<ImageButton>(R.id.bunny_streaming)
     }
-    val fullScreenButton by lazy {
+    private val fullScreenButton by lazy {
         binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
     }
 
     init {
         initializePlayer()
+        setIconResources()
     }
 
     fun loadVideo(url: String) {
@@ -148,7 +149,11 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     private fun playerListener() {
         playButton.setOnClickListener {
-            playPauseButton.performClick()
+            if (isPlaying()) {
+                pause()
+            } else {
+                play()
+            }
         }
         volumeButton.setOnClickListener {
             if (getVolume() == 0f) {
@@ -162,9 +167,35 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                 super.onIsPlayingChanged(isPlaying)
 
                 playButton.setImageDrawable(AppCompatResources.getDrawable(context,
-                    if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+                    if (isPlaying) iconSet!!.pauseIcon else iconSet!!.playIcon
                 ))
             }
         })
+    }
+
+    private fun setIconResources() {
+        val icons = iconSet ?: DEFAULT_ICON_SET
+        playButton.setImageResource(if (isPlaying()) icons.pauseIcon else icons.playIcon)
+        rewindButton.setBackgroundResource(icons.rewindIcon)
+        forwardButton.setBackgroundResource(icons.forwardIcon)
+        settingsButton.setImageResource(icons.settingsIcon)
+        volumeButton.setImageResource(if (getVolume() == 0f) icons.volumeOffIcon else icons.volumeOnIcon)
+        streamingButton.setImageResource(icons.streamingIcon)
+        fullScreenButton.setImageResource(icons.fullscreenOnIcon)
+    }
+
+    companion object {
+        private val DEFAULT_ICON_SET = BunnyPlayerIconSet(
+            R.drawable.ic_play,
+            R.drawable.ic_pause,
+            R.drawable.ic_rewind,
+            R.drawable.ic_forward,
+            R.drawable.ic_settings,
+            R.drawable.ic_sound_on,
+            R.drawable.ic_sound_off,
+            R.drawable.ic_cast,
+            R.drawable.ic_fullscreen_on,
+            R.drawable.ic_fullscreen_off,
+        )
     }
 }
