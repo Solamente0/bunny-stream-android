@@ -172,7 +172,7 @@ class DefaultBunnyPlayer(
         TODO("Not yet implemented")
     }
 
-    override fun setFullScreenListener(listener: (FullscreenMode) -> Unit) {
+    override fun setFullscreenListener(listener: (FullscreenMode) -> Unit) {
         fullscreenStateListener = listener
     }
 

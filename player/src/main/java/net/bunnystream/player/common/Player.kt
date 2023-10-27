@@ -45,7 +45,7 @@ interface Player {
     fun getBufferedPercentage(): Int
 
     /* ets a listener to be notified of playback state changes and errors. */
-    fun setPlaybackStateListener(listener: PlaybackStateListener)
+    fun setPlaybackStateListener(listener: PlaybackState)
 
     /* Returns the current playback state. */
     fun getPlaybackState()
@@ -63,6 +63,6 @@ interface Player {
     fun setAspectRatio(aspectRatio: Float)
 
     /* Listener that state of player's fullscreen mode. */
-    fun isInFullscreen(listener: (FullscreenMode) -> Unit)
+    fun setFullscreenListener(listener: (FullscreenMode) -> Unit)
 
 }

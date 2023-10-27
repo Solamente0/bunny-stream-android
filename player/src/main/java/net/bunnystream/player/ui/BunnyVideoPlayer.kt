@@ -6,9 +6,8 @@ import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import net.bunnystream.player.BunnyPlayerImpl
+import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.R
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.BunnyPlayerIconSet
@@ -18,7 +17,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    private val playerManager: BunnyPlayerImpl,
+    private val playerManager: DefaultBunnyPlayer,
     private val iconSet: BunnyPlayerIconSet,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
