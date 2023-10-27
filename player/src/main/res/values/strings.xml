@@ -7,4 +7,5 @@
     <string name="bunny_settings_description">Open settings for video</string>
     <string name="bunny_streaming_description">Stream video to another device</string>
     <string name="bunny_fullscreen_description">Fullscreen mode video</string>
+    <string name="bunny_divider" translatable="false">/</string>
 </resources>

@@ -24,7 +24,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
-
             <ImageButton
                 android:id="@id/exo_rew"
                 style="@style/BunnyStyleControls.Button.Rewind"
@@ -64,6 +63,27 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="00:00"/>
+
+                <LinearLayout
+                    android:id="@+id/bunny_duration_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/exo_position"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/bunny_duration_divider"
+                        style="@style/BunnyStyleControls.Text.Divider"
+                        android:text="@string/bunny_divider"/>
+
+                    <TextView
+                        android:id="@id/exo_duration"
+                        style="@style/BunnyStyleControls.Text.Duration"
+                        tools:text="00:00" />
+
+                </LinearLayout>
 
                 <ImageButton
                     android:id="@+id/bunny_volume"

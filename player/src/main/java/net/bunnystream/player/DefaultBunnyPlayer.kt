@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -24,6 +25,8 @@ class DefaultBunnyPlayer(
     private val context: Context,
     private val parentView: ViewGroup,
     private val iconSet: BunnyPlayerIconSet,
+    private val colorTheme: String,
+    private val font: Int,
 ): BunnyPlayer {
 
     private var exoPlayer: ExoPlayer? = null
@@ -51,13 +54,14 @@ class DefaultBunnyPlayer(
         normalPlayer = BunnyVideoPlayer(
             context,
             playerManager = this@DefaultBunnyPlayer,
-            iconSet = iconSet
+            iconSet = iconSet,
+            colorTheme = colorTheme,
+            font = font,
         ).apply {
             exoPlayer?.let {
                 it.prepareFullScreenPlayer(
                     playerView,
                     this@DefaultBunnyPlayer,
-                    iconSet = iconSet,
                 )
                 playerView.player = it
             }
@@ -176,16 +180,75 @@ class DefaultBunnyPlayer(
         fullscreenStateListener = listener
     }
 
+    override fun setRewindButtonVisibility(isVisible: Boolean) {
+        normalPlayer.rewindButton.isVisible = isVisible
+        fullScreenPlayer.rewindButton.isVisible = isVisible
+    }
+
+    override fun setForwardButtonVisibility(isVisible: Boolean) {
+        normalPlayer.forwardButton.isVisible = isVisible
+        fullScreenPlayer.forwardButton.isVisible = isVisible
+    }
+
+    override fun setPlayButtonVisibility(isVisible: Boolean) {
+        normalPlayer.playButton.isVisible = isVisible
+        fullScreenPlayer.playButton.isVisible = isVisible
+    }
+
+    override fun setCaptionsVisibility(isVisible: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setCurrentTimeVisibility(isVisible: Boolean) {
+        normalPlayer.timePosition.isVisible = isVisible
+        fullScreenPlayer.timePosition.isVisible = isVisible
+    }
+
+    override fun setDurationVisibility(isVisible: Boolean) {
+        normalPlayer.timeDurationContainer.isVisible = isVisible
+        fullScreenPlayer.timeDurationContainer.isVisible = isVisible
+    }
+
+    override fun setFullscreenButtonVisibility(isVisible: Boolean) {
+        normalPlayer.fullScreenButton.isVisible = isVisible
+        fullScreenPlayer.fullScreenButton.isVisible = isVisible
+    }
+
+    override fun setMuteButtonVisibility(isVisible: Boolean) {
+        normalPlayer.volumeButton.isVisible = isVisible
+        fullScreenPlayer.volumeButton.isVisible = isVisible
+    }
+
+    override fun setCastButtonVisibility(isVisible: Boolean) {
+        normalPlayer.streamingButton.isVisible = isVisible
+        fullScreenPlayer.volumeButton.isVisible = isVisible
+    }
+
+    override fun setProgressVisibility(isVisible: Boolean) {
+        normalPlayer.progress.isVisible = isVisible
+        fullScreenPlayer.progress.isVisible = isVisible
+    }
+
+    override fun setSettingsVisibility(isVisible: Boolean) {
+        normalPlayer.settingsButton.isVisible = isVisible
+        fullScreenPlayer.settingsButton.isVisible = isVisible
+    }
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     @SuppressLint("SourceLockedOrientationActivity")
     fun ExoPlayer.prepareFullScreenPlayer(
         normalPlayerPlayerView: PlayerView,
         playerManager: BunnyPlayer,
-        iconSet: BunnyPlayerIconSet,
         forceLandscape: Boolean = false,
     ) {
         (normalPlayerPlayerView.context as Activity).apply {
-            fullScreenPlayer = FullScreenBunnyVideoPlayer(this, playerManager = playerManager, iconSet = iconSet)
+            fullScreenPlayer = FullScreenBunnyVideoPlayer(
+                this,
+                playerManager = playerManager,
+                iconSet = iconSet,
+                colorTheme = colorTheme,
+                font = font,
+            )
             val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             fullScreenPlayer.layoutParams = layoutParams
             fullScreenPlayer.visibility = View.GONE
@@ -223,3 +286,4 @@ class DefaultBunnyPlayer(
     }
 
 }
+
