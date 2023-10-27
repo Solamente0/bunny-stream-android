@@ -7,22 +7,22 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import net.bunnystream.player.DefaultBunnyPlayer
+import androidx.media3.ui.PlayerView
+import net.bunnystream.player.BunnyPlayer
 import net.bunnystream.player.R
-import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
+import net.bunnystream.player.databinding.ViewFullScreenBunnyVideoPlayerBinding
 import net.bunnystream.player.model.BunnyPlayerIconSet
 
 @SuppressLint("ViewConstructor")
-class BunnyVideoPlayer @JvmOverloads constructor(
+class FullScreenBunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    private val playerManager: DefaultBunnyPlayer,
+    private val playerManager: BunnyPlayer,
     private val iconSet: BunnyPlayerIconSet,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : PlayerView(context, attrs, defStyleAttr) {
 
-    private val binding = ViewBunnyVideoPlayerBinding.inflate(LayoutInflater.from(context), this, true)
+    private var binding = ViewFullScreenBunnyVideoPlayerBinding.inflate(LayoutInflater.from(context), this, true)
 
     val playerView by lazy {
         binding.playerView
@@ -67,14 +67,9 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        if (newConfig?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (newConfig?.orientation == Configuration.ORIENTATION_PORTRAIT) {
             fullScreenButton.performClick()
         }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        playerManager.release()
     }
 
     private fun playerListener() {
@@ -101,6 +96,6 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         settingsButton.setImageResource(iconSet.settingsIcon)
         volumeButton.setImageResource(if (playerManager.getVolume() == 0f) iconSet.volumeOffIcon else iconSet.volumeOnIcon)
         streamingButton.setImageResource(iconSet.streamingIcon)
-        fullScreenButton.setImageResource(iconSet.fullscreenOnIcon)
+        fullScreenButton.setImageResource(iconSet.fullscreenOffIcon)
     }
 }

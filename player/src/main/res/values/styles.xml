@@ -76,7 +76,7 @@
     <style name="BunnyStyleControls.Button.Streaming">
         <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">24dp</item>
-        <item name="android:src">@drawable/ic_collapse</item>
+        <item name="android:src">@drawable/ic_cast</item>
         <item name="android:contentDescription">@string/bunny_streaming_description</item>
         <item name="android:background">@null</item>
     </style>

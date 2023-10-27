@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:clipToPadding="false"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -81,11 +80,11 @@
                 <ImageButton
                     android:id="@+id/bunny_streaming"
                     style="@style/BunnyStyleControls.Button.Streaming"
-                    app:layout_constraintEnd_toStartOf="@id/exo_fullscreen"
+                    app:layout_constraintEnd_toStartOf="@id/bunny_fullscreen"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageButton
-                    android:id="@id/exo_fullscreen"
+                    android:id="@+id/bunny_fullscreen"
                     style="@style/BunnyStyleControls.Button.Fullscreen"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>

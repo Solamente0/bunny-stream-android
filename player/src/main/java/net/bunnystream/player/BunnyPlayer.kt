@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.ViewGroup
 import net.bunnystream.player.common.Player
 import net.bunnystream.player.model.BunnyPlayerIconSet
-import net.bunnystream.player.ui.BunnyVideoPlayer
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 interface BunnyPlayer: Player {
@@ -13,12 +12,13 @@ interface BunnyPlayer: Player {
 
 //    fun loadVideo(libraryId: String, videoId: String, cdnHost: String)
 
-    // configure(apiKey)
+//    configure(apiKey)
+
 }
 
 // TODO Jan: Extend FrameLayout here
 class BunnyPlayerBuilder(private val context: Context) {
-    private var iconSet: BunnyPlayerIconSet? = null
+    private var iconSet: BunnyPlayerIconSet = DEFAULT_ICON_SET
 
     fun setIconSet(iconSet: BunnyPlayerIconSet): BunnyPlayerBuilder {
         this.iconSet = iconSet
@@ -26,8 +26,21 @@ class BunnyPlayerBuilder(private val context: Context) {
     }
 
     fun build(parentView: ViewGroup): BunnyPlayer {
-        val bunnyVideoPlayer = BunnyVideoPlayer(context, iconSet = iconSet)
-        parentView.addView(bunnyVideoPlayer)
-        return DefaultBunnyPlayer(bunnyVideoPlayer)
+        return DefaultBunnyPlayer(context, parentView, iconSet = iconSet)
+    }
+
+    companion object {
+        private val DEFAULT_ICON_SET = BunnyPlayerIconSet(
+            R.drawable.ic_play,
+            R.drawable.ic_pause,
+            R.drawable.ic_rewind,
+            R.drawable.ic_forward,
+            R.drawable.ic_settings,
+            R.drawable.ic_sound_on,
+            R.drawable.ic_sound_off,
+            R.drawable.ic_cast,
+            R.drawable.ic_fullscreen_on,
+            R.drawable.ic_fullscreen_off,
+        )
     }
 }

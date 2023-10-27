@@ -16,6 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:show_buffering="always"
         app:show_shuffle_button="false"
+        app:resize_mode="zoom"
         app:surface_type="surface_view"
         app:controller_layout_id="@layout/view_media_controller"/>
 

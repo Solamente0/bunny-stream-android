@@ -57,9 +57,12 @@ interface Player {
     fun getAvailableVideoQualities(): VideoQuality
 
     /* Sets whether the player should be in fullscreen mode. */
-    fun setFullscreen(fullscreen: Boolean)
+    fun setFullscreen(fullscreen: FullscreenMode)
 
     /* Sets the aspect ratio of the video. */
     fun setAspectRatio(aspectRatio: Float)
+
+    /* Listener that state of player's fullscreen mode. */
+    fun setFullScreenListener(listener: (FullscreenMode) -> Unit)
 
 }
