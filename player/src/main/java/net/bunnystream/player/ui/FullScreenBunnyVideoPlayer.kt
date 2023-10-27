@@ -31,10 +31,10 @@ class FullScreenBunnyVideoPlayer @JvmOverloads constructor(
         binding.playerView.findViewById<ImageButton>(R.id.bunny_play_pause)
     }
     private val rewindButton by lazy {
-        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_rew_with_amount)
+        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_rew)
     }
     private val forwardButton by lazy {
-        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_ffwd_with_amount)
+        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_ffwd)
     }
     private val settingsButton by lazy {
         binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_settings)
@@ -91,8 +91,8 @@ class FullScreenBunnyVideoPlayer @JvmOverloads constructor(
 
     private fun setIconResources() {
         playButton.setImageResource(if (playerManager.isPlaying()) iconSet.pauseIcon else iconSet.playIcon)
-        rewindButton.setBackgroundResource(iconSet.rewindIcon)
-        forwardButton.setBackgroundResource(iconSet.forwardIcon)
+        rewindButton.setImageResource(iconSet.rewindIcon)
+        forwardButton.setImageResource(iconSet.forwardIcon)
         settingsButton.setImageResource(iconSet.settingsIcon)
         volumeButton.setImageResource(if (playerManager.getVolume() == 0f) iconSet.volumeOffIcon else iconSet.volumeOnIcon)
         streamingButton.setImageResource(iconSet.streamingIcon)

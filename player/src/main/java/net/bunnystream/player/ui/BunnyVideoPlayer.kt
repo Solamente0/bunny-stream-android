@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import net.bunnystream.player.DefaultBunnyPlayer
+import net.bunnystream.player.BunnyPlayerImpl
 import net.bunnystream.player.R
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.BunnyPlayerIconSet
@@ -18,7 +18,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    private val playerManager: DefaultBunnyPlayer,
+    private val playerManager: BunnyPlayerImpl,
     private val iconSet: BunnyPlayerIconSet,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
@@ -31,10 +31,10 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         binding.playerView.findViewById<ImageButton>(R.id.bunny_play_pause)
     }
     private val rewindButton by lazy {
-        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_rew_with_amount)
+        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_rew)
     }
     private val forwardButton by lazy {
-        binding.playerView.findViewById<TextView>(androidx.media3.ui.R.id.exo_ffwd_with_amount)
+        binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_ffwd)
     }
     private val settingsButton by lazy {
         binding.playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_settings)
@@ -96,8 +96,8 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     private fun setIconResources() {
         playButton.setImageResource(if (playerManager.isPlaying()) iconSet.pauseIcon else iconSet.playIcon)
-        rewindButton.setBackgroundResource(iconSet.rewindIcon)
-        forwardButton.setBackgroundResource(iconSet.forwardIcon)
+        rewindButton.setImageResource(iconSet.rewindIcon)
+        forwardButton.setImageResource(iconSet.forwardIcon)
         settingsButton.setImageResource(iconSet.settingsIcon)
         volumeButton.setImageResource(if (playerManager.getVolume() == 0f) iconSet.volumeOffIcon else iconSet.volumeOnIcon)
         streamingButton.setImageResource(iconSet.streamingIcon)

@@ -12,22 +12,35 @@
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <FrameLayout
+        <LinearLayout
             android:id="@id/exo_center_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
+            android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
+
+            <ImageButton
+                android:id="@id/exo_rew"
+                style="@style/BunnyStyleControls.Button.Rewind"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
             <ImageButton
                 android:id="@+id/bunny_play_pause"
                 style="@style/BunnyStyleControls.Button.PlayPause" />
 
-        </FrameLayout>
+            <ImageButton
+                android:id="@id/exo_ffwd"
+                style="@style/BunnyStyleControls.Button.FastForward"
+                app:layout_constraintStart_toEndOf="@id/exo_rew_with_amount"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </LinearLayout>
 
         <FrameLayout
             android:id="@id/exo_bottom_bar"
@@ -45,47 +58,38 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@id/exo_rew_with_amount"
-                    style="@style/BunnyStyleControls.Button.Rewind"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:text="10"/>
-
-                <TextView
-                    android:id="@id/exo_ffwd_with_amount"
-                    style="@style/BunnyStyleControls.Button.FastForward"
-                    app:layout_constraintStart_toEndOf="@id/exo_rew_with_amount"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:text="10" />
-
-                <TextView
                     android:id="@id/exo_position"
                     style="@style/BunnyStyleControls.Text.Position"
-                    app:layout_constraintEnd_toStartOf="@id/bunny_volume"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="00:00"/>
 
                 <ImageButton
                     android:id="@+id/bunny_volume"
                     style="@style/BunnyStyleControls.Button.Volume"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/exo_settings"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageButton
                     android:id="@id/exo_settings"
                     style="@style/BunnyStyleControls.Button.Settings"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/bunny_streaming"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageButton
                     android:id="@+id/bunny_streaming"
                     style="@style/BunnyStyleControls.Button.Streaming"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/bunny_fullscreen"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageButton
                     android:id="@+id/bunny_fullscreen"
                     style="@style/BunnyStyleControls.Button.Fullscreen"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 

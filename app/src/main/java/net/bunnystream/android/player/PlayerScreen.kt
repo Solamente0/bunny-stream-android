@@ -16,10 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -27,10 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import net.bunnystream.android.R
-import net.bunnystream.android.common.LifecycleAware
 import net.bunnystream.android.ui.AppState
 import net.bunnystream.android.ui.theme.BunnyStreamTheme
-import net.bunnystream.player.BunnyPlayer
 import net.bunnystream.player.BunnyPlayerBuilder
 import net.bunnystream.player.model.BunnyPlayerIconSet
 
@@ -51,12 +45,7 @@ private fun PlayerScreen(
     modifier: Modifier = Modifier,
     onBackClicked: () -> Unit,
 ) {
-    var bunnyPlayer: BunnyPlayer? by remember { mutableStateOf(null) }
     val bunnyPlayerBuilder = BunnyPlayerBuilder(LocalContext.current)
-    LifecycleAware(
-        onPause = { bunnyPlayer?.pause() },
-        onResume = { bunnyPlayer?.play() }
-    )
     Scaffold(
         topBar = {
             Surface(shadowElevation = 3.dp) {
@@ -91,7 +80,6 @@ private fun PlayerScreen(
             BunnyPlayerComposable(
                 url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
                 bunnyPlayerBuilder = bunnyPlayerBuilder,
-                onBunnyPlayerCreated = { bunnyPlayer = it },
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -102,7 +90,6 @@ private fun PlayerScreen(
 fun BunnyPlayerComposable(
     url: String,
     bunnyPlayerBuilder: BunnyPlayerBuilder,
-    onBunnyPlayerCreated: (BunnyPlayer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AndroidView(
@@ -124,10 +111,10 @@ fun BunnyPlayerComposable(
                     net.bunnystream.player.R.drawable.ic_cast,
                     net.bunnystream.player.R.drawable.ic_fullscreen_on,
                     net.bunnystream.player.R.drawable.ic_fullscreen_off,
-                    )
-                ).build(view as ViewGroup)
+                )
+                )
+                .build(view as ViewGroup)
 
-            onBunnyPlayerCreated(bunnyPlayer)
             bunnyPlayer.loadVideo(url)
             bunnyPlayer.play()
         },
@@ -143,7 +130,6 @@ private fun PlayerScreenPreview() {
         BunnyPlayerComposable(
             url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
             bunnyPlayerBuilder = bunnyPlayerBuilder,
-            onBunnyPlayerCreated = {},
             modifier = Modifier.fillMaxSize()
         )
     }
