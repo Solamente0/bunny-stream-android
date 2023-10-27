@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="ExoStyledControls.Button.Center.PlayPause" tools:override="true">
+        <item name="android:src">@drawable/ic_placeholder</item>
+        <item name="android:contentDescription">Test</item>
+    </style>
+
+</resources>
