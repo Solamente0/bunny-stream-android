@@ -1,9 +1,9 @@
 package net.bunnystream.player
 
-import net.bunnystream.player.common.PlaybackStateListener
+import net.bunnystream.player.common.PlaybackState
 import net.bunnystream.player.common.VideoQuality
 
-class BunnyPlayerImpl: BunnyPlayer {
+class DefaultBunnyPlayer: BunnyPlayer {
 
     override fun loadVideo(url: String) {
         TODO("Not yet implemented")
@@ -61,7 +61,7 @@ class BunnyPlayerImpl: BunnyPlayer {
         TODO("Not yet implemented")
     }
 
-    override fun setPlaybackStateListener(listener: PlaybackStateListener) {
+    override fun setPlaybackStateListener(listener: PlaybackState) {
         TODO("Not yet implemented")
     }
 

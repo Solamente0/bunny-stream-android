@@ -1,6 +1,6 @@
 package net.bunnystream.player.common
 
-enum class PlaybackStateListener {
+enum class PlaybackState {
     STATE_IDLE,
     STATE_BUFFERING,
     STATE_READY,

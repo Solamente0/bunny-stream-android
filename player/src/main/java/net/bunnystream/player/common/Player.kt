@@ -45,7 +45,7 @@ interface Player {
     fun getBufferedPercentage(): Int
 
     /* ets a listener to be notified of playback state changes and errors. */
-    fun setPlaybackStateListener(listener: PlaybackStateListener)
+    fun setPlaybackStateListener(listener: PlaybackState)
 
     /* Returns the current playback state. */
     fun getPlaybackState()
