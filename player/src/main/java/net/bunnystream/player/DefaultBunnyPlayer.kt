@@ -2,60 +2,55 @@ package net.bunnystream.player
 
 import net.bunnystream.player.common.PlaybackState
 import net.bunnystream.player.common.VideoQuality
+import net.bunnystream.player.ui.BunnyVideoPlayer
 
-class DefaultBunnyPlayer: BunnyPlayer {
+class DefaultBunnyPlayer(
+    private val bunnyVideoPlayer: BunnyVideoPlayer,
+): BunnyPlayer {
 
     override fun loadVideo(url: String) {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.loadVideo(url)
     }
 
     override fun release() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.release()
     }
 
     override fun play() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.play()
     }
 
     override fun pause() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.pause()
     }
 
     override fun stop() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.stop()
     }
 
     override fun seekTo(positionMs: Long) {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.seekTo(positionMs)
     }
 
     override fun setVolume(volume: Float) {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.setVolume(volume)
     }
 
-    override fun getVolume(): Float {
-        TODO("Not yet implemented")
-    }
+    override fun getVolume(): Float = bunnyVideoPlayer.getVolume()
 
     override fun mute() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.mute()
     }
 
     override fun unmute() {
-        TODO("Not yet implemented")
+        bunnyVideoPlayer.unmute()
     }
 
-    override fun isPlaying(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isPlaying(): Boolean = bunnyVideoPlayer.isPlaying()
 
-    override fun getDuration(): Long {
-        TODO("Not yet implemented")
-    }
+    override fun getDuration(): Long = bunnyVideoPlayer.getDuration()
 
-    override fun getCurrentPosition(): Long {
-        TODO("Not yet implemented")
-    }
+    override fun getCurrentPosition(): Long = bunnyVideoPlayer.getCurrentPosition()
 
     override fun getBufferedPercentage(): Int {
         TODO("Not yet implemented")

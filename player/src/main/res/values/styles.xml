@@ -1,9 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="ExoStyledControls.Button.Center.PlayPause" tools:override="true">
-        <item name="android:src">@drawable/ic_placeholder</item>
-        <item name="android:contentDescription">Test</item>
+    <style name="BunnyStyleControls"/>
+    <style name="BunnyStyleControls.Button">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:backgroundTint">#FFFFFF</item>
+    </style>
+    <style name="BunnyStyleControls.Text">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="BunnyStyleControls.BottomBar">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:background">#34000000</item>
+    </style>
+    <style name="BunnyStyleControls.Progress">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_marginTop">-10dp</item>
+        <item name="android:layout_gravity">top</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.PlayPause" parent="ExoStyledControls.Button.Center.PlayPause">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:src">@drawable/ic_play</item>
+        <item name="android:contentDescription">@string/bunny_play_pause_description</item>
+        <item name="android:background">@null</item>
+        <item name="android:tint">#FFFFFF</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Play">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:src">@drawable/ic_play</item>
+        <item name="android:contentDescription">@string/bunny_play_pause_description</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Rewind">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:background">@drawable/ic_rewind</item>
+        <item name="android:contentDescription">@string/bunny_rewind_description</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.FastForward">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:background">@drawable/ic_forward</item>
+        <item name="android:contentDescription">@string/bunny_fast_forward_description</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Volume">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:src">@drawable/ic_sound_on</item>
+        <item name="android:contentDescription">@string/bunny_sound_description</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Settings">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:src">@drawable/ic_settings</item>
+        <item name="android:contentDescription">@string/bunny_settings_description</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Streaming">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:src">@drawable/ic_collapse</item>
+        <item name="android:contentDescription">@string/bunny_streaming_description</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="BunnyStyleControls.Button.Fullscreen">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:src">@drawable/ic_fullscreen</item>
+        <item name="android:contentDescription">@string/bunny_fullscreen_description</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="BunnyStyleControls.Text.Position">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
 </resources>

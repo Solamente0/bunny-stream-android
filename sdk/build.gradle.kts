@@ -15,7 +15,7 @@ android {
     sourceSets["main"].java.srcDirs("$buildDir/generated/api")
 
     namespace = "net.bunnystream.androidsdk"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 24
