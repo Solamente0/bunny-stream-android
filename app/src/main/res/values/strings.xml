@@ -10,6 +10,7 @@
     <string name="dialog_title_error">Error</string>
     <string name="dialog_button_ok">OK</string>
     <string name="button_upload_video">Upload video</string>
+    <string name="screen_player">Player</string>
     <string name="checkbox_enable_tus">Upload using TUS Uploads</string>
     <string name="dialog_delete_video">Delete Video?</string>
     <string name="dialog_button_delete">Delete</string>

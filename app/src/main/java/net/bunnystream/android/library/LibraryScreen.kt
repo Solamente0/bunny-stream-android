@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -75,6 +76,7 @@ fun LibraryRoute(
     appState: AppState,
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
+    navigateToPlayer: () -> Unit,
     localPrefs: LocalPrefs,
     viewModel: LibraryViewModel = viewModel(),
 ) {
@@ -161,6 +163,7 @@ fun LibraryRoute(
     LibraryScreen(
         modifier = modifier,
         navigateToSettings = navigateToSettings,
+        navigateToPlayer = navigateToPlayer,
         showAccessKeyNeeded = showAccessKeyNeeded,
         onLoadLibraryClicked = viewModel::loadLibrary,
         uiState = uiState,
@@ -190,6 +193,7 @@ fun LibraryRoute(
 private fun LibraryScreen(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
+    navigateToPlayer: () -> Unit,
     showAccessKeyNeeded: Boolean,
     onLoadLibraryClicked: (Long) -> Unit,
     libraryId: Long,
@@ -220,6 +224,12 @@ private fun LibraryScreen(
                         IconButton(onClick = navigateToSettings) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
+                                contentDescription = null
+                            )
+                        }
+                        IconButton(onClick = navigateToPlayer) {
+                            Icon(
+                                imageVector = Icons.Filled.PlayArrow,
                                 contentDescription = null
                             )
                         }
@@ -533,6 +543,7 @@ private fun LibraryScreenPreview() {
     BunnyStreamTheme {
         LibraryScreen(
             navigateToSettings = {},
+            navigateToPlayer = {},
             showAccessKeyNeeded = false,
             onLoadLibraryClicked = {},
             uiState = LibraryUiState.LibraryUiEmpty,
