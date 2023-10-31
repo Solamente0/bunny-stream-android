@@ -1,289 +1,221 @@
 package net.bunnystream.player
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.pm.ActivityInfo
-import android.graphics.Color
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isVisible
+import android.util.Log
+import androidx.media3.cast.CastPlayer
+import androidx.media3.cast.SessionAvailabilityListener
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
-import net.bunnystream.player.common.FullscreenMode
-import net.bunnystream.player.common.PlaybackState
-import net.bunnystream.player.common.VideoQuality
-import net.bunnystream.player.model.BunnyPlayerIconSet
-import net.bunnystream.player.ui.BunnyVideoPlayer
-import net.bunnystream.player.ui.FullScreenBunnyVideoPlayer
+import com.google.android.gms.cast.framework.CastState
+import net.bunnystream.player.common.BunnyPlayer
+import net.bunnystream.player.context.AppCastContext
 
-class DefaultBunnyPlayer(
-    private val context: Context,
-    private val parentView: ViewGroup,
-    private val iconSet: BunnyPlayerIconSet,
-    private val colorTheme: String,
-    private val font: Int,
-): BunnyPlayer {
+@UnstableApi
+class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
 
-    private var exoPlayer: ExoPlayer? = null
-    private lateinit var normalPlayer: BunnyVideoPlayer
-    private lateinit var fullScreenPlayer: FullScreenBunnyVideoPlayer
+    companion object {
+        private const val TAG = "DefaultBunnyPlayer"
 
-    private var currentVolume: Float = 0f
+        private const val SEEK_SKIP_MILLIS = 10 * 1000
 
-    private var fullscreenStateListener: ((FullscreenMode) -> Unit)? = null
+        @Volatile
+        private var instance: BunnyPlayer? = null
+
+        fun getInstance(context: Context) =
+            instance ?: synchronized(this) {
+                instance ?: DefaultBunnyPlayer(context).also { instance = it }
+            }
+    }
+
+    private var localPlayer: Player? = null
+    private val castContext = AppCastContext.get()
+    private var castPlayer: Player? = null
+    override var currentPlayer: Player? = null
+
+    override var playerStateListener: PlayerStateListener? = null
+        set(value) {
+            field = value
+            playerStateListener?.onPlayingChanged(isPlaying())
+            playerStateListener?.onMutedChanged(isMuted())
+        }
+
+    private var mediaItem: MediaItem? = null
+
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            Log.d(TAG, "onIsPlayingChanged: $isPlaying")
+            playerStateListener?.onPlayingChanged(isPlaying)
+        }
+
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+            Log.d(TAG, "onPlaybackParametersChanged speed: ${playbackParameters.speed}")
+            playerStateListener?.onPlaybackSpeedChanged(playbackParameters.speed)
+        }
+
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            Log.d(TAG, "onIsLoadingChanged isLoading: $isLoading")
+            playerStateListener?.onLoadingChanged(isLoading)
+        }
+    }
 
     init {
-        initExoPlayer()
-        initializeBunnyPlayerView()
-        listeners()
-    }
-
-    private fun initExoPlayer() {
-        if (exoPlayer != null) {
-            exoPlayer?.prepare()
+        localPlayer = ExoPlayer.Builder(context).build().also {
+            it.addListener(playerListener)
         }
-        exoPlayer = ExoPlayer.Builder(context).build()
-    }
 
-    private fun initializeBunnyPlayerView() {
-        normalPlayer = BunnyVideoPlayer(
-            context,
-            playerManager = this@DefaultBunnyPlayer,
-            iconSet = iconSet,
-            colorTheme = colorTheme,
-            font = font,
-        ).apply {
-            exoPlayer?.let {
-                it.prepareFullScreenPlayer(
-                    playerView,
-                    this@DefaultBunnyPlayer,
-                )
-                playerView.player = it
+        castPlayer = CastPlayer(castContext).also {
+            it.addListener(playerListener)
+            it.setSessionAvailabilityListener(object : SessionAvailabilityListener {
+                override fun onCastSessionAvailable() {
+                    Log.d(TAG, "onCastSessionAvailable")
+                    switchCurrentPlayer(it)
+                }
+
+                override fun onCastSessionUnavailable() {
+                    Log.d(TAG, "onCastSessionUnavailable")
+                    switchCurrentPlayer(localPlayer!!)
+                }
+            })
+        }
+
+        castContext.addCastStateListener {
+            Log.d(TAG, "onCastStateChanged: $it")
+            when(it) {
+                CastState.CONNECTED -> {}
+                CastState.CONNECTING -> {}
+                CastState.NOT_CONNECTED -> {}
+                CastState.NO_DEVICES_AVAILABLE -> {}
             }
         }
-        parentView.addView(normalPlayer)
+
+        currentPlayer = localPlayer
     }
 
-    private fun setVolumeIcon(isMute: Boolean) {
-        normalPlayer.isMute = isMute
-        fullScreenPlayer.isMute = isMute
+    override fun loadVideo(url: String, mimeType: String) {
+        Log.d(TAG, "loadVideo url=$url")
+        mediaItem = MediaItem.Builder().setUri(url).setMimeType(mimeType).build().also {
+            currentPlayer?.setMediaItem(it)
+        }
+        currentPlayer?.prepare()
     }
 
-    private fun setPlayIcon(isPlaying: Boolean) {
-        normalPlayer.isPlaying = isPlaying
-        fullScreenPlayer.isPlaying = isPlaying
+    override fun skipForward() {
+        currentPlayer?.let {
+            it.seekTo(it.currentPosition + SEEK_SKIP_MILLIS)
+        }
     }
 
-    private fun listeners() {
-        exoPlayer?.addListener(object: Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                super.onIsPlayingChanged(isPlaying)
-                setPlayIcon(isPlaying = isPlaying)
+    override fun replay() {
+        currentPlayer?.let {
+            val current = it.currentPosition
+            val target = if(current > SEEK_SKIP_MILLIS) {
+                current - SEEK_SKIP_MILLIS
+            } else {
+                0
             }
-        })
-    }
-
-    override fun loadVideo(url: String) {
-        val item =
-            MediaItem.Builder()
-                .setUri(url)
-                .build()
-        exoPlayer?.setMediaItem(item)
-        exoPlayer?.prepare()
+            it.seekTo(target)
+        }
     }
 
     override fun release() {
-        exoPlayer?.stop()
-        exoPlayer?.release()
-        exoPlayer = null
+        currentPlayer?.stop()
+
+        localPlayer?.release()
+        localPlayer = null
+
+        castPlayer?.release()
+        castPlayer = null
+
+        instance = null
     }
 
     override fun play() {
-        exoPlayer?.play()
+        currentPlayer?.play()
     }
 
     override fun pause() {
-        exoPlayer?.pause()
+        currentPlayer?.pause()
     }
 
     override fun stop() {
-        exoPlayer?.stop()
+        currentPlayer?.stop()
     }
 
     override fun seekTo(positionMs: Long) {
-        exoPlayer?.seekTo(positionMs)
+        currentPlayer?.seekTo(positionMs)
     }
 
     override fun setVolume(volume: Float) {
-        exoPlayer?.volume = volume
+        currentPlayer?.volume = volume
     }
 
-    override fun getVolume(): Float = exoPlayer?.volume ?: 0f
+    override fun getVolume(): Float = currentPlayer?.volume ?: 0f
+
+    override fun isMuted(): Boolean {
+        return currentPlayer?.volume == 0F
+    }
 
     override fun mute() {
-        val volume = getVolume()
-        if (volume != 0f) {
-            currentVolume = volume
-        }
-        setVolume(0f)
-        setVolumeIcon(isMute = true)
+        currentPlayer?.volume = 0F
+        playerStateListener?.onMutedChanged(true)
     }
 
     override fun unmute() {
-        setVolume(currentVolume)
-        setVolumeIcon(isMute = false)
+        currentPlayer?.volume = 1F
+        playerStateListener?.onMutedChanged(false)
     }
 
-    override fun isPlaying(): Boolean = exoPlayer?.isPlaying ?: false
+    override fun isPlaying(): Boolean = currentPlayer?.isPlaying ?: false
 
-    override fun getDuration(): Long = exoPlayer?.duration ?: 0L
+    override fun getDuration(): Long = currentPlayer?.duration ?: 0L
 
-    override fun getCurrentPosition(): Long = exoPlayer?.currentPosition ?: 0L
-
-    override fun getBufferedPercentage(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun setPlaybackStateListener(listener: PlaybackState) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPlaybackState() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setVideoQuality(videoQuality: VideoQuality) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAvailableVideoQualities(): VideoQuality {
-        TODO("Not yet implemented")
-    }
-
-    override fun setFullscreen(fullscreen: FullscreenMode) {
-        when (fullscreen) {
-            FullscreenMode.FULLSCREEN -> normalPlayer.fullScreenButton.performClick()
-            FullscreenMode.NORMAL -> fullScreenPlayer.fullScreenButton.performClick()
-        }
-    }
-
-    override fun setAspectRatio(aspectRatio: Float) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setFullscreenListener(listener: (FullscreenMode) -> Unit) {
-        fullscreenStateListener = listener
-    }
-
-    override fun setRewindButtonVisibility(isVisible: Boolean) {
-        normalPlayer.rewindButton.isVisible = isVisible
-        fullScreenPlayer.rewindButton.isVisible = isVisible
-    }
-
-    override fun setForwardButtonVisibility(isVisible: Boolean) {
-        normalPlayer.forwardButton.isVisible = isVisible
-        fullScreenPlayer.forwardButton.isVisible = isVisible
-    }
-
-    override fun setPlayButtonVisibility(isVisible: Boolean) {
-        normalPlayer.playButton.isVisible = isVisible
-        fullScreenPlayer.playButton.isVisible = isVisible
-    }
-
-    override fun setCaptionsVisibility(isVisible: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setCurrentTimeVisibility(isVisible: Boolean) {
-        normalPlayer.timePosition.isVisible = isVisible
-        fullScreenPlayer.timePosition.isVisible = isVisible
-    }
-
-    override fun setDurationVisibility(isVisible: Boolean) {
-        normalPlayer.timeDurationContainer.isVisible = isVisible
-        fullScreenPlayer.timeDurationContainer.isVisible = isVisible
-    }
-
-    override fun setFullscreenButtonVisibility(isVisible: Boolean) {
-        normalPlayer.fullScreenButton.isVisible = isVisible
-        fullScreenPlayer.fullScreenButton.isVisible = isVisible
-    }
-
-    override fun setMuteButtonVisibility(isVisible: Boolean) {
-        normalPlayer.volumeButton.isVisible = isVisible
-        fullScreenPlayer.volumeButton.isVisible = isVisible
-    }
-
-    override fun setCastButtonVisibility(isVisible: Boolean) {
-        normalPlayer.streamingButton.isVisible = isVisible
-        fullScreenPlayer.volumeButton.isVisible = isVisible
-    }
-
-    override fun setProgressVisibility(isVisible: Boolean) {
-        normalPlayer.progress.isVisible = isVisible
-        fullScreenPlayer.progress.isVisible = isVisible
-    }
-
-    override fun setSettingsVisibility(isVisible: Boolean) {
-        normalPlayer.settingsButton.isVisible = isVisible
-        fullScreenPlayer.settingsButton.isVisible = isVisible
-    }
+    override fun getCurrentPosition(): Long = currentPlayer?.currentPosition ?: 0L
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    @SuppressLint("SourceLockedOrientationActivity")
-    fun ExoPlayer.prepareFullScreenPlayer(
-        normalPlayerPlayerView: PlayerView,
-        playerManager: BunnyPlayer,
-        forceLandscape: Boolean = false,
-    ) {
-        (normalPlayerPlayerView.context as Activity).apply {
-            fullScreenPlayer = FullScreenBunnyVideoPlayer(
-                this,
-                playerManager = playerManager,
-                iconSet = iconSet,
-                colorTheme = colorTheme,
-                font = font,
-            )
-            val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            fullScreenPlayer.layoutParams = layoutParams
-            fullScreenPlayer.visibility = View.GONE
-            fullScreenPlayer.setBackgroundColor(Color.BLACK)
-            (normalPlayerPlayerView.rootView as ViewGroup).apply { addView(fullScreenPlayer, childCount) }
-            val fullScreenButton: ImageView = normalPlayerPlayerView.findViewById(R.id.bunny_fullscreen)
-            val normalScreenButton: ImageView = fullScreenPlayer.findViewById(R.id.bunny_fullscreen)
-            fullScreenButton.setOnClickListener {
-                if (forceLandscape)
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                normalPlayerPlayerView.visibility = View.GONE
-                fullScreenPlayer.visibility = View.VISIBLE
-                PlayerView.switchTargetView(
-                    this@prepareFullScreenPlayer,
-                    normalPlayerPlayerView,
-                    fullScreenPlayer.playerView,
-                )
-                fullscreenStateListener?.invoke(FullscreenMode.FULLSCREEN)
-            }
-            normalScreenButton.setOnClickListener {
-                if (forceLandscape || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                normalPlayerPlayerView.visibility = View.VISIBLE
-                fullScreenPlayer.visibility = View.GONE
-                PlayerView.switchTargetView(
-                    this@prepareFullScreenPlayer,
-                    fullScreenPlayer.playerView,
-                    normalPlayerPlayerView,
-                )
-                fullscreenStateListener?.invoke(FullscreenMode.NORMAL)
-            }
-            normalPlayerPlayerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-            normalPlayerPlayerView.player = this@prepareFullScreenPlayer
+    private fun switchCurrentPlayer(newPlayer: Player) {
+        Log.d(TAG, "switchCurrentPlayer $newPlayer")
+
+        if (this.currentPlayer === newPlayer) {
+            return
         }
+
+        if(newPlayer === castPlayer) {
+            playerStateListener?.onPlayerTypeChanged(newPlayer, PlayerType.CAST_PLAYER)
+        } else {
+            playerStateListener?.onPlayerTypeChanged(newPlayer, PlayerType.DEFAULT_PLAYER)
+        }
+
+        currentPlayer?.removeListener(playerListener)
+
+        var newPlaybackPositionMs = C.TIME_UNSET
+        var newPlayWhenReady = false
+        val previousPlayer: Player? = currentPlayer
+
+        if (previousPlayer != null) {
+            val playbackState = previousPlayer.playbackState
+
+            if (playbackState != Player.STATE_ENDED) {
+                newPlaybackPositionMs = previousPlayer.currentPosition
+                newPlayWhenReady = previousPlayer.playWhenReady
+            }
+
+            previousPlayer.removeListener(playerListener)
+            previousPlayer.stop()
+            previousPlayer.clearMediaItems()
+        }
+
+        currentPlayer = newPlayer
+        currentPlayer?.addListener(playerListener)
+
+        mediaItem?.let {
+            newPlayer.setMediaItem(it, newPlaybackPositionMs)
+        }
+
+        newPlayer.playWhenReady = newPlayWhenReady
+        newPlayer.prepare()
     }
-
 }
-
