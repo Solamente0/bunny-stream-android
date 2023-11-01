@@ -75,4 +75,10 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.1.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.1.1")
     implementation("androidx.media3:media3-cast:1.1.1")
+
+    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
