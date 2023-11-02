@@ -9,7 +9,6 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
@@ -52,6 +51,10 @@ class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
 
     private val httpDataSourceFactory: HttpDataSource.Factory =
         DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
+
+    private val drmConfig =
+        MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+            .build()
 
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -119,6 +122,7 @@ class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
         mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMimeType(mimeType)
+            .setDrmConfiguration(drmConfig)
             .build().also {
                 currentPlayer?.setMediaItem(it)
             }
