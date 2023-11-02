@@ -29,10 +29,14 @@ import net.bunnystream.player.ui.BunnyVideoPlayer
 @Composable
 fun PlayerRoute(
     appState: AppState,
+    libraryId: Long,
+    videoId: String,
     modifier: Modifier = Modifier,
 ) {
     PlayerScreen(
         modifier = modifier,
+        libraryId = libraryId,
+        videoId = videoId,
         onBackClicked = { appState.navController.popBackStack() },
     )
 }
@@ -41,6 +45,8 @@ fun PlayerRoute(
 @Composable
 private fun PlayerScreen(
     modifier: Modifier = Modifier,
+    libraryId: Long,
+    videoId: String,
     onBackClicked: () -> Unit,
 ) {
     Scaffold(
@@ -75,17 +81,18 @@ private fun PlayerScreen(
                 .padding(innerPadding),
         ) {
             BunnyPlayerComposable(
-                url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                libraryId = libraryId,
+                videoId = videoId,
                 modifier = Modifier.fillMaxSize()
             )
         }
     }
 }
 
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun BunnyPlayerComposable(
-    url: String,
+    libraryId: Long,
+    videoId: String,
     modifier: Modifier = Modifier
 ) {
     AndroidView(
@@ -93,8 +100,7 @@ fun BunnyPlayerComposable(
             BunnyVideoPlayer(context)
         },
         update = {
-            it.loadVideo(url)
-            it.play()
+            it.playVideo(libraryId, videoId)
         },
         modifier = modifier.background(Color.Gray)
     )
@@ -105,7 +111,8 @@ fun BunnyPlayerComposable(
 private fun PlayerScreenPreview() {
     BunnyStreamTheme {
         BunnyPlayerComposable(
-            url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            libraryId = 0,
+            videoId = "",
             modifier = Modifier.fillMaxSize()
         )
     }
