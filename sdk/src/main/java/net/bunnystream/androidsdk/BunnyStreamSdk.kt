@@ -18,6 +18,8 @@ class BunnyStreamSdk private constructor(
     companion object {
         private const val TUS_PREFS_FILE = "tusPrefs"
 
+        val baseApi = BuildConfig.BASE_API
+
         lateinit var cdnHostname: String
             private set
 

@@ -7,6 +7,7 @@ import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
@@ -15,8 +16,10 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.google.android.gms.cast.framework.CastState
+import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import org.openapitools.client.models.VideoModel
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
@@ -52,9 +55,7 @@ class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
     private val httpDataSourceFactory: HttpDataSource.Factory =
         DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
 
-    private val drmConfig =
-        MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-            .build()
+    private val drmConfig = MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
 
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -116,13 +117,16 @@ class DefaultBunnyPlayer private constructor(context: Context) : BunnyPlayer {
         currentPlayer = localPlayer
     }
 
-    override fun loadVideo(url: String, mimeType: String) {
-        Log.d(TAG, "loadVideo url=$url mimeType=$mimeType")
+    override fun playVideo(libraryId: Long, video: VideoModel) {
+        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video")
+
+        val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
+        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/$libraryId/${video.guid}?contentId=${video.guid}"
 
         mediaItem = MediaItem.Builder()
             .setUri(url)
-            .setMimeType(mimeType)
-            .setDrmConfiguration(drmConfig)
+            .setMimeType(MimeTypes.APPLICATION_M3U8)
+            .setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
             .build().also {
                 currentPlayer?.setMediaItem(it)
             }

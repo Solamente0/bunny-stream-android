@@ -3,6 +3,7 @@ package net.bunnystream.player.common
 import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import net.bunnystream.player.PlayerStateListener
+import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
 
@@ -52,7 +53,7 @@ interface BunnyPlayer {
     /* Returns the current playback position. */
     fun getCurrentPosition(): Long
 
-    fun loadVideo(url: String, mimeType: String)
+    fun playVideo(libraryId: Long, video: VideoModel)
 
     fun skipForward()
 

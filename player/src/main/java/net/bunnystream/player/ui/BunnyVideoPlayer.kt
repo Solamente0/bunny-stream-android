@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
-import androidx.media3.common.MimeTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -105,10 +104,11 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         pendingJob = {
             scope!!.launch {
                 try {
-                    val video = withContext(Dispatchers.IO) { BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId) }
+                    val video = withContext(Dispatchers.IO) {
+                        BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
+                    }
                     Log.d(TAG, "video=$video")
-                    val url = "${BunnyStreamSdk.cdnHostname}/$videoId/playlist.m3u8"
-                    bunnyPlayer.loadVideo(url, MimeTypes.APPLICATION_M3U8)
+                    bunnyPlayer.playVideo(libraryId, video)
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to fetch video: ${e.message}")
                     e.printStackTrace()
