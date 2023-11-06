@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -76,7 +76,7 @@ fun LibraryRoute(
     appState: AppState,
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
-    navigateToPlayer: () -> Unit,
+    navigateToPlayer: (Long, Video) -> Unit,
     localPrefs: LocalPrefs,
     viewModel: LibraryViewModel = viewModel(),
 ) {
@@ -163,7 +163,6 @@ fun LibraryRoute(
     LibraryScreen(
         modifier = modifier,
         navigateToSettings = navigateToSettings,
-        navigateToPlayer = navigateToPlayer,
         showAccessKeyNeeded = showAccessKeyNeeded,
         onLoadLibraryClicked = viewModel::loadLibrary,
         uiState = uiState,
@@ -184,6 +183,9 @@ fun LibraryRoute(
         useTusUpload = viewModel.useTusUpload,
         onDeleteVideoClicked = {
             deleteVideo = it
+        },
+        onVideoClicked = {
+            navigateToPlayer(viewModel.libraryId, it)
         }
     )
 }
@@ -193,7 +195,6 @@ fun LibraryRoute(
 private fun LibraryScreen(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
-    navigateToPlayer: () -> Unit,
     showAccessKeyNeeded: Boolean,
     onLoadLibraryClicked: (Long) -> Unit,
     libraryId: Long,
@@ -205,6 +206,7 @@ private fun LibraryScreen(
     onTusUploadOptionChanged: (Boolean) -> Unit,
     useTusUpload: Boolean,
     onDeleteVideoClicked: (Video) -> Unit,
+    onVideoClicked: (Video) -> Unit,
 ) {
 
     var libId by remember { mutableStateOf(libraryId.toString()) }
@@ -224,12 +226,6 @@ private fun LibraryScreen(
                         IconButton(onClick = navigateToSettings) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = navigateToPlayer) {
-                            Icon(
-                                imageVector = Icons.Filled.PlayArrow,
                                 contentDescription = null
                             )
                         }
@@ -296,7 +292,8 @@ private fun LibraryScreen(
                                         ){
                                             VideoItem(
                                                 video = it,
-                                                onDeleteVideoClicked = { onDeleteVideoClicked(it) }
+                                                onDeleteVideoClicked = { onDeleteVideoClicked(it) },
+                                                onVideoClicked = { onVideoClicked(it) }
                                             )
                                         }
                                     }
@@ -331,9 +328,14 @@ private fun LibraryScreen(
 private fun VideoItem(
     video: Video,
     onDeleteVideoClicked: () -> Unit,
+    onVideoClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier.padding(vertical = 10.dp)) {
+    Row(
+        modifier = modifier
+            .padding(vertical = 10.dp)
+            .clickable(onClick = onVideoClicked)
+    ) {
 
         AsyncImage(
             modifier = modifier
@@ -381,7 +383,8 @@ private fun VideoItemPreview(){
     BunnyStreamTheme {
         VideoItem(
             video = Video("1", "Video 1", "1m", VideoStatus.FINISHED),
-            onDeleteVideoClicked = {}
+            onDeleteVideoClicked = {},
+            onVideoClicked = {}
         )
     }
 }
@@ -543,7 +546,6 @@ private fun LibraryScreenPreview() {
     BunnyStreamTheme {
         LibraryScreen(
             navigateToSettings = {},
-            navigateToPlayer = {},
             showAccessKeyNeeded = false,
             onLoadLibraryClicked = {},
             uiState = LibraryUiState.LibraryUiEmpty,
@@ -554,7 +556,8 @@ private fun LibraryScreenPreview() {
             onCancelUploadClicked = {},
             onTusUploadOptionChanged = {},
             useTusUpload = true,
-            onDeleteVideoClicked = {}
+            onDeleteVideoClicked = {},
+            onVideoClicked = {}
         )
     }
 }

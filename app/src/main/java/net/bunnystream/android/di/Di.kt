@@ -10,20 +10,25 @@ import net.bunnystream.androidsdk.StreamSdk
 @SuppressLint("StaticFieldLeak")
 class Di(private val context: Context) {
 
-    private val prefs by lazy { context.getSharedPreferences("", Context.MODE_PRIVATE) }
+    private val prefs = context.getSharedPreferences("", Context.MODE_PRIVATE)
+    val localPrefs = LocalPrefs(prefs)
 
-    val localPrefs by lazy { LocalPrefs(prefs) }
+    init {
+        BunnyStreamSdk.initialize(context, localPrefs.accessKey, localPrefs.cdnHostname)
+    }
 
-    var streamSdk: StreamSdk = BunnyStreamSdk(context, localPrefs.accessKey)
+    var streamSdk: StreamSdk = BunnyStreamSdk.getInstance()
         private set
 
     var videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
 
     var tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
 
-    fun updateAccessKey(accessKey: String) {
+    fun updateKeys(accessKey: String, cdnHostname: String) {
         localPrefs.accessKey = accessKey
-        streamSdk = BunnyStreamSdk(context, localPrefs.accessKey)
+        localPrefs.cdnHostname = cdnHostname
+        BunnyStreamSdk.initialize(context, accessKey, cdnHostname)
+        streamSdk = BunnyStreamSdk.getInstance()
         videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
         tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
     }

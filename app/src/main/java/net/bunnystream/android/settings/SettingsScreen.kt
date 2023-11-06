@@ -36,9 +36,9 @@ fun SettingsRoute(
         modifier = modifier,
         onBackClicked = { appState.navController.popBackStack() },
         accessKey = viewModel.accessKey,
-        onAccessKeyUpdated = { viewModel.updateAccessKey(it) },
+        onAccessKeyUpdated = { viewModel.updateKeys(it, viewModel.cdnHostname) },
         cdnHostname = viewModel.cdnHostname,
-        onCdnHostnameUpdated = { viewModel.updateCdnHostname(it) }
+        onCdnHostnameUpdated = { viewModel.updateKeys(viewModel.accessKey, it) }
     )
 }
 

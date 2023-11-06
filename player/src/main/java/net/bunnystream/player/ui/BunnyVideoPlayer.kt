@@ -4,16 +4,21 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.util.UnstableApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.PlayerIconSet
 import net.bunnystream.player.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.player.ui.widget.BunnyPlayerView
 
-@UnstableApi
 class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -23,6 +28,11 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     companion object {
         private const val TAG = "BunnyVideoPlayer"
     }
+
+    private var job: Job? = null
+    private var scope: CoroutineScope? = null
+    private var loadVideoJob: Job? = null
+    private var pendingJob: (() -> Job)? = null
 
     private val binding = ViewBunnyVideoPlayerBinding.inflate(LayoutInflater.from(context), this)
 
@@ -40,7 +50,6 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     init {
         playerView.iconSet = iconSet
-        playerView.bunnyPlayer = bunnyPlayer
         playerView.fullscreenListener = object : BunnyPlayerView.FullscreenListener {
             override fun onFullscreenToggleClicked() {
                 playerView.bunnyPlayer = null
@@ -50,6 +59,25 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                 }
             }
         }
+
+        addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+                Log.d(TAG, "onViewAttachedToWindow")
+                job = SupervisorJob()
+                scope = CoroutineScope(Dispatchers.Main + job!!)
+
+                pendingJob?.let {
+                    Log.d(TAG, "there is pending job, executing...")
+                    pendingJob?.invoke()
+                    pendingJob = null
+                }
+            }
+
+            override fun onViewDetachedFromWindow(view: View) {
+                Log.d(TAG, "onViewDetachedFromWindow")
+                job?.cancel()
+            }
+        })
     }
 
     override fun onAttachedToWindow() {
@@ -62,11 +90,38 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         bunnyPlayer.release()
     }
 
-    fun loadVideo(url: String) {
-        bunnyPlayer.loadVideo(url, MimeTypes.VIDEO_MP4)
-    }
+    fun playVideo(libraryId: Long, videoId: String) {
+        Log.d(TAG, "playVideo libraryId=$libraryId videoId=$videoId")
 
-    fun play() {
-        bunnyPlayer.play()
+        if(!BunnyStreamSdk.isInitialized()) {
+            Log.e(TAG, "Unable to play video, initialize the player first using BunnyStreamSdk.initialize")
+            return
+        }
+
+        loadVideoJob?.cancel()
+
+        pendingJob = {
+            scope!!.launch {
+                try {
+                    val video = withContext(Dispatchers.IO) {
+                        BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
+                    }
+                    Log.d(TAG, "video=$video")
+                    bunnyPlayer.playVideo(binding.playerView, libraryId, video)
+                    playerView.bunnyPlayer = bunnyPlayer
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unable to fetch video: ${e.message}")
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        if(scope == null) {
+            Log.d(TAG, "scope not created yet")
+            return
+        }
+
+        loadVideoJob = pendingJob?.invoke()
+        pendingJob = null
     }
 }
