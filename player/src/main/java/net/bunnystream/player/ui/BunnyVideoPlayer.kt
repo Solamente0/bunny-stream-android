@@ -50,7 +50,6 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     init {
         playerView.iconSet = iconSet
-        playerView.bunnyPlayer = bunnyPlayer
         playerView.fullscreenListener = object : BunnyPlayerView.FullscreenListener {
             override fun onFullscreenToggleClicked() {
                 playerView.bunnyPlayer = null
@@ -108,7 +107,8 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                         BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
                     }
                     Log.d(TAG, "video=$video")
-                    bunnyPlayer.playVideo(libraryId, video)
+                    bunnyPlayer.playVideo(binding.playerView, libraryId, video)
+                    playerView.bunnyPlayer = bunnyPlayer
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to fetch video: ${e.message}")
                     e.printStackTrace()
