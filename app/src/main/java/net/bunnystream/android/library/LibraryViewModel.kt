@@ -21,6 +21,7 @@ import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
 import net.bunnystream.android.library.model.VideoStatus
 import net.bunnystream.android.library.model.VideoUploadUiState
+import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.androidsdk.upload.model.UploadError
 import net.bunnystream.androidsdk.upload.service.UploadListener
 import org.openapitools.client.models.VideoModel
@@ -91,7 +92,7 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "<init> $this")
         App.di.videoUploadService.uploadListener = uploadListener
 
-        if(libraryId != -1L && App.di.streamSdk.isInitialized) {
+        if(libraryId != -1L && BunnyStreamSdk.isInitialized()) {
             loadLibrary(libraryId)
         }
     }
@@ -213,7 +214,7 @@ class LibraryViewModel : ViewModel() {
 
     private fun getVideoThumbnail(videoId: String?, thumbnailFileName: String?): String? {
         videoId ?: return null
-        return "${prefs.cdnHostname}/$videoId/$thumbnailFileName"
+        return "${BunnyStreamSdk.cdnHostname}/$videoId/$thumbnailFileName"
     }
 
     override fun onCleared() {

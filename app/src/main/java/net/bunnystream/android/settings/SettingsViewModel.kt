@@ -16,13 +16,9 @@ class SettingsViewModel : ViewModel() {
     var cdnHostname by mutableStateOf(prefs.cdnHostname)
         private set
 
-    fun updateAccessKey(key: String){
-        accessKey = key
-        App.di.updateAccessKey(accessKey)
-    }
-
-    fun updateCdnHostname(hostname: String){
-        cdnHostname = hostname
-        prefs.cdnHostname = hostname
+    fun updateKeys(accessKey: String, cdnHostname: String){
+        this.accessKey = accessKey
+        this.cdnHostname = cdnHostname
+        App.di.updateKeys(accessKey, cdnHostname)
     }
 }

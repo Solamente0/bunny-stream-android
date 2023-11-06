@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ToggleableImageButton">
+        <attr name="tibDefaultIcon" format="integer|reference"/>
+        <attr name="tibToggledIcon" format="integer|reference"/>
+    </declare-styleable>
+</resources>

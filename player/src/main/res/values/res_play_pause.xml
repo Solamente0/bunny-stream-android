@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="exo_controls_play" type="drawable">@drawable/ic_play</item>
-    <item name="exo_controls_pause" type="drawable">@drawable/ic_pause</item>
-</resources>

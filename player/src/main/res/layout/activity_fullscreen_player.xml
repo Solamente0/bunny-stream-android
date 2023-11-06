@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:parentTag="android.widget.FrameLayout">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <net.bunnystream.player.ui.widget.BunnyPlayerView
         android:id="@+id/player_view"
@@ -14,4 +12,4 @@
         app:controller_layout_id="@layout/view_media_controller"
         android:background="@android:color/black"/>
 
-</merge>
+</FrameLayout>
