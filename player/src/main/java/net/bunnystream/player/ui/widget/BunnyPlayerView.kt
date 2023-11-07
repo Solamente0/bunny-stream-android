@@ -2,17 +2,25 @@ package net.bunnystream.player.ui.widget
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
+import android.view.Menu
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_NONE
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import androidx.mediarouter.app.MediaRouteButton
 import com.github.rubensousa.previewseekbar.PreviewBar
 import com.github.rubensousa.previewseekbar.animator.PreviewFadeAnimator
@@ -107,7 +115,7 @@ class BunnyPlayerView @JvmOverloads constructor(
     }
 
     private val settingsButton by lazy {
-        findViewById<ImageButton>(R.id.exo_settings)
+        findViewById<ImageButton>(R.id.bunny_settings)
     }
 
     private val muteButton by lazy {
@@ -134,6 +142,14 @@ class BunnyPlayerView @JvmOverloads constructor(
         findViewById<ImageView>(R.id.imageView)
     }
 
+    private val subtitles by lazy {
+        findViewById<SubtitleView>(R.id.exo_subtitles)
+    }
+
+    private val subtitle by lazy {
+        findViewById<ToggleableImageButton>(R.id.bunny_subtitle)
+    }
+
     private fun setPlayerControls(){
         playPauseButton.setOnClickListener {
             if (bunnyPlayer?.isPlaying() == true) {
@@ -151,6 +167,88 @@ class BunnyPlayerView @JvmOverloads constructor(
             }
         }
 
+        subtitle.setOnClickListener { view ->
+            bunnyPlayer?.let {
+                it.setSubtitlesEnabled(!it.areSubtitlesEnabled())
+            }
+            subtitle.state = if(bunnyPlayer?.areSubtitlesEnabled() == true) {
+                ToggleableImageButton.State.STATE_TOGGLED
+            } else {
+                ToggleableImageButton.State.STATE_DEFAULT
+            }
+        }
+
+        settingsButton.setOnClickListener {
+            val popupMenu = PopupMenu(context, it)
+            popupMenu.inflate(R.menu.video_settings)
+
+            val subtitlesConfig = bunnyPlayer?.getSubtitles()
+
+            val subtitleMenuId = View.generateViewId()
+            val subtitleMenuIds = mutableMapOf<Int, SubtitleInfo>()
+
+            val speed = bunnyPlayer?.getSpeed()
+
+            if(subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
+                val subtitlesMenu = popupMenu.menu.addSubMenu(
+                    Menu.NONE,
+                    subtitleMenuId,
+                    Menu.NONE,
+                    context.getString(R.string.label_video_settings_captions)
+                )
+
+                subtitlesConfig.subtitles.forEach { info ->
+                    val id = View.generateViewId()
+                    subtitleMenuIds[id] = info
+                    val item = subtitlesMenu.add(
+                        Menu.NONE,
+                        id,
+                        Menu.NONE,
+                        "${info.title} (${info.language})"
+                    )
+                    item.isCheckable = true
+                    item.isChecked = subtitlesConfig.selectedSubtitle == info
+                }
+            }
+
+            val speedMenuItemId = when (speed) {
+                0.5F -> R.id.video_speed_0_5
+                0.75F -> R.id.video_speed_0_75
+                1F -> R.id.video_speed_normal
+                1.25F -> R.id.video_speed_1_25
+                1.5F -> R.id.video_speed_1_5
+                2F -> R.id.video_speed_2
+                4F -> R.id.video_speed_4
+                else -> R.id.video_speed_normal
+            }
+
+            popupMenu.menu.findItem(speedMenuItemId)?.isChecked = true
+
+            popupMenu.setOnMenuItemClickListener { item ->
+                val subtitleOption = subtitleMenuIds[item.itemId]
+
+                if(subtitleOption != null) {
+                    bunnyPlayer?.selectSubtitle(subtitleOption)
+                    subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
+                    return@setOnMenuItemClickListener true
+                }
+
+                when(item.itemId) {
+                    R.id.video_speed_0_5 -> bunnyPlayer?.setSpeed(0.5F)
+                    R.id.video_speed_0_75 -> bunnyPlayer?.setSpeed(0.75F)
+                    R.id.video_speed_normal -> bunnyPlayer?.setSpeed(1F)
+                    R.id.video_speed_1_25 -> bunnyPlayer?.setSpeed(1.25F)
+                    R.id.video_speed_1_5 -> bunnyPlayer?.setSpeed(1.5F)
+                    R.id.video_speed_2 -> bunnyPlayer?.setSpeed(2F)
+                    R.id.video_speed_4 -> bunnyPlayer?.setSpeed(4F)
+                }
+
+                true
+            }
+
+            popupMenu.show()
+        }
+
         replyButton.setOnClickListener {
             bunnyPlayer?.replay()
         }
@@ -162,6 +260,8 @@ class BunnyPlayerView @JvmOverloads constructor(
         fullScreenButton.setOnClickListener {
             fullscreenListener?.onFullscreenToggleClicked()
         }
+
+        subtitle.isVisible = bunnyPlayer?.getSubtitles()?.subtitles?.isNotEmpty() == true
 
         CastButtonFactory.setUpMediaRouteButton(context, castButton)
     }
@@ -255,5 +355,11 @@ class BunnyPlayerView @JvmOverloads constructor(
         // 0 - fully transparent
         timeBar.setUnplayedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 80))
         timeBar.setBufferedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 150))
+
+        val style = CaptionStyleCompat(
+            Color.RED, Color.WHITE, Color.GREEN, EDGE_TYPE_NONE, Color.CYAN, null
+        )
+
+        // subtitles.setStyle(style)
     }
 }

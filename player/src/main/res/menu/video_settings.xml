@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/video_settings_quality"
+        android:title="@string/label_video_settings_quality"/>
+
+    <item android:id="@+id/video_settings_speed"
+        android:title="@string/label_video_settings_speed">
+        <menu>
+            <item android:id="@+id/video_speed_0_5"
+                android:title="@string/label_video_speed_0_5"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_0_75"
+                android:title="@string/label_video_speed_0_75"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_normal"
+                android:title="@string/label_video_speed_normal"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_1_25"
+                android:title="@string/label_video_speed_1_25"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_1_5"
+                android:title="@string/label_video_speed_1_5"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_2"
+                android:title="@string/label_video_speed_2"
+                android:checkable="true"/>
+
+            <item android:id="@+id/video_speed_4"
+                android:title="@string/label_video_speed_4"
+                android:checkable="true"/>
+        </menu>
+    </item>
+
+</menu>

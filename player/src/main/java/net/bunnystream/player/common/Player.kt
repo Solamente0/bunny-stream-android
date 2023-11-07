@@ -4,7 +4,6 @@ import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
-import net.bunnystream.player.model.SeekThumbnail
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
@@ -62,6 +61,18 @@ interface BunnyPlayer {
     fun skipForward()
 
     fun replay()
+
+    fun setSpeed(speed: Float)
+
+    fun getSpeed(): Float
+
+    fun getSubtitles(): Subtitles
+
+    fun selectSubtitle(subtitleInfo: SubtitleInfo)
+
+    fun setSubtitlesEnabled(enabled: Boolean)
+
+    fun areSubtitlesEnabled(): Boolean
 
     fun seekThumbnailPreview(video: VideoModel)
 }
