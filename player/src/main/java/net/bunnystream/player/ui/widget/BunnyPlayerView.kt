@@ -5,11 +5,13 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
+import android.widget.FrameLayout
 import android.view.Menu
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
@@ -24,7 +26,6 @@ import androidx.media3.ui.SubtitleView
 import androidx.mediarouter.app.MediaRouteButton
 import com.github.rubensousa.previewseekbar.PreviewBar
 import com.github.rubensousa.previewseekbar.animator.PreviewFadeAnimator
-import com.github.rubensousa.previewseekbar.media3.PreviewTimeBar
 import com.google.android.gms.cast.framework.CastButtonFactory
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
@@ -41,6 +42,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "BunnyPlayerView"
+        private const val MOMENT_OFFSET_MILLISECOND = 1000
     }
 
     interface FullscreenListener {
@@ -92,6 +94,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             player = bunnyPlayer?.currentPlayer
             setPlayerControls()
             timeBarPreview()
+            moments()
         }
 
     var iconSet: PlayerIconSet = PlayerIconSet()
@@ -101,6 +104,8 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
     private var currentFramePositionGlobal = 0L
+
+    private var previewLoader: PreviewLoader? = null
 
     private val playPauseButton by lazy {
         findViewById<ToggleableImageButton>(R.id.bunny_play_pause)
@@ -134,12 +139,20 @@ class BunnyPlayerView @JvmOverloads constructor(
         findViewById<TextView>(R.id.exo_position)
     }
 
-    val timeBar by lazy {
-        findViewById<PreviewTimeBar>(R.id.exo_progress)
+    private val timeBar by lazy {
+        findViewById<BunnyTimeBar>(R.id.exo_progress)
     }
 
-    val previewImageView by lazy {
+    private val previewImageView by lazy {
         findViewById<ImageView>(R.id.imageView)
+    }
+
+    private val momentFrameLayout by lazy {
+        findViewById<FrameLayout>(R.id.momentFrameLayout)
+    }
+
+    private val momentDescription by lazy {
+        findViewById<TextView>(R.id.momentDescription)
     }
 
     private val subtitles by lazy {
@@ -264,6 +277,14 @@ class BunnyPlayerView @JvmOverloads constructor(
         subtitle.isVisible = bunnyPlayer?.getSubtitles()?.subtitles?.isNotEmpty() == true
 
         CastButtonFactory.setUpMediaRouteButton(context, castButton)
+
+        timeBar.setPreviewLoader { currentPosition: Long, max: Long ->
+            if (currentFramePositionGlobal != currentPosition) {
+                currentFramePositionGlobal = currentPosition
+                previewLoader?.loadPreview(currentPosition)
+            }
+            checkAndShowMoment(currentPosition)
+        }
     }
 
     private fun timeBarPreview() {
@@ -281,17 +302,44 @@ class BunnyPlayerView @JvmOverloads constructor(
             }
 
             override fun onScrubStop(previewBar: PreviewBar) {
+                momentFrameLayout.visibility = INVISIBLE
                 player?.playWhenReady = true
             }
 
             override fun onScrubMove(previewBar: PreviewBar, progress: Int, fromUser: Boolean) = Unit
         })
+        previewLoader = PreviewLoader(context, previewImageView, seekThumbnail)
+    }
 
-        val previewLoader = PreviewLoader(context, previewImageView, seekThumbnail)
-        timeBar.setPreviewLoader { currentPosition: Long, max: Long ->
-            if (currentFramePositionGlobal != currentPosition) {
-                currentFramePositionGlobal = currentPosition
-                previewLoader.loadPreview(currentPosition)
+    private fun moments() {
+        val moment = bunnyPlayer?.moments ?: return
+        Log.d(TAG, "moments momentContainer=$moment")
+
+        timeBar.setMoments(
+            moment.momentsList,
+            moment.totalDuration,
+        )
+    }
+
+    private fun checkAndShowMoment(currentPosition: Long) {
+        val moments = bunnyPlayer?.moments?.momentsList ?: return
+        for (point in moments) {
+            val someValue = currentPosition - point.timestamp
+            if (someValue in -MOMENT_OFFSET_MILLISECOND..MOMENT_OFFSET_MILLISECOND) {
+                val xPosition: Int = timeBar.getXPositionForTime(point.timestamp)
+                if (xPosition >= 0) {
+                    val location = IntArray(2)
+                    timeBar.getLocationOnScreen(location)
+                    val params = momentFrameLayout.layoutParams as ConstraintLayout.LayoutParams
+                    params.leftMargin = location[0] + xPosition - momentFrameLayout.width / 2
+                    momentFrameLayout.setLayoutParams(params)
+
+                    momentDescription.text = point.label
+                    momentFrameLayout.visibility = VISIBLE
+                    return
+                }
+            } else {
+                momentFrameLayout.visibility = INVISIBLE
             }
         }
     }
@@ -351,6 +399,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         timeBar.setPlayedColor(iconSet.tintColor)
         timeBar.setScrubberColor(iconSet.tintColor)
         timeBar.setAdMarkerColor(iconSet.tintColor)
+        timeBar.pointColor.color = ColorUtils.setAlphaComponent(iconSet.tintColor, 90)
 
         // 0 - fully transparent
         timeBar.setUnplayedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 80))
@@ -361,5 +410,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         )
 
         // subtitles.setStyle(style)
+
+        momentDescription.setTextColor(iconSet.tintColor)
     }
 }

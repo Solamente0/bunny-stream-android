@@ -109,6 +109,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     Log.d(TAG, "video=$video")
                     bunnyPlayer.playVideo(binding.playerView, libraryId, video)
                     bunnyPlayer.seekThumbnailPreview(video)
+                    bunnyPlayer.moments(video)
                     playerView.bunnyPlayer = bunnyPlayer
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to fetch video: ${e.message}")
