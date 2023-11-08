@@ -4,6 +4,9 @@ import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
+import net.bunnystream.player.model.SeekThumbnail
+import net.bunnystream.player.ui.widget.SubtitleInfo
+import net.bunnystream.player.ui.widget.Subtitles
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
