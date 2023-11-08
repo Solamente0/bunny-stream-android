@@ -5,15 +5,18 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
-import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.mediarouter.app.MediaRouteButton
+import com.github.rubensousa.previewseekbar.PreviewBar
+import com.github.rubensousa.previewseekbar.animator.PreviewFadeAnimator
+import com.github.rubensousa.previewseekbar.media3.PreviewTimeBar
 import com.google.android.gms.cast.framework.CastButtonFactory
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
@@ -80,6 +83,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             field?.playerStateListener = playStateListener
             player = bunnyPlayer?.currentPlayer
             setPlayerControls()
+            timeBarPreview()
         }
 
     var iconSet: PlayerIconSet = PlayerIconSet()
@@ -87,6 +91,8 @@ class BunnyPlayerView @JvmOverloads constructor(
             field = value
             applyStyle()
         }
+
+    private var currentFramePositionGlobal = 0L
 
     private val playPauseButton by lazy {
         findViewById<ToggleableImageButton>(R.id.bunny_play_pause)
@@ -120,8 +126,12 @@ class BunnyPlayerView @JvmOverloads constructor(
         findViewById<TextView>(R.id.exo_position)
     }
 
-    private val timeBar by lazy {
-        findViewById<DefaultTimeBar>(R.id.exo_progress)
+    val timeBar by lazy {
+        findViewById<PreviewTimeBar>(R.id.exo_progress)
+    }
+
+    val previewImageView by lazy {
+        findViewById<ImageView>(R.id.imageView)
     }
 
     private fun setPlayerControls(){
@@ -154,6 +164,36 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
         CastButtonFactory.setUpMediaRouteButton(context, castButton)
+    }
+
+    private fun timeBarPreview() {
+        val seekThumbnail = bunnyPlayer?.seekThumbnail ?: return
+        Log.d(TAG, "timeBarPreview seekThumbnail=$seekThumbnail")
+
+        timeBar.isPreviewEnabled = true
+        timeBar.setAutoHidePreview(true)
+        timeBar.setPreviewAnimationEnabled(true)
+        timeBar.setPreviewAnimator(PreviewFadeAnimator())
+
+        timeBar.addOnScrubListener(object : PreviewBar.OnScrubListener {
+            override fun onScrubStart(previewBar: PreviewBar) {
+                player?.playWhenReady = false
+            }
+
+            override fun onScrubStop(previewBar: PreviewBar) {
+                player?.playWhenReady = true
+            }
+
+            override fun onScrubMove(previewBar: PreviewBar, progress: Int, fromUser: Boolean) = Unit
+        })
+
+        val previewLoader = PreviewLoader(context, previewImageView, seekThumbnail)
+        timeBar.setPreviewLoader { currentPosition: Long, max: Long ->
+            if (currentFramePositionGlobal != currentPosition) {
+                currentFramePositionGlobal = currentPosition
+                previewLoader.loadPreview(currentPosition)
+            }
+        }
     }
 
     private fun updatePlayer(player: Player, playerType: PlayerType){

@@ -4,6 +4,7 @@ import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
+import net.bunnystream.player.model.SeekThumbnail
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
@@ -11,6 +12,8 @@ interface BunnyPlayer {
     var playerStateListener: PlayerStateListener?
 
     var currentPlayer: Player?
+
+    var seekThumbnail: SeekThumbnail?
 
     /* Releases the resources held by the player, such as codecs. */
     fun release()
@@ -59,4 +62,6 @@ interface BunnyPlayer {
     fun skipForward()
 
     fun replay()
+
+    fun seekThumbnailPreview(video: VideoModel)
 }

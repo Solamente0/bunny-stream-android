@@ -23,7 +23,10 @@ import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import net.bunnystream.player.model.SeekThumbnail
 import org.openapitools.client.models.VideoModel
+import kotlin.math.ceil
+import kotlin.math.round
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -34,6 +37,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         private const val TEST_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
 
         private const val SEEK_SKIP_MILLIS = 10 * 1000
+
+        private const val THUMBNAILS_PER_IMAGE = 36
 
         @Volatile
         private var instance: BunnyPlayer? = null
@@ -87,6 +92,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             playerStateListener?.onLoadingChanged(isLoading)
         }
     }
+
+    override var seekThumbnail: SeekThumbnail? = null
 
     init {
         castPlayer = CastPlayer(castContext).also {
@@ -169,6 +176,23 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
             it.seekTo(target)
         }
+    }
+
+    override fun seekThumbnailPreview(video: VideoModel) {
+        val thumbnailPreviewsList: MutableList<String> = mutableListOf()
+        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
+        var i = 0
+        do {
+            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
+            i++
+        } while (i < numberOfPreviews)
+
+        seekThumbnail = SeekThumbnail(
+            thumbnailPreviewsList,
+            ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
+            video.thumbnailCount,
+            THUMBNAILS_PER_IMAGE,
+        )
     }
 
     override fun release() {
