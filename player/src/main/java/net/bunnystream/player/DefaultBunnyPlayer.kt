@@ -23,6 +23,8 @@ import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import net.bunnystream.player.ui.widget.SubtitleInfo
+import net.bunnystream.player.ui.widget.Subtitles
 import net.bunnystream.player.model.SeekThumbnail
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
@@ -54,6 +56,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var castPlayer: Player? = null
     override var currentPlayer: Player? = null
 
+    private var currentVideo: VideoModel? = null
+    private var selectedSubtitle: SubtitleInfo? = null
+
     override var playerStateListener: PlayerStateListener? = null
         set(value) {
             field = value
@@ -62,6 +67,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
 
     private var mediaItem: MediaItem? = null
+    private var mediaItemBuilder: MediaItem.Builder? = null
 
     private val httpDataSourceFactory: HttpDataSource.Factory =
         DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
@@ -125,6 +131,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel) {
         Log.d(TAG, "loadVideo libraryId=$libraryId video=$video")
 
+        currentVideo = video
+
         val imaLoader = ImaAdsLoader.Builder(context).build()
 
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
@@ -144,17 +152,17 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
         val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/$libraryId/${video.guid}?contentId=${video.guid}"
 
-        mediaItem = MediaItem.Builder()
+        mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
             // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
             .setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
-            // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-            .setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
-            .build().also {
-                currentPlayer?.setMediaItem(it)
-            }
+        // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
+        //.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+
+        mediaItem = mediaItemBuilder!!.build()
+        currentPlayer?.setMediaItem(mediaItem!!)
 
         currentPlayer?.playWhenReady = true
         currentPlayer?.prepare()
@@ -176,6 +184,66 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
             it.seekTo(target)
         }
+    }
+
+    override fun setSpeed(speed: Float) {
+        currentPlayer?.setPlaybackSpeed(speed)
+    }
+
+    override fun getSpeed(): Float {
+        return currentPlayer?.playbackParameters?.speed ?: 1F
+    }
+
+    override fun getSubtitles(): Subtitles {
+        return Subtitles(
+            currentVideo?.captions?.map {
+                SubtitleInfo(it.label!!, it.srclang!!)
+            } ?: listOf(),
+            selectedSubtitle
+        )
+    }
+
+    override fun selectSubtitle(subtitleInfo: SubtitleInfo) {
+        Log.d(TAG, "selectSubtitle: $subtitleInfo")
+        selectedSubtitle = subtitleInfo
+
+        val currentProgress = currentPlayer?.currentPosition ?: 0
+
+        val subUri = Uri.parse("${BunnyStreamSdk.cdnHostname}/${currentVideo?.guid}/captions/${subtitleInfo.language}.vtt?ver=1")
+
+        val subtitle = MediaItem.SubtitleConfiguration.Builder(subUri)
+            .setMimeType(MimeTypes.TEXT_VTT)
+            .setLanguage(subtitleInfo.language)
+            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+            .build()
+
+        mediaItemBuilder = mediaItemBuilder!!.setSubtitleConfigurations(listOf(subtitle))
+        mediaItem = mediaItemBuilder!!.build()
+
+        currentPlayer?.setMediaItem(mediaItem!!, currentProgress)
+        currentPlayer?.prepare()
+    }
+
+    override fun setSubtitlesEnabled(enabled: Boolean) {
+        if(enabled) {
+            val caption = currentVideo?.captions?.firstOrNull()
+            if (caption != null) {
+                selectedSubtitle = SubtitleInfo(caption.label!!, caption.srclang!!)
+                selectSubtitle(selectedSubtitle!!)
+            }
+        } else {
+            selectedSubtitle = null
+            val currentProgress = currentPlayer?.currentPosition ?: 0
+            mediaItemBuilder = mediaItemBuilder!!.setSubtitleConfigurations(listOf())
+            mediaItem = mediaItemBuilder!!.build()
+
+            currentPlayer?.setMediaItem(mediaItem!!, currentProgress)
+            currentPlayer?.prepare()
+        }
+    }
+
+    override fun areSubtitlesEnabled(): Boolean {
+        return selectedSubtitle != null
     }
 
     override fun seekThumbnailPreview(video: VideoModel) {

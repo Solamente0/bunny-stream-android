@@ -8,4 +8,14 @@
     <string name="bunny_streaming_description">Stream video to another device</string>
     <string name="bunny_fullscreen_description">Fullscreen mode video</string>
     <string name="bunny_divider" translatable="false">/</string>
+    <string name="label_video_settings_captions">Captions</string>
+    <string name="label_video_settings_speed">Speed</string>
+    <string name="label_video_settings_quality">Quality</string>
+    <string name="label_video_speed_0_5">0.5x</string>
+    <string name="label_video_speed_0_75">0.75x</string>
+    <string name="label_video_speed_normal">Normal</string>
+    <string name="label_video_speed_1_25">1.25x</string>
+    <string name="label_video_speed_1_5">1.5x</string>
+    <string name="label_video_speed_2">2x</string>
+    <string name="label_video_speed_4">4x</string>
 </resources>
