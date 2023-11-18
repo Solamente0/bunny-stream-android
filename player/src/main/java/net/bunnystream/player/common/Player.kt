@@ -4,10 +4,9 @@ import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
-import net.bunnystream.player.model.MomentsContainer
 import net.bunnystream.player.model.SeekThumbnail
-import net.bunnystream.player.ui.widget.SubtitleInfo
-import net.bunnystream.player.ui.widget.Subtitles
+import net.bunnystream.player.model.SubtitleInfo
+import net.bunnystream.player.model.Subtitles
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
@@ -17,8 +16,6 @@ interface BunnyPlayer {
     var currentPlayer: Player?
 
     var seekThumbnail: SeekThumbnail?
-
-    var moments: MomentsContainer?
 
     /* Releases the resources held by the player, such as codecs. */
     fun release()
@@ -79,8 +76,4 @@ interface BunnyPlayer {
     fun setSubtitlesEnabled(enabled: Boolean)
 
     fun areSubtitlesEnabled(): Boolean
-
-    fun seekThumbnailPreview(video: VideoModel)
-
-    fun moments(video: VideoModel)
 }

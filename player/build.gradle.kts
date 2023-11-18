@@ -56,10 +56,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-
-    implementation("com.github.rubensousa:previewseekbar:3.1.1")
-    implementation("com.github.rubensousa:previewseekbar-media3:1.1.1.0")
     
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
 }

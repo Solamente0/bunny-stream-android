@@ -87,6 +87,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        Log.d(TAG, "onDetachedFromWindow")
         bunnyPlayer.release()
     }
 
@@ -107,9 +108,9 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                         BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
                     }
                     Log.d(TAG, "video=$video")
+
                     bunnyPlayer.playVideo(binding.playerView, libraryId, video)
-                    bunnyPlayer.seekThumbnailPreview(video)
-                    bunnyPlayer.moments(video)
+
                     playerView.bunnyPlayer = bunnyPlayer
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to fetch video: ${e.message}")

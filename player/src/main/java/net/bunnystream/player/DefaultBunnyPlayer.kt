@@ -23,11 +23,11 @@ import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
-import net.bunnystream.player.model.MomentsContainer
 import net.bunnystream.player.model.SeekThumbnail
-import net.bunnystream.player.ui.widget.SubtitleInfo
-import net.bunnystream.player.ui.widget.Subtitles
+import net.bunnystream.player.model.SubtitleInfo
+import net.bunnystream.player.model.Subtitles
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
@@ -61,11 +61,25 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
 
+    private var chapters = listOf<Chapter>()
+        set(value) {
+            field = value
+            playerStateListener?.onChaptersUpdated(chapters)
+        }
+
+    private var moments = listOf<Moment>()
+        set(value) {
+            field = value
+            playerStateListener?.onMomentsUpdated(moments)
+        }
+
     override var playerStateListener: PlayerStateListener? = null
         set(value) {
             field = value
             playerStateListener?.onPlayingChanged(isPlaying())
             playerStateListener?.onMutedChanged(isMuted())
+            playerStateListener?.onChaptersUpdated(chapters)
+            playerStateListener?.onMomentsUpdated(moments)
         }
 
     private var mediaItem: MediaItem? = null
@@ -102,7 +116,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override var seekThumbnail: SeekThumbnail? = null
-    override var moments: MomentsContainer? = null
 
     init {
         castPlayer = CastPlayer(castContext).also {
@@ -169,6 +182,16 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         currentPlayer?.playWhenReady = true
         currentPlayer?.prepare()
+
+        initSeekThumbnailPreview(video)
+
+        moments = video.moments?.map {
+            Moment(it.label, it.timestamp * 1000L)
+        } ?: listOf()
+
+        chapters = video.chapters?.map {
+            Chapter(it.start * 1000L, it.end*1000L, it.title)
+        } ?: listOf()
     }
 
     override fun skipForward() {
@@ -189,7 +212,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun seekThumbnailPreview(video: VideoModel) {
+    private fun initSeekThumbnailPreview(video: VideoModel) {
         val thumbnailPreviewsList: MutableList<String> = mutableListOf()
         val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
         var i = 0
@@ -199,22 +222,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         } while (i < numberOfPreviews)
 
         seekThumbnail = SeekThumbnail(
-            thumbnailPreviewsList,
-            ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
-            video.thumbnailCount,
-            THUMBNAILS_PER_IMAGE,
-        )
-    }
-
-    override fun moments(video: VideoModel) {
-        moments = MomentsContainer(
-            totalDuration = video.length * 1000L,
-            video.moments?.map {
-                Moment(
-                    it.label,
-                    it.timestamp * 1000L
-                )
-            } ?: listOf()
+            seekThumbnailUrls = thumbnailPreviewsList,
+            frameDurationPerThumbnail = ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
+            totalThumbnailCount = video.thumbnailCount,
+            thumbnailsPerImage = THUMBNAILS_PER_IMAGE,
         )
     }
 
