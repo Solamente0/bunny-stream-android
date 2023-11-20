@@ -23,16 +23,20 @@ class BunnyStreamSdk private constructor(
         lateinit var cdnHostname: String
             private set
 
+        var libraryId: Long = -1
+            private set
+
         @Volatile
         private var instance: StreamSdk? = null
 
-        fun initialize(context: Context, accessKey: String, cdnHostname: String) {
+        fun initialize(context: Context, accessKey: String, cdnHostname: String, libraryId: Long) {
             instance = BunnyStreamSdk(
                 context.applicationContext,
                 accessKey,
             )
 
             this.cdnHostname = cdnHostname
+            this.libraryId = libraryId
             ApiClient.apiKey["AccessKey"] = accessKey
         }
 

@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
@@ -26,13 +24,11 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,14 +50,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.bunnystream.android.R
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
@@ -250,73 +246,56 @@ private fun LibraryScreen(
                     .fillMaxWidth()
                     .padding(16.dp)) {
 
-                    Row(modifier = modifier) {
-                        OutlinedTextField(
-                            modifier = modifier.weight(1F),
-                            value = libId,
-                            onValueChange = { if(it.isDigitsOnly()) { libId = it } },
-                            label = { Text(stringResource(id = R.string.hint_library_id)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
-                        Button(
-                            onClick = { onLoadLibraryClicked(libId.toLong()) },
-                            modifier = modifier
-                                .align(CenterVertically)
-                                .padding(start = 10.dp)
-                        ) {
-                            Text(text = stringResource(id = R.string.button_load))
-                        }
-                    }
-
-                    Column(modifier = modifier) {
-                        Box(modifier = modifier
-                            .fillMaxWidth()
-                            .weight(1F)){
-                            when (uiState) {
-                                LibraryUiState.LibraryUiEmpty -> {
-                                    Text(
-                                        modifier = modifier.align(Center),
-                                        text = stringResource(id = R.string.label_no_videos)
-                                    )
-                                }
-                                is LibraryUiState.LibraryUiLoaded -> {
-                                    LazyColumn(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 10.dp)
-                                    ){
-                                        items(
-                                            items = uiState.videos,
-                                            key = { video -> video.id }
+                    SwipeRefresh(
+                        modifier = modifier,
+                        state = rememberSwipeRefreshState(
+                            isRefreshing = uiState == LibraryUiState.LibraryUiLoading
+                        ),
+                        onRefresh = { onLoadLibraryClicked(libId.toLong()) }
+                    ) {
+                        Column(modifier = modifier) {
+                            Box(modifier = modifier
+                                .fillMaxWidth()
+                                .weight(1F)){
+                                when (uiState) {
+                                    LibraryUiState.LibraryUiEmpty -> {
+                                        Text(
+                                            modifier = modifier.align(Center),
+                                            text = stringResource(id = R.string.label_no_videos)
+                                        )
+                                    }
+                                    is LibraryUiState.LibraryUiLoaded -> {
+                                        LazyColumn(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 0.dp)
                                         ){
-                                            VideoItem(
-                                                video = it,
-                                                onDeleteVideoClicked = { onDeleteVideoClicked(it) },
-                                                onVideoClicked = { onVideoClicked(it) }
-                                            )
+                                            items(
+                                                items = uiState.videos,
+                                                key = { video -> video.id }
+                                            ){
+                                                VideoItem(
+                                                    video = it,
+                                                    onDeleteVideoClicked = { onDeleteVideoClicked(it) },
+                                                    onVideoClicked = { onVideoClicked(it) }
+                                                )
+                                            }
                                         }
                                     }
-                                }
-                                LibraryUiState.LibraryUiLoading -> {
-                                    Box(modifier = modifier.fillMaxSize()){
-                                        CircularProgressIndicator(
-                                            modifier = modifier
-                                                .width(64.dp)
-                                                .align(Center),
-                                        )
+                                    LibraryUiState.LibraryUiLoading -> {
+                                        // no-op
                                     }
                                 }
                             }
+                            VideoUploadControls(
+                                uploadingUiState = uploadingUiState,
+                                onUploadVideoClicked = onUploadVideoClicked,
+                                onDismissUploadErrorClicked = onDismissUploadErrorClicked,
+                                onCancelUploadClicked = onCancelUploadClicked,
+                                onTusUploadOptionChanged = onTusUploadOptionChanged,
+                                useTusUpload = useTusUpload,
+                            )
                         }
-                        VideoUploadControls(
-                            uploadingUiState = uploadingUiState,
-                            onUploadVideoClicked = onUploadVideoClicked,
-                            onDismissUploadErrorClicked = onDismissUploadErrorClicked,
-                            onCancelUploadClicked = onCancelUploadClicked,
-                            onTusUploadOptionChanged = onTusUploadOptionChanged,
-                            useTusUpload = useTusUpload,
-                        )
                     }
                 }
             }
