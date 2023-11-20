@@ -7,10 +7,12 @@ import android.util.Log
 import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.C
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
@@ -18,6 +20,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.ima.ImaAdsLoader
 import androidx.media3.exoplayer.ima.ImaServerSideAdInsertionMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
@@ -26,8 +30,10 @@ import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.SeekThumbnail
-import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
+import net.bunnystream.player.model.VideoQuality
+import net.bunnystream.player.model.VideoQualityOptions
+import net.bunnystream.player.model.SubtitleInfo
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
@@ -85,6 +91,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var mediaItem: MediaItem? = null
     private var mediaItemBuilder: MediaItem.Builder? = null
 
+    private var trackSelector: DefaultTrackSelector? = null
+
     private val httpDataSourceFactory: HttpDataSource.Factory =
         DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
 
@@ -112,6 +120,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         override fun onIsLoadingChanged(isLoading: Boolean) {
             Log.d(TAG, "onIsLoadingChanged isLoading: $isLoading")
             playerStateListener?.onLoadingChanged(isLoading)
+        }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            Log.d(TAG, "onTracksChanged tracks: $tracks")
         }
     }
 
@@ -153,9 +166,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(dataSourceFactory)
-//            .setLocalAdInsertionComponents({ imaLoader }, playerView)
+            .setLocalAdInsertionComponents({ imaLoader }, playerView)
+
+        trackSelector = DefaultTrackSelector(context, AdaptiveTrackSelection.Factory())
 
         localPlayer = ExoPlayer.Builder(context)
+            .setTrackSelector(trackSelector!!)
             .setMediaSourceFactory(mediaSourceFactory)
             .build().also {
                 it.addListener(playerListener)
@@ -212,6 +228,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
+    override fun moments(video: VideoModel) {
+        moments = MomentsContainer(
+            totalDuration = video.length * 1000L,
+            video.moments?.map {
+                Moment(
+                    it.label,
+                    it.timestamp * 1000L
+                )
+            } ?: listOf()
     private fun initSeekThumbnailPreview(video: VideoModel) {
         val thumbnailPreviewsList: MutableList<String> = mutableListOf()
         val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
@@ -287,6 +312,35 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun areSubtitlesEnabled(): Boolean {
         return selectedSubtitle != null
+    }
+
+    override fun seekThumbnailPreview(video: VideoModel) {
+        val thumbnailPreviewsList: MutableList<String> = mutableListOf()
+        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
+        var i = 0
+        do {
+            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
+            i++
+        } while (i < numberOfPreviews)
+
+        seekThumbnail = SeekThumbnail(
+            thumbnailPreviewsList,
+            ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
+            video.thumbnailCount,
+            THUMBNAILS_PER_IMAGE,
+        )
+    }
+
+    override fun getVideoQualityOptions(): VideoQualityOptions? {
+        return getAvailableVideoQualityOptions()
+    }
+
+    override fun selectQuality(quality: VideoQuality) {
+        Log.d(TAG, "selectQuality: $quality")
+        trackSelector?.let {
+            val params = it.buildUponParameters().setMaxVideoSize(quality.width, quality.height)
+            it.setParameters(params)
+        }
     }
 
     override fun release() {
@@ -385,5 +439,42 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         newPlayer.playWhenReady = newPlayWhenReady
         newPlayer.prepare()
+    }
+
+    private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
+        Log.d(TAG, "getAvailableVideoQualityOptions")
+
+        val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
+
+        val options = mutableListOf<VideoQuality>()
+
+        trackGroups.forEach {
+            for (trackIndex in 0 until it.length) {
+                if (it.isTrackSupported(trackIndex)) {
+                    val format = it.getTrackFormat(trackIndex)
+                    if (format.width != Format.NO_VALUE || format.height != Format.NO_VALUE) {
+                        options.add(VideoQuality(format.width, format.height))
+                    }
+                }
+            }
+        }
+
+        // Default option (resolution selected automatically by player)
+        var selectedOption = VideoQuality(Int.MAX_VALUE, Int.MAX_VALUE)
+
+        options.sortByDescending { it.width + it.height }
+        options.add(0, selectedOption)
+
+        trackSelector?.parameters?.let {
+            if(it.maxVideoWidth != Int.MAX_VALUE && it.maxVideoHeight != Int.MAX_VALUE){
+                selectedOption = VideoQuality(it.maxVideoWidth, it.maxVideoHeight)
+            }
+        }
+
+        val videoQualityOptions = VideoQualityOptions(options, selectedOption)
+
+        Log.d(TAG, "updateAvailableVideoQualityOptions videoQualityOptions=$videoQualityOptions")
+
+        return videoQualityOptions
     }
 }
