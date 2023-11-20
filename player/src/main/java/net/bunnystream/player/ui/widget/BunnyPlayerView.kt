@@ -19,7 +19,6 @@ import androidx.core.view.isVisible
 import androidx.media3.common.Player
 import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_NONE
-import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.SubtitleView
@@ -32,6 +31,7 @@ import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.model.PlayerIconSet
+import net.bunnystream.player.model.VideoQuality
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class BunnyPlayerView @JvmOverloads constructor(
@@ -224,6 +224,40 @@ class BunnyPlayerView @JvmOverloads constructor(
                 }
             }
 
+            val videoQualityOptions = bunnyPlayer?.getVideoQualityOptions()
+
+            val qualityMenuId = View.generateViewId()
+            val qualityMenuIds = mutableMapOf<Int, VideoQuality>()
+
+            if(videoQualityOptions != null) {
+                val qualityOptionsMenu = popupMenu.menu.addSubMenu(
+                    Menu.NONE,
+                    qualityMenuId,
+                    Menu.NONE,
+                    context.getString(R.string.label_video_settings_quality)
+                )
+
+                videoQualityOptions.options.forEach { option ->
+                    val id = generateViewId()
+                    qualityMenuIds[id] = option
+
+                    val title = if(option.width == Int.MAX_VALUE) {
+                        context.getString(R.string.label_video_quality_auto)
+                    } else {
+                        "${option.width} x ${option.height}"
+                    }
+
+                    val item = qualityOptionsMenu.add(
+                        Menu.NONE,
+                        id,
+                        Menu.NONE,
+                        title
+                    )
+                    item.isCheckable = true
+                    item.isChecked = videoQualityOptions.selectedOption == option
+                }
+            }
+
             val speedMenuItemId = when (speed) {
                 0.5F -> R.id.video_speed_0_5
                 0.75F -> R.id.video_speed_0_75
@@ -243,6 +277,13 @@ class BunnyPlayerView @JvmOverloads constructor(
                 if(subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
                     subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
+                    return@setOnMenuItemClickListener true
+                }
+
+                val qualityOption = qualityMenuIds[item.itemId]
+
+                if(qualityOption != null) {
+                    bunnyPlayer?.selectQuality(qualityOption)
                     return@setOnMenuItemClickListener true
                 }
 

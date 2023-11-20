@@ -18,4 +18,5 @@
     <string name="label_video_speed_1_5">1.5x</string>
     <string name="label_video_speed_2">2x</string>
     <string name="label_video_speed_4">4x</string>
+    <string name="label_video_quality_auto">Auto</string>
 </resources>
