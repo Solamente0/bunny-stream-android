@@ -3,7 +3,9 @@ package net.bunnystream.player.ui.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Point
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
@@ -17,6 +19,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.TimeBar
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
+import net.bunnystream.player.model.RetentionGraphEntry
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -30,16 +33,20 @@ class BunnyTimeBar @JvmOverloads constructor(
 
     companion object {
         private const val DEFAULT_PLAYED_COLOR = 0xFFFFFFFF.toInt()
+        private const val DEFAULT_CHAPTER_SELECTED_COLOR = 0xFFFFFFFF.toInt()
         private const val DEFAULT_UNPLAYED_COLOR = 0x88FFFFFF.toInt()
         private const val DEFAULT_BUFFERED_COLOR = 0xDDEEEEEE.toInt()
         private const val DEFAULT_SCRUBBER_COLOR = 0xFFFFFFFF.toInt()
         private const val DEFAULT_MOMENT_COLOR = 0xAAFFFFFF.toInt()
+        private const val DEFAULT_GRAPH_COLOR = 0x33FFFFFF
+        private const val DEFAULT_GRAPH_OVERLAY_COLOR = Color.WHITE.toInt()
 
         private const val TIME_BAR_HEIGHT_DP = 2
-        private const val TOUCH_TARGET_HEIGHT_DP = 26
+        private const val TOUCH_TARGET_HEIGHT_DP = 20
         private const val SCRUBBER_ENABLED_SIZE_DP = 12
         private const val SCRUBBER_DRAGGED_SIZE_DP = 24
         private const val SCRUBBER_DISABLED_SIZE_DP = 4
+        private const val RETENTION_GRAPH_HEIGHT = 20
 
         private const val GAP_SIZE_DP = 2
         private const val CHAPTER_THICKNESS_DELTA_DP = 2
@@ -55,6 +62,10 @@ class BunnyTimeBar @JvmOverloads constructor(
     private val positionBar = Rect()
     private val bufferedBar = Rect()
     private val scrubberBar = Rect()
+    private val graphBounds = Rect()
+    private val retentionGraphOverlayBounds = Rect()
+
+    private val retentionGraphFillPath = Path()
 
     private var scrubPosition = 0L
     private var duration = C.TIME_UNSET
@@ -66,6 +77,14 @@ class BunnyTimeBar @JvmOverloads constructor(
     private val unPlayedPaint = paintWithColor(DEFAULT_UNPLAYED_COLOR)
     private val scrubberCirclePaint = paintWithColor(DEFAULT_SCRUBBER_COLOR)
     private val momentsPaint = paintWithColor(DEFAULT_MOMENT_COLOR)
+    private val chapterSelectedPaint = paintWithColor(DEFAULT_CHAPTER_SELECTED_COLOR)
+
+    private val graphFillPaint = paintWithColor(DEFAULT_GRAPH_COLOR).also {
+        it.style = Paint.Style.FILL
+    }
+    private val graphOverlayPaint = paintWithColor(DEFAULT_GRAPH_OVERLAY_COLOR).also {
+        it.xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
+    }
 
     private val clearPaint = Paint().also {
         it.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -78,6 +97,7 @@ class BunnyTimeBar @JvmOverloads constructor(
     private val barHeight by lazy { dpToPx(TIME_BAR_HEIGHT_DP) }
     private val initEdgeSize by lazy { dpToPx(INIT_EDGE_DP) }
     private val touchTargetHeight by lazy { dpToPx(TOUCH_TARGET_HEIGHT_DP) }
+    private val retentionGraphHeight by lazy { dpToPx(RETENTION_GRAPH_HEIGHT) }
     private val additionDragOffset by lazy { dpToPx(ADDITIONAL_DRAG_OFFSET_DP) }
 
     private val chapterThicknessDelta by lazy { dpToPx(CHAPTER_THICKNESS_DELTA_DP) }
@@ -118,6 +138,15 @@ class BunnyTimeBar @JvmOverloads constructor(
             invalidate()
         }
 
+    private var adjustedGraphPoints: Array<RetentionGraphPoint> = arrayOf()
+
+    var retentionGraphData = listOf<RetentionGraphEntry>()
+        set(value) {
+            field = value.sortedBy { it.x }
+            adjustRetentionGraphPoints()
+            invalidate()
+        }
+
     private var currentMoment: Moment? = null
     private var currentChapter: Chapter? = null
 
@@ -140,6 +169,8 @@ class BunnyTimeBar @JvmOverloads constructor(
         get() = positionLeft + getScreenScrubber()
 
     init {
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
+
         addListener(object : TimeBar.OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {
                 startPreview(
@@ -341,6 +372,7 @@ class BunnyTimeBar @JvmOverloads constructor(
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
         canvas.save()
+        drawRetentionGraph(canvas)
         drawTimeBar(canvas)
         drawMoments(canvas)
         drawScrubber(canvas)
@@ -360,19 +392,19 @@ class BunnyTimeBar @JvmOverloads constructor(
         }
 
         canvas.drawRect(
-            seekBounds.left.toFloat(),
-            barTop.toFloat(),
-            progressBar.left.toFloat(),
-            barBottom.toFloat(),
-            playedPaint
+            /* left = */ seekBounds.left.toFloat(),
+            /* top = */ barTop.toFloat(),
+            /* right = */ progressBar.left.toFloat(),
+            /* bottom = */ barBottom.toFloat(),
+            /* paint = */ playedPaint
         )
 
         canvas.drawRect(
-            progressBar.right.toFloat(),
-            barTop.toFloat(),
-            seekBounds.right.toFloat(),
-            barBottom.toFloat(),
-            if (position >= duration) playedPaint else unPlayedPaint
+            /* left = */ progressBar.right.toFloat(),
+            /* top = */ barTop.toFloat(),
+            /* right = */ seekBounds.right.toFloat(),
+            /* bottom = */ barBottom.toFloat(),
+            /* paint = */ if (position >= duration) playedPaint else unPlayedPaint
         )
 
         drawDefaultTimeBar(canvas)
@@ -400,48 +432,42 @@ class BunnyTimeBar @JvmOverloads constructor(
     private fun calculateGapChapters() {
         gapChapters = chapters.map {
             Gap(
-                it.startTimeMs, it.endTimeMs,
-                (screenPositionOnProgressBar(it.startTimeMs) + defaultGapSize).toFloat(),
-                screenPositionOnProgressBar(it.endTimeMs).toFloat()
+                startTimeMs = it.startTimeMs, endTimeMs = it.endTimeMs,
+                startScreenPosition = (screenPositionOnProgressBar(it.startTimeMs) + defaultGapSize).toFloat(),
+                endScreenPosition = screenPositionOnProgressBar(it.endTimeMs).toFloat()
             )
         }
     }
 
     private fun drawDefaultTimeBar(canvas: Canvas) {
         canvas.drawRect(
-            (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
-            barTop.toFloat(),
-            progressBar.right.toFloat(),
-            barBottom.toFloat(),
-            unPlayedPaint
+            /* left = */ (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
+            /* top = */ barTop.toFloat(),
+            /* right = */ progressBar.right.toFloat(),
+            /* bottom = */ barBottom.toFloat(),
+            /* paint = */ unPlayedPaint
         )
 
         // Buffered
         canvas.drawRect(
-            (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
-            barTop.toFloat(),
-            bufferedBar.right.toFloat() - if (isScrubbing) initEdgeSize else 0,
-            barBottom.toFloat(),
-            bufferedPaint
+            /* left = */ (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
+            /* top = */ barTop.toFloat(),
+            /* right = */ bufferedBar.right.toFloat() - if (isScrubbing) initEdgeSize else 0,
+            /* bottom = */ barBottom.toFloat(),
+            /* paint = */ bufferedPaint
         )
 
         // Played
         canvas.drawRect(
-            (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
-            barTop.toFloat(),
-            positionBar.right.toFloat() - if (isScrubbing) initEdgeSize else 0,
-            barBottom.toFloat(),
-            playedPaint
+            /* left = */ (if (isScrubbing) seekBounds.left else progressBar.left).toFloat(),
+            /* top = */ barTop.toFloat(),
+            /* right = */ positionBar.right.toFloat() - if (isScrubbing) initEdgeSize else 0,
+            /* bottom = */ barBottom.toFloat(),
+            /* paint = */ playedPaint
         )
     }
 
     private fun drawChapters(canvas: Canvas) {
-        val progressPositionOnBar = if (isScrubbing) screenPositionOnSeekBounds(position)
-        else screenPositionOnProgressBar(position)
-
-        val bufferedPositionOnBar = if (isScrubbing) screenPositionOnSeekBounds(bufferedPosition)
-        else screenPositionOnProgressBar(bufferedPosition)
-
         gapChapters.forEach { gapHelper ->
             // gap to the left of chapter
             canvas.drawRect(
@@ -459,50 +485,14 @@ class BunnyTimeBar @JvmOverloads constructor(
                 /* bottom = */ barBottom.toFloat(),
                 /* paint = */ clearPaint)
 
-            if (!isScrubbing) {
-                // Buffered
-                if (bufferedPosition >= gapHelper.startTimeMs) {
-                    canvas.drawRect(
-                        /* left = */ gapHelper.startScreenPosition,
-                        /* top = */ barTop.toFloat(),
-                        /* right = */ bufferedPositionOnBar.toFloat()
-                            .coerceAtLeast(gapHelper.startScreenPosition)
-                            .coerceAtMost(gapHelper.endScreenPosition),
-                        /* bottom = */ barBottom.toFloat(),
-                        /* paint = */ bufferedPaint
-                    )
-                }
-                // Played
-                if (position >= gapHelper.startTimeMs) {
-                    canvas.drawRect(
-                        /* left = */ gapHelper.startScreenPosition,
-                        /* top = */ barTop.toFloat(),
-                        /* right = */ progressPositionOnBar.toFloat()
-                            .coerceAtMost(gapHelper.endScreenPosition),
-                        /* bottom = */ barBottom.toFloat(),
-                        /* paint = */ playedPaint
-                    )
-                }
-            } else {
-                if (scrubPosition in gapHelper.startTimeMs..gapHelper.endTimeMs) {
-                    canvas.drawRect(
-                        /* left = */ gapHelper.startScreenPosition,
-                        /* top = */ (barTop - chapterThicknessDelta).toFloat(),
-                        /* right = */ gapHelper.endScreenPosition,
-                        /* bottom = */ (barBottom + chapterThicknessDelta).toFloat(),
-                        /* paint = */ bufferedPaint
-                    )
-                }
-                // Played
-                if (position >= gapHelper.startTimeMs) {
-                    canvas.drawRect(
-                        /* left = */ gapHelper.startScreenPosition,
-                        /* top = */ (barTop - chapterThicknessDelta).toFloat(),
-                        /* right = */ progressPositionOnBar.toFloat().coerceAtMost(gapHelper.endScreenPosition),
-                        /* bottom = */ (barBottom + chapterThicknessDelta).toFloat(),
-                        /* paint = */ playedPaint
-                    )
-                }
+            if (isScrubbing && scrubPosition in gapHelper.startTimeMs..gapHelper.endTimeMs) {
+                canvas.drawRect(
+                    /* left = */ gapHelper.startScreenPosition,
+                    /* top = */ (barTop - chapterThicknessDelta).toFloat(),
+                    /* right = */ gapHelper.endScreenPosition,
+                    /* bottom = */ (barBottom + chapterThicknessDelta).toFloat(),
+                    /* paint = */ chapterSelectedPaint
+                )
             }
         }
     }
@@ -517,6 +507,28 @@ class BunnyTimeBar @JvmOverloads constructor(
             /* radius = */ scrubberRadius.toFloat(),
             /* paint = */ scrubberCirclePaint
         )
+    }
+
+    private fun drawRetentionGraph(canvas: Canvas) {
+        if(adjustedGraphPoints.isEmpty()) {
+            return
+        }
+
+        buildRetentionGraphPath(retentionGraphFillPath)
+
+        retentionGraphFillPath.lineTo(graphBounds.right.toFloat(), graphBounds.bottom.toFloat())
+        retentionGraphFillPath.lineTo(graphBounds.left.toFloat(), graphBounds.bottom.toFloat())
+        retentionGraphFillPath.lineTo(graphBounds.left.toFloat(), adjustedGraphPoints[0].y)
+        retentionGraphFillPath.close()
+
+        canvas.drawPath(retentionGraphFillPath, graphFillPaint)
+
+        retentionGraphOverlayBounds.left = graphBounds.left
+        retentionGraphOverlayBounds.top = graphBounds.top
+        retentionGraphOverlayBounds.right = getScreenScrubber()
+        retentionGraphOverlayBounds.bottom = graphBounds.bottom
+
+        canvas.drawRect(retentionGraphOverlayBounds, graphOverlayPaint)
     }
 
     private fun updateValues() {
@@ -568,9 +580,9 @@ class BunnyTimeBar @JvmOverloads constructor(
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
         val height = when (heightMode) {
-            MeasureSpec.UNSPECIFIED -> touchTargetHeight
+            MeasureSpec.UNSPECIFIED -> touchTargetHeight + retentionGraphHeight
             MeasureSpec.EXACTLY -> heightSize
-            else -> touchTargetHeight.coerceAtMost(heightSize)
+            else -> (touchTargetHeight + retentionGraphHeight).coerceAtMost(heightSize)
         }
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), height)
     }
@@ -600,8 +612,16 @@ class BunnyTimeBar @JvmOverloads constructor(
             /* bottom = */ progressY + barHeight
         )
 
+        graphBounds.set(
+            /* left = */ left,
+            /* top = */ top,
+            /* right = */ right,
+            /* bottom = */ progressY
+        )
+
         calculateGapChapters()
         updateValues()
+        adjustRetentionGraphPoints()
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -635,12 +655,6 @@ class BunnyTimeBar @JvmOverloads constructor(
         return progressBar.left.plus(progressBar.width().times(millis.toFloat().div(duration))).toInt()
             .coerceAtLeast(progressBar.left)
             .coerceAtMost(progressBar.right)
-    }
-
-    private fun screenPositionOnSeekBounds(millis: Long): Int {
-        return seekBounds.left.plus(seekBounds.width().times(millis.toFloat().div(duration))).toInt()
-            .coerceAtLeast(seekBounds.left)
-            .coerceAtMost(seekBounds.right)
     }
 
     private fun getScreenScrubber(): Int {
@@ -701,10 +715,58 @@ class BunnyTimeBar @JvmOverloads constructor(
         return paint
     }
 
+    private fun adjustRetentionGraphPoints() {
+        val chartHeight = graphBounds.bottom - graphBounds.top
+        val chartWidth = graphBounds.right - graphBounds.left
+
+        var maxY = 0f
+
+        for (p in retentionGraphData) {
+            if (p.y > maxY) {
+                maxY = p.y.toFloat()
+            }
+        }
+
+        val scaleY = chartHeight / maxY
+        val axesSpan = retentionGraphData[retentionGraphData.size - 1].x - retentionGraphData[0].x
+        val startX = retentionGraphData[0].x
+        for (i in retentionGraphData.indices) {
+            val p = retentionGraphData[i]
+            val newX = (p.x - startX) * chartWidth / axesSpan + graphBounds.left
+            val newY = chartHeight - p.y * scaleY
+            adjustedGraphPoints += RetentionGraphPoint(newX.toFloat(), newY)
+        }
+    }
+
+    private fun buildRetentionGraphPath(path: Path) {
+        path.reset()
+        path.moveTo(adjustedGraphPoints[0].x, adjustedGraphPoints[0].y)
+
+        val pointSize = adjustedGraphPoints.size
+        for (i in 0 until adjustedGraphPoints.size - 1) {
+            val pointX = (adjustedGraphPoints[i].x + adjustedGraphPoints[i + 1].x) / 2
+            val pointY = (adjustedGraphPoints[i].y + adjustedGraphPoints[i + 1].y) / 2
+            val controlX = adjustedGraphPoints[i].x
+            val controlY = adjustedGraphPoints[i].y
+            path.quadTo(controlX, controlY, pointX, pointY)
+        }
+        path.quadTo(
+            adjustedGraphPoints[pointSize - 1].x,
+            adjustedGraphPoints[pointSize - 1].y,
+            adjustedGraphPoints[pointSize - 1].x,
+            adjustedGraphPoints[pointSize - 1].y
+        )
+    }
+
     private data class Gap(
         val startTimeMs: Long,
         val endTimeMs: Long,
         val startScreenPosition: Float,
         val endScreenPosition: Float,
+    )
+
+    private data class RetentionGraphPoint(
+        val x: Float,
+        val y: Float
     )
 }

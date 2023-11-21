@@ -30,6 +30,7 @@ import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.PlayerIconSet
+import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.VideoQuality
 
@@ -87,6 +88,10 @@ class BunnyPlayerView @JvmOverloads constructor(
         override fun onMomentsUpdated(moments: List<Moment>) {
             Log.d(TAG, "onMomentsUpdated: $moments")
             timeBar?.moments = moments
+        }
+
+        override fun onRetentionGraphUpdated(points: List<RetentionGraphEntry>) {
+            timeBar?.retentionGraphData = points
         }
 
         override fun onPlayerTypeChanged(player: Player, playerType: PlayerType) {
