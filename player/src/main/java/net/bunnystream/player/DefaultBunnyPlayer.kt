@@ -30,10 +30,10 @@ import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.SeekThumbnail
+import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
 import net.bunnystream.player.model.VideoQuality
 import net.bunnystream.player.model.VideoQualityOptions
-import net.bunnystream.player.model.SubtitleInfo
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
@@ -188,10 +188,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
             // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
-            .setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+            //.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
         // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-        //.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+//        .setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
 
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
@@ -228,15 +228,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun moments(video: VideoModel) {
-        moments = MomentsContainer(
-            totalDuration = video.length * 1000L,
-            video.moments?.map {
-                Moment(
-                    it.label,
-                    it.timestamp * 1000L
-                )
-            } ?: listOf()
     private fun initSeekThumbnailPreview(video: VideoModel) {
         val thumbnailPreviewsList: MutableList<String> = mutableListOf()
         val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
@@ -312,23 +303,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun areSubtitlesEnabled(): Boolean {
         return selectedSubtitle != null
-    }
-
-    override fun seekThumbnailPreview(video: VideoModel) {
-        val thumbnailPreviewsList: MutableList<String> = mutableListOf()
-        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
-        var i = 0
-        do {
-            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
-            i++
-        } while (i < numberOfPreviews)
-
-        seekThumbnail = SeekThumbnail(
-            thumbnailPreviewsList,
-            ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
-            video.thumbnailCount,
-            THUMBNAILS_PER_IMAGE,
-        )
     }
 
     override fun getVideoQualityOptions(): VideoQualityOptions? {

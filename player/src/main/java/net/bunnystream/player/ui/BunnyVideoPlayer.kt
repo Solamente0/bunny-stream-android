@@ -88,7 +88,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         Log.d(TAG, "onDetachedFromWindow")
-        bunnyPlayer.release()
+        bunnyPlayer.stop()
     }
 
     fun playVideo(libraryId: Long, videoId: String) {

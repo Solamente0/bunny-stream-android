@@ -60,13 +60,16 @@ class BunnyTimeBar @JvmOverloads constructor(
     private var duration = C.TIME_UNSET
     private var position = 0L
     private var bufferedPosition = 0L
-    private var lastPreviewPoint = 0
 
     private val playedPaint = paintWithColor(DEFAULT_PLAYED_COLOR)
     private val bufferedPaint = paintWithColor(DEFAULT_BUFFERED_COLOR)
     private val unPlayedPaint = paintWithColor(DEFAULT_UNPLAYED_COLOR)
     private val scrubberCirclePaint = paintWithColor(DEFAULT_SCRUBBER_COLOR)
     private val momentsPaint = paintWithColor(DEFAULT_MOMENT_COLOR)
+
+    private val clearPaint = Paint().also {
+        it.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+    }
 
     private val scrubberDisabledSize by lazy { dpToPx(SCRUBBER_DISABLED_SIZE_DP) }
     private val scrubberEnabledSize by lazy { dpToPx(SCRUBBER_ENABLED_SIZE_DP) }
@@ -150,13 +153,7 @@ class BunnyTimeBar @JvmOverloads constructor(
                 val positionSanitized = position
                     .coerceAtLeast(0)
                     .coerceAtMost(max(getDuration(), 0))
-
-                val positionSec = (positionSanitized / 1000.0).toInt()
-
-                if(lastPreviewPoint != positionSec) {
-                    lastPreviewPoint = positionSec
-                    updatePreview(positionSanitized)
-                }
+                updatePreview(positionSanitized)
             }
 
             override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
@@ -446,9 +443,6 @@ class BunnyTimeBar @JvmOverloads constructor(
         else screenPositionOnProgressBar(bufferedPosition)
 
         gapChapters.forEach { gapHelper ->
-            val clearPaint = Paint()
-            clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-
             // gap to the left of chapter
             canvas.drawRect(
                 /* left = */ gapHelper.startScreenPosition - defaultGapSize,

@@ -8,9 +8,12 @@
 
     <net.bunnystream.player.ui.widget.BunnyPlayerView
         android:id="@+id/player_view"
+        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:show_buffering="when_playing"
+        app:resize_mode="fit"
+        app:surface_type="texture_view"
         app:controller_layout_id="@layout/view_media_controller"
         android:background="@android:color/black"/>
 

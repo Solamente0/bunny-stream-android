@@ -30,8 +30,8 @@ import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.PlayerIconSet
-import net.bunnystream.player.model.VideoQuality
 import net.bunnystream.player.model.SubtitleInfo
+import net.bunnystream.player.model.VideoQuality
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class BunnyPlayerView @JvmOverloads constructor(
@@ -274,11 +274,14 @@ class BunnyPlayerView @JvmOverloads constructor(
             popupMenu.menu.findItem(speedMenuItemId)?.isChecked = true
 
             popupMenu.setOnMenuItemClickListener { item ->
+                Log.d(TAG, "setOnMenuItemClickListener")
+
                 val subtitleOption = subtitleMenuIds[item.itemId]
 
                 if(subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
                     subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
+                    controllerShowTimeoutMs = 2 * 1000
                     return@setOnMenuItemClickListener true
                 }
 
@@ -286,6 +289,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 if(qualityOption != null) {
                     bunnyPlayer?.selectQuality(qualityOption)
+                    controllerShowTimeoutMs = 2 * 1000
                     return@setOnMenuItemClickListener true
                 }
 
@@ -301,6 +305,9 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 true
             }
+
+            controllerHideOnTouch = true
+            controllerShowTimeoutMs = -1
 
             popupMenu.show()
         }
