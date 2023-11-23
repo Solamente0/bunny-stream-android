@@ -105,7 +105,7 @@ class LibraryViewModel : ViewModel() {
 
         scope.launch {
             try {
-                val response = App.di.streamSdk.videosApi.videoList(
+                val response = App.di.streamSdk.streamApi.videosApi.videoList(
                     libraryId = libraryId,
                     page = null,
                     itemsPerPage = null,
@@ -165,7 +165,7 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "onDeleteVideo video=$video")
         scope.launch {
             try {
-                val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
+                val result = App.di.streamSdk.streamApi.videosApi.videoDeleteVideo(libraryId, video.id)
 
                 if(result.success) {
                     Log.d(TAG, "Video deleted")
