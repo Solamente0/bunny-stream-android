@@ -2,14 +2,18 @@ package net.bunnystream.player.ui.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Point
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -38,15 +42,19 @@ class BunnyTimeBar @JvmOverloads constructor(
         private const val DEFAULT_BUFFERED_COLOR = 0xDDEEEEEE.toInt()
         private const val DEFAULT_SCRUBBER_COLOR = 0xFFFFFFFF.toInt()
         private const val DEFAULT_MOMENT_COLOR = 0xAAFFFFFF.toInt()
-        private const val DEFAULT_GRAPH_COLOR = 0x33FFFFFF
-        private const val DEFAULT_GRAPH_OVERLAY_COLOR = Color.WHITE.toInt()
+        private const val DEFAULT_GRAPH_OVERLAY_COLOR = Color.WHITE
+        private const val DEFAULT_GRAPH_GRADIENT_START_COLOR = 0x88FFFFFF.toInt()
+        private const val DEFAULT_GRAPH_GRADIENT_END_COLOR = 0x00000000
 
         private const val TIME_BAR_HEIGHT_DP = 2
+        private const val TIME_BAR_BOTTOM_MARGIN_DP = 10
+
         private const val TOUCH_TARGET_HEIGHT_DP = 20
         private const val SCRUBBER_ENABLED_SIZE_DP = 12
         private const val SCRUBBER_DRAGGED_SIZE_DP = 24
         private const val SCRUBBER_DISABLED_SIZE_DP = 4
-        private const val RETENTION_GRAPH_HEIGHT = 20
+        private const val RETENTION_GRAPH_HEIGHT_DP = 40
+        private const val RETENTION_GRAPH_BOTTOM_MARGIN_DP = 5
 
         private const val GAP_SIZE_DP = 2
         private const val CHAPTER_THICKNESS_DELTA_DP = 2
@@ -79,9 +87,10 @@ class BunnyTimeBar @JvmOverloads constructor(
     private val momentsPaint = paintWithColor(DEFAULT_MOMENT_COLOR)
     private val chapterSelectedPaint = paintWithColor(DEFAULT_CHAPTER_SELECTED_COLOR)
 
-    private val graphFillPaint = paintWithColor(DEFAULT_GRAPH_COLOR).also {
+    private val graphFillPaint = Paint().also {
         it.style = Paint.Style.FILL
     }
+
     private val graphOverlayPaint = paintWithColor(DEFAULT_GRAPH_OVERLAY_COLOR).also {
         it.xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
     }
@@ -95,9 +104,13 @@ class BunnyTimeBar @JvmOverloads constructor(
     private val scrubberDraggedSize by lazy { dpToPx(SCRUBBER_DRAGGED_SIZE_DP) }
 
     private val barHeight by lazy { dpToPx(TIME_BAR_HEIGHT_DP) }
+    private val barBottomMargin by lazy { dpToPx(TIME_BAR_BOTTOM_MARGIN_DP) }
+
     private val initEdgeSize by lazy { dpToPx(INIT_EDGE_DP) }
     private val touchTargetHeight by lazy { dpToPx(TOUCH_TARGET_HEIGHT_DP) }
-    private val retentionGraphHeight by lazy { dpToPx(RETENTION_GRAPH_HEIGHT) }
+    private val retentionGraphHeight by lazy { dpToPx(RETENTION_GRAPH_HEIGHT_DP) }
+    private val retentionGraphBottomMargin by lazy { dpToPx(RETENTION_GRAPH_BOTTOM_MARGIN_DP) }
+
     private val additionDragOffset by lazy { dpToPx(ADDITIONAL_DRAG_OFFSET_DP) }
 
     private val chapterThicknessDelta by lazy { dpToPx(CHAPTER_THICKNESS_DELTA_DP) }
@@ -422,7 +435,7 @@ class BunnyTimeBar @JvmOverloads constructor(
 
             canvas.drawCircle(
                 /* cx = */ xPosition.toFloat(),
-                /* cy = */ (height / 2f),
+                /* cy = */ progressBar.centerY().toFloat(),
                 /* radius = */ radius,
                 /* paint = */ momentsPaint,
             )
@@ -587,12 +600,13 @@ class BunnyTimeBar @JvmOverloads constructor(
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), height)
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         positionLeft = left
 
         val width: Int = right - left
         val height: Int = bottom - top
-        val barY: Int = (height - touchTargetHeight) / 2
+        val barY: Int = (height - touchTargetHeight) - barBottomMargin
 
         val seekLeft: Int = paddingLeft
         val seekRight: Int = width - paddingRight
@@ -616,12 +630,13 @@ class BunnyTimeBar @JvmOverloads constructor(
             /* left = */ left,
             /* top = */ top,
             /* right = */ right,
-            /* bottom = */ progressY
+            /* bottom = */ progressY - retentionGraphBottomMargin
         )
 
         calculateGapChapters()
         updateValues()
         adjustRetentionGraphPoints()
+        updateGraphGradient()
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -756,6 +771,31 @@ class BunnyTimeBar @JvmOverloads constructor(
             adjustedGraphPoints[pointSize - 1].x,
             adjustedGraphPoints[pointSize - 1].y
         )
+    }
+
+    private fun updateGraphGradient(){
+        val gradientBitmap = createGradientBitmap(graphBounds.bottom)
+        graphFillPaint.shader = BitmapShader(gradientBitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+    }
+
+    private fun createGradientBitmap(height: Int): Bitmap {
+        val bitmap = Bitmap.createBitmap(1, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val gradient = LinearGradient(
+            0f, 0f, 0f, height.toFloat(),
+            intArrayOf(DEFAULT_GRAPH_GRADIENT_START_COLOR, DEFAULT_GRAPH_GRADIENT_END_COLOR),
+            null,
+            Shader.TileMode.CLAMP
+        )
+
+        val paint = Paint().apply {
+            shader = gradient
+        }
+
+        canvas.drawRect(0f, 0f, 1f, height.toFloat(), paint)
+
+        return bitmap
     }
 
     private data class Gap(
