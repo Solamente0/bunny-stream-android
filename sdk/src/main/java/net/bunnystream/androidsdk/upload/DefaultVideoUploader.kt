@@ -49,7 +49,7 @@ class DefaultVideoUploader(
         val fileInfo = getFileInfo(videoUri)
 
         if(fileInfo == null) {
-            listener.onUploadError(UploadError.ErrorReadingFile)
+            listener.onUploadError(UploadError.ErrorReadingFile, null)
             return
         }
 
@@ -74,12 +74,12 @@ class DefaultVideoUploader(
                     is ServerException -> UploadError.ServerError
                     else ->  UploadError.UnknownError(e.message ?: e.toString())
                 }
-                listener.onUploadError(error)
+                listener.onUploadError(error, null)
                 return@launch
             }
 
             if(videoId.isNullOrEmpty()) {
-                listener.onUploadError(UploadError.ErrorCreating)
+                listener.onUploadError(UploadError.ErrorCreating, videoId)
                 return@launch
             }
 
@@ -87,37 +87,35 @@ class DefaultVideoUploader(
 
             val request = videoUploadService.upload(
                 libraryId, videoId, fileInfo, object : UploadListener {
-                    override fun onProgressUpdated(percentage: Int) {
+                    override fun onProgressUpdated(percentage: Int, videoId: String) {
                         Log.d(TAG, "onProgressUpdated: $percentage")
-                        listener.onProgressUpdated(percentage)
+                        listener.onProgressUpdated(percentage, videoId)
                     }
 
-                    override fun onUploadDone() {
+                    override fun onUploadDone(videoId: String) {
                         Log.d(TAG, "onUploadDone")
-                        listener.onUploadDone()
+                        listener.onUploadDone(videoId)
                     }
 
-                    override fun onUploadStarted(uploadId: String) {
+                    override fun onUploadStarted(uploadId: String, videoId: String) {
                         Log.d(TAG, "onUploadStarted uploadId=$uploadId")
                     }
 
-                    override fun onUploadError(error: UploadError) {
+                    override fun onUploadError(error: UploadError, videoId: String?) {
                         Log.d(TAG, "onUploadError: $error")
-                        listener.onUploadError(error)
+                        listener.onUploadError(error, videoId)
                     }
 
-                    override fun onUploadCancelled() {
+                    override fun onUploadCancelled(videoId: String) {
                         Log.d(TAG, "onUploadCancelled")
-                        listener.onUploadCancelled()
+                        listener.onUploadCancelled(videoId)
                     }
                 }
             )
 
-            if(request != null) {
-                synchronized(lock) {
-                    uploadsInProgress[uploadId] = request
-                    listener.onUploadStarted(uploadId)
-                }
+            synchronized(lock) {
+                uploadsInProgress[uploadId] = request
+                listener.onUploadStarted(uploadId, videoId)
             }
 
             Log.d(TAG, "uploadsInProgress: $uploadsInProgress")
