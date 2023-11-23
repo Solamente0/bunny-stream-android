@@ -68,6 +68,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
 
+    override var autoPaused = false
+
     private var chapters = listOf<Chapter>()
         set(value) {
             field = value
@@ -359,7 +361,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         currentPlayer?.play()
     }
 
-    override fun pause() {
+    override fun pause(autoPaused: Boolean) {
+        this.autoPaused = autoPaused
         currentPlayer?.pause()
     }
 
