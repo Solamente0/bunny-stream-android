@@ -10,11 +10,9 @@ import net.bunnystream.player.model.SeekThumbnail
 
 class PreviewLoader(
     private val context: Context,
-    private val previewImageView: ImageView,
     private val seekThumbnail: SeekThumbnail,
 ) {
-
-    fun loadPreview(currentPosition: Long) {
+    fun loadPreview(currentPosition: Long, previewImageView: ImageView) {
         val currentFrameGlobal = (currentPosition / seekThumbnail.frameDurationPerThumbnail).toInt()
         val jpgIndex = currentFrameGlobal / seekThumbnail.thumbnailsPerImage
         val safeJpgIndex = jpgIndex.coerceIn(0, (seekThumbnail.seekThumbnailUrls.size) - 1)

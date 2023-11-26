@@ -1,4 +1,4 @@
-package net.bunnystream.player.ui.widget
+package net.bunnystream.player.model
 
 data class SubtitleInfo(
     val title: String,
