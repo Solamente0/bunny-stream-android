@@ -5,10 +5,10 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.model.SeekThumbnail
+import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
 import net.bunnystream.player.model.VideoQuality
 import net.bunnystream.player.model.VideoQualityOptions
-import net.bunnystream.player.model.SubtitleInfo
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
@@ -61,7 +61,7 @@ interface BunnyPlayer {
     /* Returns the current playback position. */
     fun getCurrentPosition(): Long
 
-    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel)
+    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>)
 
     fun skipForward()
 

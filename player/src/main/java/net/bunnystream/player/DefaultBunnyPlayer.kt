@@ -166,8 +166,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video")
+    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>) {
+        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
 
         currentVideo = video
 
@@ -218,23 +218,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
-        val data = listOf(
-            RetentionGraphEntry(0, 12),
-            RetentionGraphEntry(1, 100),
-            RetentionGraphEntry(2, 56),
-            RetentionGraphEntry(3, 37),
-            RetentionGraphEntry(4, 100),
-            RetentionGraphEntry(5, 56),
-            RetentionGraphEntry(6, 37),
-            RetentionGraphEntry(7, 100),
-            RetentionGraphEntry(8, 56),
-            RetentionGraphEntry(9, 37),
-            RetentionGraphEntry(10, 100),
-            RetentionGraphEntry(11, 56),
-            RetentionGraphEntry(12, 37)
-        )
-
-        retentionData = data
+        this.retentionData = retentionData.map {
+            RetentionGraphEntry(it.key, it.value)
+        }
     }
 
     override fun skipForward() {
