@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="camera_controls_background">#55000000</color>
+    <color name="start_stop_button_default">#FFFFFF</color>
+    <color name="start_stop_button_recording">#FF0000</color>
+    <color name="start_stop_button_border">#8D8D8D</color>
+    <color name="control_buttons_background">#4F000000</color>
+</resources>

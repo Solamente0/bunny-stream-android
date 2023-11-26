@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+  <SurfaceView
+      android:id="@+id/surface_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      />
+
+  <androidx.constraintlayout.widget.Barrier
+      android:id="@+id/barrier"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:barrierDirection="top"
+      app:constraint_referenced_ids="start_stop"
+      android:layout_marginBottom="48dp"/>
+
+  <View
+      android:id="@+id/controls_background"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:background="@color/camera_controls_background"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toTopOf="@id/barrier" />
+
+  <ImageView
+    android:id="@+id/mute"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:src="@drawable/ic_mic_on_24dp"
+      android:background="@drawable/switch_camera_background"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toLeftOf="@+id/start_stop"
+      app:layout_constraintTop_toBottomOf="@+id/barrier"
+      app:layout_constraintBottom_toBottomOf="parent"
+      />
+
+  <ImageView
+      android:id="@+id/start_stop"
+      android:layout_width="72dp"
+      android:layout_height="72dp"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/barrier"
+      android:layout_marginBottom="32dp"
+      android:layout_marginTop="32dp"
+      android:background="@drawable/start_stop_default_background"/>
+
+  <ImageView
+      android:id="@+id/switch_camera"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:src="@drawable/ic_cameraswitch_24dp"
+      android:background="@drawable/switch_camera_background"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintLeft_toRightOf="@+id/start_stop"
+      app:layout_constraintTop_toBottomOf="@+id/barrier"
+      app:layout_constraintBottom_toBottomOf="parent"
+      />
+
+
+</merge>
