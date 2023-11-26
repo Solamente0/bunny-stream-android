@@ -29,6 +29,7 @@ import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
+import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SeekThumbnail
 import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
@@ -79,6 +80,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             playerStateListener?.onMomentsUpdated(moments)
         }
 
+    private var retentionData = listOf<RetentionGraphEntry>()
+        set(value) {
+            field = value
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
+        }
+
     override var playerStateListener: PlayerStateListener? = null
         set(value) {
             field = value
@@ -86,6 +93,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             playerStateListener?.onMutedChanged(isMuted())
             playerStateListener?.onChaptersUpdated(chapters)
             playerStateListener?.onMomentsUpdated(moments)
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
         }
 
     private var mediaItem: MediaItem? = null
@@ -208,6 +216,24 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         chapters = video.chapters?.map {
             Chapter(it.start * 1000L, it.end*1000L, it.title)
         } ?: listOf()
+
+        val data = listOf(
+            RetentionGraphEntry(0, 12),
+            RetentionGraphEntry(1, 100),
+            RetentionGraphEntry(2, 56),
+            RetentionGraphEntry(3, 37),
+            RetentionGraphEntry(4, 100),
+            RetentionGraphEntry(5, 56),
+            RetentionGraphEntry(6, 37),
+            RetentionGraphEntry(7, 100),
+            RetentionGraphEntry(8, 56),
+            RetentionGraphEntry(9, 37),
+            RetentionGraphEntry(10, 100),
+            RetentionGraphEntry(11, 56),
+            RetentionGraphEntry(12, 37)
+        )
+
+        retentionData = data
     }
 
     override fun skipForward() {
