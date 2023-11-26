@@ -33,6 +33,7 @@ import net.bunnystream.player.model.PlayerIconSet
 import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.VideoQuality
+import kotlin.time.Duration.Companion.seconds
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class BunnyPlayerView @JvmOverloads constructor(
@@ -286,7 +287,7 @@ class BunnyPlayerView @JvmOverloads constructor(
                 if(subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
                     subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
-                    controllerShowTimeoutMs = 2 * 1000
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
                 }
 
@@ -294,7 +295,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 if(qualityOption != null) {
                     bunnyPlayer?.selectQuality(qualityOption)
-                    controllerShowTimeoutMs = 2 * 1000
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
                 }
 
@@ -410,12 +411,11 @@ class BunnyPlayerView @JvmOverloads constructor(
                 previewLoader?.loadPreview(position, imageView)
             }
         })
-        thumbnailPreview.durationPerFrame(20 * 1000)
 
         timeBar.addListener(object : TimeBar.OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {
                 showController()
-                controllerShowTimeoutMs = 120 * 1000
+                controllerShowTimeoutMs = 120.seconds.inWholeMilliseconds.toInt()
             }
 
             override fun onScrubMove(timeBar: TimeBar, position: Long) {
@@ -425,7 +425,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
                 player?.seekTo(position)
                 timeBar.setPosition(position)
-                controllerShowTimeoutMs = 2 * 1000
+                controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
             }
         })
 

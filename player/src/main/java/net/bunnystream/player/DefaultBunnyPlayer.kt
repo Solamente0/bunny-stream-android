@@ -38,6 +38,7 @@ import net.bunnystream.player.model.VideoQualityOptions
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -210,11 +211,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         initSeekThumbnailPreview(video)
 
         moments = video.moments?.map {
-            Moment(it.label, it.timestamp * 1000L)
+            Moment(it.label, it.timestamp.seconds.inWholeMilliseconds)
         } ?: listOf()
 
         chapters = video.chapters?.map {
-            Chapter(it.start * 1000L, it.end*1000L, it.title)
+            Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
         val data = listOf(
