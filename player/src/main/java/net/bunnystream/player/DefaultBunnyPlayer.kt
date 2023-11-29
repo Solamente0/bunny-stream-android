@@ -27,16 +27,18 @@ import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
-import net.bunnystream.player.model.MomentsContainer
+import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SeekThumbnail
+import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
 import net.bunnystream.player.model.VideoQuality
 import net.bunnystream.player.model.VideoQualityOptions
-import net.bunnystream.player.ui.widget.SubtitleInfo
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -67,11 +69,32 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
 
+    private var chapters = listOf<Chapter>()
+        set(value) {
+            field = value
+            playerStateListener?.onChaptersUpdated(chapters)
+        }
+
+    private var moments = listOf<Moment>()
+        set(value) {
+            field = value
+            playerStateListener?.onMomentsUpdated(moments)
+        }
+
+    private var retentionData = listOf<RetentionGraphEntry>()
+        set(value) {
+            field = value
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
+        }
+
     override var playerStateListener: PlayerStateListener? = null
         set(value) {
             field = value
             playerStateListener?.onPlayingChanged(isPlaying())
             playerStateListener?.onMutedChanged(isMuted())
+            playerStateListener?.onChaptersUpdated(chapters)
+            playerStateListener?.onMomentsUpdated(moments)
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
         }
 
     private var mediaItem: MediaItem? = null
@@ -115,7 +138,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override var seekThumbnail: SeekThumbnail? = null
-    override var moments: MomentsContainer? = null
 
     init {
         castPlayer = CastPlayer(castContext).also {
@@ -175,16 +197,44 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
             // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
-            .setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+            //.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
         // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-        //.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+//        .setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
 
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
 
         currentPlayer?.playWhenReady = true
         currentPlayer?.prepare()
+
+        initSeekThumbnailPreview(video)
+
+        moments = video.moments?.map {
+            Moment(it.label, it.timestamp.seconds.inWholeMilliseconds)
+        } ?: listOf()
+
+        chapters = video.chapters?.map {
+            Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
+        } ?: listOf()
+
+        val data = listOf(
+            RetentionGraphEntry(0, 12),
+            RetentionGraphEntry(1, 100),
+            RetentionGraphEntry(2, 56),
+            RetentionGraphEntry(3, 37),
+            RetentionGraphEntry(4, 100),
+            RetentionGraphEntry(5, 56),
+            RetentionGraphEntry(6, 37),
+            RetentionGraphEntry(7, 100),
+            RetentionGraphEntry(8, 56),
+            RetentionGraphEntry(9, 37),
+            RetentionGraphEntry(10, 100),
+            RetentionGraphEntry(11, 56),
+            RetentionGraphEntry(12, 37)
+        )
+
+        retentionData = data
     }
 
     override fun skipForward() {
@@ -205,15 +255,20 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun moments(video: VideoModel) {
-        moments = MomentsContainer(
-            totalDuration = video.length * 1000L,
-            video.moments?.map {
-                Moment(
-                    it.label,
-                    it.timestamp * 1000L
-                )
-            } ?: listOf()
+    private fun initSeekThumbnailPreview(video: VideoModel) {
+        val thumbnailPreviewsList: MutableList<String> = mutableListOf()
+        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
+        var i = 0
+        do {
+            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
+            i++
+        } while (i < numberOfPreviews)
+
+        seekThumbnail = SeekThumbnail(
+            seekThumbnailUrls = thumbnailPreviewsList,
+            frameDurationPerThumbnail = ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
+            totalThumbnailCount = video.thumbnailCount,
+            thumbnailsPerImage = THUMBNAILS_PER_IMAGE,
         )
     }
 
@@ -275,23 +330,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun areSubtitlesEnabled(): Boolean {
         return selectedSubtitle != null
-    }
-
-    override fun seekThumbnailPreview(video: VideoModel) {
-        val thumbnailPreviewsList: MutableList<String> = mutableListOf()
-        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
-        var i = 0
-        do {
-            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
-            i++
-        } while (i < numberOfPreviews)
-
-        seekThumbnail = SeekThumbnail(
-            thumbnailPreviewsList,
-            ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
-            video.thumbnailCount,
-            THUMBNAILS_PER_IMAGE,
-        )
     }
 
     override fun getVideoQualityOptions(): VideoQualityOptions? {
