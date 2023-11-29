@@ -25,6 +25,8 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.androidsdk.settings.toUri
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
@@ -46,10 +48,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     companion object {
         private const val TAG = "DefaultBunnyPlayer"
 
-        private const val TEST_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
-
         private const val SEEK_SKIP_MILLIS = 10 * 1000
-
         private const val THUMBNAILS_PER_IMAGE = 36
 
         @Volatile
@@ -107,6 +106,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     private val dataSourceFactory: DataSource.Factory = DataSource.Factory {
         val dataSource: HttpDataSource = httpDataSourceFactory.createDataSource()
+        // Needed if "Block Direct Url File Access" is enabled on Dashboard
         dataSource.setRequestProperty("Referer", "https://iframe.mediadelivery.net/")
         dataSource
     }
@@ -166,8 +166,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video")
+    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video settings=$settings")
 
         currentVideo = video
 
@@ -196,11 +196,16 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
-            // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
-            //.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
-        // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-//        .setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+        if(settings?.drmEnabled == true) {
+            mediaItemBuilder!!.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+        }
+
+        val vastTagUri = settings?.vastTagUrl.toUri()
+
+        if(vastTagUri != null) {
+            mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
+        }
 
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
@@ -234,7 +239,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             RetentionGraphEntry(12, 37)
         )
 
-        retentionData = data
+        if(settings?.showHeatmap == true) {
+            retentionData = data
+        }
     }
 
     override fun skipForward() {

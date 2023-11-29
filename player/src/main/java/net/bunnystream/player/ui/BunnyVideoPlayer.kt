@@ -109,9 +109,16 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     }
                     Log.d(TAG, "video=$video")
 
-                    bunnyPlayer.playVideo(binding.playerView, libraryId, video)
+                    val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(libraryId, videoId).getOrNull()
+
+                    bunnyPlayer.playVideo(binding.playerView, libraryId, video, settings)
 
                     playerView.bunnyPlayer = bunnyPlayer
+
+                    if(settings != null) {
+                        playerView.playerSettings = settings
+                    }
+
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to fetch video: ${e.message}")
                     e.printStackTrace()

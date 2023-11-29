@@ -1,7 +1,6 @@
 package net.bunnystream.player.ui.widget
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
@@ -23,6 +22,7 @@ import androidx.media3.ui.SubtitleView
 import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.MediaRouteButton
 import com.google.android.gms.cast.framework.CastButtonFactory
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R
@@ -116,6 +116,12 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
     var iconSet: PlayerIconSet = PlayerIconSet()
+        set(value) {
+            field = value
+            applyStyle()
+        }
+
+    var playerSettings: PlayerSettings? = null
         set(value) {
             field = value
             applyStyle()
@@ -362,19 +368,10 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private fun applyStyle() {
         playPauseButton.setStateIcons(iconSet.playIcon, iconSet.pauseIcon)
-        playPauseButton.tintColor = iconSet.tintColor
-
         replyButton.setImageResource(iconSet.rewindIcon)
-        replyButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         forwardButton.setImageResource(iconSet.forwardIcon)
-        forwardButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         settingsButton.setImageResource(iconSet.settingsIcon)
-        settingsButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         muteButton.setStateIcons(iconSet.volumeOnIcon, iconSet.volumeOffIcon)
-        muteButton.tintColor = iconSet.tintColor
 
         val fullScreenIcon = if(isFullscreen) {
             iconSet.fullscreenOffIcon
@@ -383,24 +380,28 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
         fullScreenButton.setImageResource(fullScreenIcon)
-        fullScreenButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
 
-        progressTextView.setTextColor(iconSet.tintColor)
+        playerSettings?.let {
+            timeBar.tintColor = it.keyColor
 
-//        timeBar.setPlayedColor(iconSet.tintColor)
-//        timeBar.setScrubberColor(iconSet.tintColor)
-//        timeBar.setAdMarkerColor(iconSet.tintColor)
-//        timeBar.pointColor.color = ColorUtils.setAlphaComponent(iconSet.tintColor, 90)
-//
-//        // 0 - fully transparent
-//        timeBar.setUnplayedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 80))
-//        timeBar.setBufferedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 150))
+            val style = CaptionStyleCompat(
+                /* foregroundColor = */ it.captionsFontColor ?: Color.WHITE,
+                /* backgroundColor = */ it.captionsBackgroundColor ?: Color.BLACK,
+                /* windowColor = */ Color.TRANSPARENT,
+                /* edgeType = */ EDGE_TYPE_NONE,
+                /* edgeColor = */ Color.WHITE,
+                /* typeface = */ null
+            )
 
-        val style = CaptionStyleCompat(
-            Color.RED, Color.WHITE, Color.GREEN, EDGE_TYPE_NONE, Color.CYAN, null
-        )
+            subtitles.setStyle(style)
 
-        // subtitles.setStyle(style)
+            // "play-large,play,progress,current-time,mute,volume,captions,settings,airplay,pip,fullscreen"
+        } ?: kotlin.run {
+            timeBar.tintColor = Color.WHITE
+            subtitles.setStyle(CaptionStyleCompat.DEFAULT)
+        }
+
+        invalidate()
     }
 
     private fun initTimeBar() {
