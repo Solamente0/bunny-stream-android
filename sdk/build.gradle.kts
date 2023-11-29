@@ -35,7 +35,17 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        getByName("debug") {
+
+        }
+
+        create("staging") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "BASE_API", "\"https://video.testfluffle.net/\"")
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

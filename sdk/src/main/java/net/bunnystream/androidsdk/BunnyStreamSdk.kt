@@ -18,7 +18,7 @@ class BunnyStreamSdk private constructor(
     companion object {
         private const val TUS_PREFS_FILE = "tusPrefs"
 
-        val baseApi = BuildConfig.BASE_API
+        const val baseApi = BuildConfig.BASE_API
 
         lateinit var cdnHostname: String
             private set
@@ -65,19 +65,21 @@ class BunnyStreamSdk private constructor(
         dispatcher = Dispatchers.IO
     )
 
-    override val collectionsApi = ManageCollectionsApi()
+    override val collectionsApi = ManageCollectionsApi(baseApi)
 
-    override val videosApi = ManageVideosApi()
+    override val videosApi = ManageVideosApi(baseApi)
 
     override val videoUploader = DefaultVideoUploader(
         context = context,
         videoUploadService = basicUploaderService,
         ioDispatcher = Dispatchers.IO,
+        videosApi
     )
 
     override val tusVideoUploader = DefaultVideoUploader(
         context = context,
         videoUploadService = tusVideoUploaderService,
         ioDispatcher = Dispatchers.IO,
+        videosApi
     )
 }

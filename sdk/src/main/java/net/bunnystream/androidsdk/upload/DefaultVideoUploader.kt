@@ -25,13 +25,12 @@ class DefaultVideoUploader(
     private val context: Context,
     private val videoUploadService: UploadService,
     ioDispatcher: CoroutineDispatcher,
+    private val videosApi: ManageVideosApi
 ) : VideoUploader {
 
     companion object {
         private const val TAG = "DefaultVideoUploader"
     }
-
-    private val videosApi = ManageVideosApi()
 
     private val supervisorJob = SupervisorJob()
     private val exceptionHandler = CoroutineExceptionHandler { context, exception ->
