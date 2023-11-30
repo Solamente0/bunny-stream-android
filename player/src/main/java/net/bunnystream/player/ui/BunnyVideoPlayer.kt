@@ -105,7 +105,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
             scope!!.launch {
                 try {
                     val video = withContext(Dispatchers.IO) {
-                        BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
+                        BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(libraryId, videoId)
                     }
                     Log.d(TAG, "video=$video")
 

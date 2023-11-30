@@ -2,8 +2,6 @@ package net.bunnystream.androidsdk
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
-import net.bunnystream.androidsdk.api.ManageCollectionsApi
-import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.ktor.initHttpClient
 import net.bunnystream.androidsdk.upload.DefaultVideoUploader
 import net.bunnystream.androidsdk.upload.service.basic.BasicUploaderService
@@ -49,6 +47,8 @@ class BunnyStreamSdk private constructor(
         }
     }
 
+    override val streamApi = StreamApi()
+
     private val prefs = context.getSharedPreferences(TUS_PREFS_FILE, Context.MODE_PRIVATE)
 
     private val ktorClient = initHttpClient(accessKey)
@@ -64,10 +64,6 @@ class BunnyStreamSdk private constructor(
         accessKey = accessKey,
         dispatcher = Dispatchers.IO
     )
-
-    override val collectionsApi = ManageCollectionsApi()
-
-    override val videosApi = ManageVideosApi()
 
     override val videoUploader = DefaultVideoUploader(
         context = context,
