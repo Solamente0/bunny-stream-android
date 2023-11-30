@@ -21,6 +21,6 @@ class BasicUploadRequest(
             Log.e("BasicUploadRequest","cancel exception: ${e.message}")
             e.printStackTrace()
         }
-        listener.onUploadCancelled()
+        listener.onUploadCancelled(videoId)
     }
 }
