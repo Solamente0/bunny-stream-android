@@ -2,9 +2,9 @@ package net.bunnystream.android.library
 
 import android.net.Uri
 import android.util.Log
-import net.bunnystream.androidsdk.upload.service.UploadListener
 import net.bunnystream.androidsdk.upload.VideoUploader
 import net.bunnystream.androidsdk.upload.model.UploadError
+import net.bunnystream.androidsdk.upload.service.UploadListener
 
 class DefaultVideoUploadService(
     private val videoUploader: VideoUploader
@@ -19,29 +19,29 @@ class DefaultVideoUploadService(
     override fun uploadVideo(libraryId: Long, videoUri: Uri) {
         Log.d(TAG, "uploadVideo videoUri=$videoUri videoUploader=$videoUploader")
         videoUploader.uploadVideo(libraryId, videoUri, object : UploadListener {
-            override fun onUploadError(error: UploadError) {
+            override fun onUploadError(error: UploadError, videoId: String?) {
                 Log.d(TAG, "onVideoUploadError: $error")
-                uploadListener?.onUploadError(error)
+                uploadListener?.onUploadError(error, videoId)
             }
 
-            override fun onUploadDone() {
+            override fun onUploadDone(videoId: String) {
                 Log.d(TAG, "onVideoUploadDone")
-                uploadListener?.onUploadDone()
+                uploadListener?.onUploadDone(videoId)
             }
 
-            override fun onUploadStarted(uploadId: String) {
+            override fun onUploadStarted(uploadId: String, videoId: String) {
                 Log.d(TAG, "onVideoUploadStarted: uploadId=$uploadId")
-                uploadListener?.onUploadStarted(uploadId)
+                uploadListener?.onUploadStarted(uploadId, videoId)
             }
 
-            override fun onProgressUpdated(percentage: Int) {
+            override fun onProgressUpdated(percentage: Int, videoId: String) {
                 Log.d(TAG, "onUploadProgress: percentage=$percentage")
-                uploadListener?.onProgressUpdated(percentage)
+                uploadListener?.onProgressUpdated(percentage, videoId)
             }
 
-            override fun onUploadCancelled() {
+            override fun onUploadCancelled(videoId: String) {
                 Log.d(TAG, "onUploadProgress: onVideoUploadCancelled")
-                uploadListener?.onUploadCancelled()
+                uploadListener?.onUploadCancelled(videoId)
             }
         })
     }

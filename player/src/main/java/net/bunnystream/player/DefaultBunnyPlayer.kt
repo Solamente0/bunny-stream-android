@@ -68,6 +68,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
 
+    override var autoPaused = false
+
     private var chapters = listOf<Chapter>()
         set(value) {
             field = value
@@ -166,8 +168,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, settings: PlayerSettings?) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video settings=$settings")
+    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
 
         currentVideo = video
 
@@ -223,24 +225,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
-        val data = listOf(
-            RetentionGraphEntry(0, 12),
-            RetentionGraphEntry(1, 100),
-            RetentionGraphEntry(2, 56),
-            RetentionGraphEntry(3, 37),
-            RetentionGraphEntry(4, 100),
-            RetentionGraphEntry(5, 56),
-            RetentionGraphEntry(6, 37),
-            RetentionGraphEntry(7, 100),
-            RetentionGraphEntry(8, 56),
-            RetentionGraphEntry(9, 37),
-            RetentionGraphEntry(10, 100),
-            RetentionGraphEntry(11, 56),
-            RetentionGraphEntry(12, 37)
-        )
-
-        if(settings?.showHeatmap == true) {
-            retentionData = data
+        if(settings?.showHeatmap) {
+            this.retentionData = retentionData.map {
+                RetentionGraphEntry(it.key, it.value)
+            }
         }
     }
 
@@ -367,7 +355,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         currentPlayer?.play()
     }
 
-    override fun pause() {
+    override fun pause(autoPaused: Boolean) {
+        this.autoPaused = autoPaused
         currentPlayer?.pause()
     }
 

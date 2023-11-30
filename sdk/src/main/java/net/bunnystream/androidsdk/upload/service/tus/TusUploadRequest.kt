@@ -21,6 +21,6 @@ class TusUploadRequest(
             Log.e("TusUploadRequest", "cancel exception: ${e.message}")
             e.printStackTrace()
         }
-        listener.onUploadCancelled()
+        listener.onUploadCancelled(videoId)
     }
 }

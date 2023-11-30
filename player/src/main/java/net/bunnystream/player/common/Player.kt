@@ -20,6 +20,8 @@ interface BunnyPlayer {
 
     var seekThumbnail: SeekThumbnail?
 
+    var autoPaused: Boolean
+
     /* Releases the resources held by the player, such as codecs. */
     fun release()
 
@@ -27,7 +29,7 @@ interface BunnyPlayer {
     fun play()
 
     /* Pauses playback. */
-    fun pause()
+    fun pause(autoPaused: Boolean = false)
 
     /* Stops playback and resets the player to its initial state. */
     fun stop()
@@ -62,7 +64,7 @@ interface BunnyPlayer {
     /* Returns the current playback position. */
     fun getCurrentPosition(): Long
 
-    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, settings: PlayerSettings?)
+    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, playerSettings: PlayerSettings?)
 
     fun skipForward()
 

@@ -52,30 +52,30 @@ class LibraryViewModel : ViewModel() {
     private var uploadInProgressId: String? = null
 
     private val uploadListener = object : UploadListener {
-        override fun onUploadError(error: UploadError) {
+        override fun onUploadError(error: UploadError, videoId: String?) {
             Log.d(TAG, "onVideoUploadError: $error")
             mutableUploadUiState.value = VideoUploadUiState.UploadError(error.toString())
             uploadInProgressId = null
         }
 
-        override fun onUploadDone() {
+        override fun onUploadDone(videoId: String) {
             Log.d(TAG, "onVideoUploadDone")
             loadLibrary(libraryId)
             mutableUploadUiState.value = VideoUploadUiState.NotUploading
             uploadInProgressId = null
         }
 
-        override fun onUploadStarted(uploadId: String) {
+        override fun onUploadStarted(uploadId: String, videoId: String) {
             Log.d(TAG, "onVideoUploadStarted: uploadId=$uploadId")
             uploadInProgressId = uploadId
         }
 
-        override fun onProgressUpdated(percentage: Int) {
+        override fun onProgressUpdated(percentage: Int, videoId: String) {
             Log.d(TAG, "onUploadProgress: percentage=$percentage")
             mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage)
         }
 
-        override fun onUploadCancelled() {
+        override fun onUploadCancelled(videoId: String) {
             Log.d(TAG, "onVideoUploadCancelled")
             mutableUploadUiState.value = VideoUploadUiState.NotUploading
             uploadInProgressId = null
@@ -105,7 +105,7 @@ class LibraryViewModel : ViewModel() {
 
         scope.launch {
             try {
-                val response = App.di.streamSdk.videosApi.videoList(
+                val response = App.di.streamSdk.streamApi.videosApi.videoList(
                     libraryId = libraryId,
                     page = null,
                     itemsPerPage = null,
@@ -165,7 +165,7 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "onDeleteVideo video=$video")
         scope.launch {
             try {
-                val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
+                val result = App.di.streamSdk.streamApi.videosApi.videoDeleteVideo(libraryId, video.id)
 
                 if(result.success) {
                     Log.d(TAG, "Video deleted")
