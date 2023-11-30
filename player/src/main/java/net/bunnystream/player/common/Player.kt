@@ -5,10 +5,10 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.model.SeekThumbnail
+import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
 import net.bunnystream.player.model.VideoQuality
 import net.bunnystream.player.model.VideoQualityOptions
-import net.bunnystream.player.model.SubtitleInfo
 import org.openapitools.client.models.VideoModel
 
 interface BunnyPlayer {
@@ -19,6 +19,8 @@ interface BunnyPlayer {
 
     var seekThumbnail: SeekThumbnail?
 
+    var autoPaused: Boolean
+
     /* Releases the resources held by the player, such as codecs. */
     fun release()
 
@@ -26,7 +28,7 @@ interface BunnyPlayer {
     fun play()
 
     /* Pauses playback. */
-    fun pause()
+    fun pause(autoPaused: Boolean = false)
 
     /* Stops playback and resets the player to its initial state. */
     fun stop()

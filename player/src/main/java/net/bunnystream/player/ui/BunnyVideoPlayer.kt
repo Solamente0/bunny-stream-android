@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +26,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr), BunnyPlayer {
 
     companion object {
         private const val TAG = "BunnyVideoPlayer"
@@ -40,13 +43,26 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         binding.playerView
     }
 
-    var iconSet: PlayerIconSet = PlayerIconSet()
+    override var iconSet: PlayerIconSet = PlayerIconSet()
         set(value) {
             field = value
             playerView.iconSet = value
         }
 
     private val bunnyPlayer = DefaultBunnyPlayer.getInstance(context)
+
+    private val lifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
+            if(bunnyPlayer.autoPaused) {
+                bunnyPlayer.play()
+            }
+        }
+
+        override fun onPause(owner: LifecycleOwner) {
+            val autoPaused = bunnyPlayer.isPlaying()
+            bunnyPlayer.pause(autoPaused)
+        }
+    }
 
     init {
         playerView.iconSet = iconSet
@@ -71,11 +87,14 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     pendingJob?.invoke()
                     pendingJob = null
                 }
+
+                findViewTreeLifecycleOwner()?.lifecycle?.addObserver(lifecycleObserver)
             }
 
             override fun onViewDetachedFromWindow(view: View) {
                 Log.d(TAG, "onViewDetachedFromWindow")
                 job?.cancel()
+                findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(lifecycleObserver)
             }
         })
     }
@@ -91,7 +110,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         bunnyPlayer.stop()
     }
 
-    fun playVideo(libraryId: Long, videoId: String) {
+    override fun playVideo(libraryId: Long, videoId: String) {
         Log.d(TAG, "playVideo libraryId=$libraryId videoId=$videoId")
 
         if(!BunnyStreamSdk.isInitialized()) {
@@ -126,5 +145,13 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
         loadVideoJob = pendingJob?.invoke()
         pendingJob = null
+    }
+
+    override fun pause() {
+        bunnyPlayer.pause()
+    }
+
+    override fun play() {
+        bunnyPlayer.play()
     }
 }
