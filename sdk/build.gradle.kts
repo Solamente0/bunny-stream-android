@@ -106,7 +106,10 @@ tasks.register("openApiGenerateAll") {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn("openApiGenerateAll")
+    dependsOn(
+        "downloadLatestOpenApiSpecs",
+        "openApiGenerateAll"
+    )
 }
 
 tasks.dokkaHtml.configure {
@@ -130,4 +133,10 @@ tasks.dokkaHtml.configure {
             }
         }
     }
+}
+
+tasks.register("downloadLatestOpenApiSpecs") {
+    val openApiSpecsUrl = "https://docs.bunny.net/openapi/6054a6cc63d1a0001e3d22fc"
+    val destinationFile = project.file("openapi/").resolve("StreamApi.json")
+    ant.invokeMethod("get", mapOf("src" to openApiSpecsUrl, "dest" to destinationFile))
 }

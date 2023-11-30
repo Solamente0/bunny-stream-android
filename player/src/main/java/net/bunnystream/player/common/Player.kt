@@ -63,7 +63,7 @@ interface BunnyPlayer {
     /* Returns the current playback position. */
     fun getCurrentPosition(): Long
 
-    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel)
+    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>)
 
     fun skipForward()
 

@@ -19,6 +19,7 @@ import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.PlayerIconSet
+import net.bunnystream.player.model.getSanitizedRetentionData
 import net.bunnystream.player.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.player.ui.widget.BunnyPlayerView
 
@@ -128,7 +129,15 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     }
                     Log.d(TAG, "video=$video")
 
-                    bunnyPlayer.playVideo(binding.playerView, libraryId, video)
+                    val retentionData = withContext(Dispatchers.IO) {
+                        BunnyStreamSdk.getInstance().videosApi.videoGetVideoHeatmap(libraryId, videoId)
+                    }
+
+                    val retentionValues = retentionData.getSanitizedRetentionData()
+
+                    Log.d(TAG, "retentionData=$retentionData")
+
+                    bunnyPlayer.playVideo(binding.playerView, libraryId, video, retentionValues)
 
                     playerView.bunnyPlayer = bunnyPlayer
                 } catch (e: Exception) {
