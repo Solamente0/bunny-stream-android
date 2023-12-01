@@ -7,6 +7,8 @@ android {
     namespace = "net.bunnystream.android"
     compileSdk = 34
 
+    viewBinding.enable = true
+
     defaultConfig {
         applicationId = "net.bunnystream.android"
         minSdk = 24
@@ -62,7 +64,7 @@ dependencies {
     implementation(project(":player"))
     implementation(project(":streaming"))
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))

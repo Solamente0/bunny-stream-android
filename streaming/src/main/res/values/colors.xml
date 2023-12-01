@@ -3,6 +3,9 @@
     <color name="camera_controls_background">#55000000</color>
     <color name="start_stop_button_default">#FFFFFF</color>
     <color name="start_stop_button_recording">#FF0000</color>
+    <color name="stream_status_recording">#FF0000</color>
     <color name="start_stop_button_border">#8D8D8D</color>
     <color name="control_buttons_background">#4F000000</color>
+    <color name="black">#000</color>
+    <color name="white">#fff</color>
 </resources>

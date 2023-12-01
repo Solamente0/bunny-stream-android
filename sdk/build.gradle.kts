@@ -23,6 +23,7 @@ android {
 
         buildConfigField("String", "TUS_UPLOAD_ENDPOINT", "\"https://video.bunnycdn.com/tusupload\"")
         buildConfigField("String", "BASE_API", "\"https://video.bunnycdn.com\"")
+        buildConfigField("String", "RTMP_ENDPOINT", "\"rtmp://94.130.242.34/ingest/\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

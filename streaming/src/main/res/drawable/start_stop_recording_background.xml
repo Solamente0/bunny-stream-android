@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/start_stop_button_default">
-    <item android:id="@android:id/background">
-        <shape
-            android:shape="oval">
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
 
-            <solid android:color="@color/start_stop_button_recording"/>
+    <solid android:color="@color/start_stop_button_recording"/>
 
-            <stroke android:color="@color/start_stop_button_border"
-                android:width="4dp"/>
-        </shape>
-    </item>
-</ripple>
+    <stroke
+        android:color="@color/start_stop_button_border"
+        android:width="4dp"/>
+</shape>
