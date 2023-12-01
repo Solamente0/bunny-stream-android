@@ -22,6 +22,8 @@ interface BunnyPlayer {
 
     var autoPaused: Boolean
 
+    var playerSettings: PlayerSettings?
+
     /* Releases the resources held by the player, such as codecs. */
     fun release()
 

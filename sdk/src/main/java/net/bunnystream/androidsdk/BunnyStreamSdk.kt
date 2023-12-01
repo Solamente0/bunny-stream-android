@@ -50,7 +50,7 @@ class BunnyStreamSdk private constructor(
         }
     }
 
-    override val streamApi = StreamApi()
+    override val streamApi = StreamApi(baseApi)
 
     private val prefs = context.getSharedPreferences(TUS_PREFS_FILE, Context.MODE_PRIVATE)
 

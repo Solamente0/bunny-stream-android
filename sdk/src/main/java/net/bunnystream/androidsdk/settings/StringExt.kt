@@ -19,3 +19,11 @@ fun String?.toUri(): Uri? {
         null
     }
 }
+
+fun String.capitalizeWords(): String {
+    return this.split(" ").joinToString(" ") {
+        it.replaceFirstChar { char ->
+            char.uppercaseChar()
+        }
+    }
+}

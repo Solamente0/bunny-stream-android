@@ -2,9 +2,11 @@ package net.bunnystream.androidsdk.settings.data.model
 
 import android.graphics.Color
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.androidsdk.settings.toColorOrDefault
 
+@Serializable
 data class PlayerSettingsResponse(
     @SerialName("thumbnailUrl")
     val thumbnailUrl: String,

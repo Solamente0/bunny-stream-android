@@ -13,4 +13,16 @@ data class PlayerSettings(
     val playbackSpeeds: String,
     val drmEnabled: Boolean,
     val vastTagUrl: String?
-)
+) {
+    // "rewind,fast-forward,play-large,captions,current-time,duration,fullscreen,mute,pip,play,progress,settings,volume"
+    val subtitlesEnabled = controls.contains("captions")
+    val rewindEnabled = controls.contains("rewind")
+    val fastForwardEnabled = controls.contains("fast-forward")
+    val currentTimeEnabled = controls.contains("current-time")
+    val fullScreenEnabled = controls.contains("fullscreen")
+    val muteEnabled = controls.contains("mute")
+    val settingsEnabled = controls.contains("settings")
+    val progressEnabled = controls.contains("progress")
+    val durationEnabled = controls.contains("duration")
+    val playButtonEnabled = controls.contains("play-large") || controls.contains("play")
+}

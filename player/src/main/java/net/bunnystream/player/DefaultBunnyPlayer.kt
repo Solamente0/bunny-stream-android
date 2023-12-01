@@ -141,6 +141,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override var seekThumbnail: SeekThumbnail? = null
 
+    override var playerSettings: PlayerSettings? = null
+
     init {
         castPlayer = CastPlayer(castContext).also {
             it.addListener(playerListener)
@@ -171,6 +173,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
         Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
 
+        this.playerSettings = settings
         currentVideo = video
 
         val imaLoader = ImaAdsLoader.Builder(context).build()
@@ -225,7 +228,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
-        if(settings?.showHeatmap) {
+        if(settings?.showHeatmap == true) {
             this.retentionData = retentionData.map {
                 RetentionGraphEntry(it.key, it.value)
             }
@@ -352,6 +355,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun play() {
+        val current = currentPlayer?.currentPosition ?: 0
+        val duration = currentPlayer?.duration ?: 0
+        // There can be few ms difference
+        if(current >= duration) {
+            currentPlayer?.seekTo(0)
+        }
         currentPlayer?.play()
     }
 

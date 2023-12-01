@@ -22,6 +22,7 @@ import net.bunnystream.player.model.PlayerIconSet
 import net.bunnystream.player.model.getSanitizedRetentionData
 import net.bunnystream.player.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.player.ui.widget.BunnyPlayerView
+import org.openapitools.client.models.VideoModel
 
 class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
@@ -123,35 +124,43 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
         pendingJob = {
             scope!!.launch {
+
+                val video: VideoModel
+
                 try {
-                    val video = withContext(Dispatchers.IO) {
-                        BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(libraryId, videoId)
+                    video = withContext(Dispatchers.IO) {
+                        BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(
+                            libraryId,
+                            videoId
+                        )
                     }
                     Log.d(TAG, "video=$video")
-
-                    val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(libraryId, videoId).getOrNull()
-
-                    bunnyPlayer.playVideo(binding.playerView, libraryId, video, settings)
-                    val retentionData = withContext(Dispatchers.IO) {
-                        BunnyStreamSdk.getInstance().videosApi.videoGetVideoHeatmap(libraryId, videoId)
-                    }
-
-                    val retentionValues = retentionData.getSanitizedRetentionData()
-
-                    Log.d(TAG, "retentionData=$retentionData")
-
-                    bunnyPlayer.playVideo(binding.playerView, libraryId, video, retentionValues)
-
-                    playerView.bunnyPlayer = bunnyPlayer
-
-                    if(settings != null) {
-                        playerView.playerSettings = settings
-                    }
-
                 } catch (e: Exception) {
-                    Log.e(TAG, "Unable to fetch video: ${e.message}")
-                    e.printStackTrace()
+                    Log.w(TAG, "Error fetching video: $e")
+                    return@launch
                 }
+
+                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(libraryId, videoId).getOrNull()
+
+                var retentionData: Map<Int, Int> = mutableMapOf()
+
+                if(settings?.showHeatmap == true) {
+                    try {
+                        val retentionDataResponse = withContext(Dispatchers.IO) {
+                            BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideoHeatmap(
+                                libraryId,
+                                videoId
+                            )
+                        }
+                        retentionData = retentionDataResponse.getSanitizedRetentionData()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Error fetching video heatmap")
+                    }
+                }
+
+                bunnyPlayer.playVideo(binding.playerView, libraryId, video, retentionData, settings)
+
+                playerView.bunnyPlayer = bunnyPlayer
             }
         }
 

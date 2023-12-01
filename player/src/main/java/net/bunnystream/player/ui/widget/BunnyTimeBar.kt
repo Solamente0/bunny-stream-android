@@ -743,6 +743,10 @@ class BunnyTimeBar @JvmOverloads constructor(
     }
 
     private fun adjustRetentionGraphPoints() {
+        if(retentionGraphData.isEmpty()) {
+            return
+        }
+
         val chartHeight = graphBounds.bottom - graphBounds.top
         val chartWidth = graphBounds.right - graphBounds.left
 
