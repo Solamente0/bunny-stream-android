@@ -1,10 +1,11 @@
 package net.bunnystream.androidsdk
 
 import android.content.Context
+import arrow.core.Either
 import kotlinx.coroutines.Dispatchers
-import net.bunnystream.androidsdk.api.ManageCollectionsApi
-import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.ktor.initHttpClient
+import net.bunnystream.androidsdk.settings.data.DefaultSettingsRepository
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.androidsdk.upload.DefaultVideoUploader
 import net.bunnystream.androidsdk.upload.service.basic.BasicUploaderService
 import net.bunnystream.androidsdk.upload.service.tus.TusUploaderService
@@ -49,6 +50,8 @@ class BunnyStreamSdk private constructor(
         }
     }
 
+    override val streamApi = StreamApi(baseApi)
+
     private val prefs = context.getSharedPreferences(TUS_PREFS_FILE, Context.MODE_PRIVATE)
 
     private val ktorClient = initHttpClient(accessKey)
@@ -65,21 +68,26 @@ class BunnyStreamSdk private constructor(
         dispatcher = Dispatchers.IO
     )
 
-    override val collectionsApi = ManageCollectionsApi(baseApi)
-
-    override val videosApi = ManageVideosApi(baseApi)
-
     override val videoUploader = DefaultVideoUploader(
         context = context,
         videoUploadService = basicUploaderService,
         ioDispatcher = Dispatchers.IO,
-        videosApi
+        streamApi.videosApi
     )
 
     override val tusVideoUploader = DefaultVideoUploader(
         context = context,
         videoUploadService = tusVideoUploaderService,
         ioDispatcher = Dispatchers.IO,
-        videosApi
+        streamApi.videosApi
     )
+
+    override val settingsRepository = DefaultSettingsRepository(
+        httpClient = ktorClient,
+        coroutineDispatcher = Dispatchers.IO
+    )
+
+    override suspend fun fetchPlayerSettings(libraryId: Long, videoId: String): Either<String, PlayerSettings> {
+        return settingsRepository.fetchSettings(libraryId, videoId)
+    }
 }

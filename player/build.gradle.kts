@@ -66,4 +66,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("io.arrow-kt:arrow-core:1.2.0")
 }

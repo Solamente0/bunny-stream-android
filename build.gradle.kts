@@ -6,4 +6,5 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.1" apply false
     id("org.openapi.generator") version "5.3.0" apply false
     id("org.jetbrains.dokka") version "1.9.10" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10" apply false
 }

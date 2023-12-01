@@ -17,6 +17,7 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import androidx.media3.common.C
 import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.UnstableApi
@@ -180,6 +181,17 @@ class BunnyTimeBar @JvmOverloads constructor(
 
     private val scrubberPositionScreen: Int
         get() = positionLeft + getScreenScrubber()
+
+    var tintColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            playedPaint.color = tintColor
+            scrubberCirclePaint.color = tintColor
+            chapterSelectedPaint.color = tintColor
+            bufferedPaint.color = ColorUtils.setAlphaComponent(tintColor, 150)
+            unPlayedPaint.color = ColorUtils.setAlphaComponent(tintColor, 80)
+            invalidate()
+        }
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -731,6 +743,10 @@ class BunnyTimeBar @JvmOverloads constructor(
     }
 
     private fun adjustRetentionGraphPoints() {
+        if(retentionGraphData.isEmpty()) {
+            return
+        }
+
         val chartHeight = graphBounds.bottom - graphBounds.top
         val chartWidth = graphBounds.right - graphBounds.left
 
