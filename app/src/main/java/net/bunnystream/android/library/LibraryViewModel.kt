@@ -60,7 +60,7 @@ class LibraryViewModel : ViewModel() {
 
         override fun onUploadDone(videoId: String) {
             Log.d(TAG, "onVideoUploadDone")
-            loadLibrary(libraryId)
+            loadLibrary()
             mutableUploadUiState.value = VideoUploadUiState.NotUploading
             uploadInProgressId = null
         }
@@ -93,15 +93,13 @@ class LibraryViewModel : ViewModel() {
         App.di.videoUploadService.uploadListener = uploadListener
 
         if(libraryId != -1L && BunnyStreamSdk.isInitialized()) {
-            loadLibrary(libraryId)
+            loadLibrary()
         }
     }
 
-    fun loadLibrary(libraryId: Long) {
+    fun loadLibrary() {
+        Log.d(TAG, "loadLibrary")
         mutableUiState.value = LibraryUiState.LibraryUiLoading
-
-        this.libraryId = libraryId
-        prefs.libraryId = this.libraryId
 
         scope.launch {
             try {

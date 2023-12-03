@@ -37,6 +37,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -162,9 +163,8 @@ fun LibraryRoute(
         modifier = modifier,
         navigateToSettings = navigateToSettings,
         showAccessKeyNeeded = showAccessKeyNeeded,
-        onLoadLibraryClicked = viewModel::loadLibrary,
+        onLoadLibrary = viewModel::loadLibrary,
         uiState = uiState,
-        libraryId = viewModel.libraryId,
         onUploadVideoClicked = {
             pickVideoLauncher.launch(
                 PickVisualMediaRequest(
@@ -187,6 +187,8 @@ fun LibraryRoute(
         },
         navigateToStreaming = navigateToStreaming
     )
+
+    LaunchedEffect(key1 = "loadLibrary", block = { viewModel.loadLibrary() })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -195,8 +197,7 @@ private fun LibraryScreen(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
     showAccessKeyNeeded: Boolean,
-    onLoadLibraryClicked: (Long) -> Unit,
-    libraryId: Long,
+    onLoadLibrary: () -> Unit,
     uiState: LibraryUiState,
     onUploadVideoClicked: () -> Unit,
     uploadingUiState: VideoUploadUiState,
@@ -208,8 +209,6 @@ private fun LibraryScreen(
     onVideoClicked: (Video) -> Unit,
     navigateToStreaming: () -> Unit,
 ) {
-
-    var libId by remember { mutableStateOf(libraryId.toString()) }
 
     Scaffold(
         topBar = {
@@ -223,11 +222,13 @@ private fun LibraryScreen(
                         Text(stringResource(id = R.string.screen_library))
                     },
                     actions = {
-                        IconButton(onClick = navigateToStreaming) {
-                            Icon(
-                                imageVector = Icons.Filled.Face,
-                                contentDescription = null
-                            )
+                        if(!showAccessKeyNeeded) {
+                            IconButton(onClick = navigateToStreaming) {
+                                Icon(
+                                    imageVector = Icons.Filled.Face,
+                                    contentDescription = null
+                                )
+                            }
                         }
                         IconButton(onClick = navigateToSettings) {
                             Icon(
@@ -261,7 +262,7 @@ private fun LibraryScreen(
                         state = rememberSwipeRefreshState(
                             isRefreshing = uiState == LibraryUiState.LibraryUiLoading
                         ),
-                        onRefresh = { onLoadLibraryClicked(libId.toLong()) }
+                        onRefresh = { onLoadLibrary() }
                     ) {
                         Column(modifier = modifier) {
                             Box(modifier = modifier
@@ -339,7 +340,10 @@ private fun VideoItem(
             contentScale = ContentScale.Crop,
         )
 
-        Column(modifier = modifier.weight(1F).align(CenterVertically).padding(start = 10.dp)) {
+        Column(modifier = modifier
+            .weight(1F)
+            .align(CenterVertically)
+            .padding(start = 10.dp)) {
             Text(
                 modifier = modifier,
                 text = video.name
@@ -536,9 +540,8 @@ private fun LibraryScreenPreview() {
         LibraryScreen(
             navigateToSettings = {},
             showAccessKeyNeeded = false,
-            onLoadLibraryClicked = {},
+            onLoadLibrary = {},
             uiState = LibraryUiState.LibraryUiEmpty,
-            libraryId = -1,
             onUploadVideoClicked = {},
             uploadingUiState = VideoUploadUiState.Uploading(50),
             onDismissUploadErrorClicked = {},

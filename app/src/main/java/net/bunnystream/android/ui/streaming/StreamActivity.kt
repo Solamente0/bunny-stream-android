@@ -34,8 +34,6 @@ class StreamActivity : AppCompatActivity() {
         binding = ActivityStreamBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.streamView.libraryId = 0
-
         binding.streamView.closeStreamClickListener = OnClickListener {
             finish()
         }

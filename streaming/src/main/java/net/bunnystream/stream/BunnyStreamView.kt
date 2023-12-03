@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.core.view.isVisible
 import kotlinx.coroutines.Dispatchers
+import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.stream.data.DefaultStreamRepository
 import net.bunnystream.stream.databinding.StreamViewBinding
 import net.bunnystream.stream.domain.DefaultStreamHandler
@@ -37,7 +38,7 @@ class BunnyStreamView @JvmOverloads constructor(
         coroutineDispatcher = Dispatchers.IO
     )
 
-    var libraryId: Long? = null
+    private val libraryId = BunnyStreamSdk.libraryId
 
     override var hideDefaultControls: Boolean = false
         set(value) {
@@ -115,7 +116,7 @@ class BunnyStreamView @JvmOverloads constructor(
 
         binding.startStop.setOnClickListener {
             if(!streamHandler.isStreaming()) {
-                streamHandler.startStreaming(libraryId!!)
+                streamHandler.startStreaming(libraryId)
             } else {
                 streamHandler.stopStreaming()
             }
@@ -154,7 +155,7 @@ class BunnyStreamView @JvmOverloads constructor(
     }
 
     override fun startStreaming(){
-        streamHandler.startStreaming(libraryId!!)
+        streamHandler.startStreaming(libraryId)
     }
 
     override fun stopStreaming(){
