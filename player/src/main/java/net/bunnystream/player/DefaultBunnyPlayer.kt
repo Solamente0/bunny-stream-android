@@ -170,8 +170,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
+    override fun playVideo(playerView: PlayerView, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData")
 
         this.playerSettings = settings
         currentVideo = video
@@ -196,7 +196,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
         val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
-        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/$libraryId/${video.guid}?contentId=${video.guid}"
+        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/${BunnyStreamSdk.libraryId}/${video.guid}?contentId=${video.guid}"
 
         mediaItemBuilder = MediaItem.Builder()
             .setUri(url)

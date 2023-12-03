@@ -3,7 +3,6 @@ package net.bunnystream.android.library
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -82,8 +81,8 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
-    var libraryId by mutableLongStateOf(prefs.libraryId)
-        private set
+    private val libraryId: Long
+        get() = BunnyStreamSdk.libraryId
 
     var useTusUpload by mutableStateOf(false)
         private set

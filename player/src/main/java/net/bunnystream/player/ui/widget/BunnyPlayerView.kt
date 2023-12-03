@@ -518,4 +518,8 @@ class BunnyPlayerView @JvmOverloads constructor(
 
         progressDurationDivider.isVisible = progressTextView.isVisible && durationTextView.isVisible
     }
+
+    private fun updateThumbnailPreview() {
+
+    }
 }

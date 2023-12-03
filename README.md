@@ -27,7 +27,7 @@ To use player in Jetpack Compose, instantiate `BunnyVideoPlayer` in `AndroidView
 
 You can find an example in [PlayerScreen.kt](app/src/main/java/net/bunnystream/android/player/PlayerScreen.kt).
 
-To use player in XML views, add `BunnyVideoPlayer` widget in layout and call `playVideo(libraryId, videoId)` after layout is inflated.
+To use player in XML views, add `BunnyVideoPlayer` widget in layout and call `playVideo(videoId)` after layout is inflated.
 
 You can supply your own icons for player by setting `iconSet` field. Check [PlayerIconSet](player/src/main/java/net/bunnystream/player/model/PlayerIconSet.kt).
 
