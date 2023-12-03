@@ -1,8 +1,10 @@
 package net.bunnystream.player.ui.widget
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Menu
@@ -10,12 +12,14 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.Dimension
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.provider.FontRequest
+import androidx.core.provider.FontsContractCompat
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
 import androidx.media3.ui.CaptionStyleCompat
-import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_NONE
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
@@ -23,6 +27,8 @@ import androidx.media3.ui.SubtitleView
 import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.MediaRouteButton
 import com.google.android.gms.cast.framework.CastButtonFactory
+import net.bunnystream.androidsdk.settings.capitalizeWords
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R
@@ -30,7 +36,10 @@ import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.PlayerIconSet
+import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SubtitleInfo
+import net.bunnystream.player.model.VideoQuality
+import kotlin.time.Duration.Companion.seconds
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class BunnyPlayerView @JvmOverloads constructor(
@@ -88,6 +97,10 @@ class BunnyPlayerView @JvmOverloads constructor(
             timeBar?.moments = moments
         }
 
+        override fun onRetentionGraphUpdated(points: List<RetentionGraphEntry>) {
+            timeBar?.retentionGraphData = points
+        }
+
         override fun onPlayerTypeChanged(player: Player, playerType: PlayerType) {
             updatePlayer(player, playerType)
         }
@@ -100,8 +113,10 @@ class BunnyPlayerView @JvmOverloads constructor(
             field = value
             field?.playerStateListener = playStateListener
             player = bunnyPlayer?.currentPlayer
+            playerSettings = value?.playerSettings
             setPlayerControls()
             initTimeBar()
+            applyStyle()
 
             bunnyPlayer?.seekThumbnail?.let {
                 previewLoader = PreviewLoader(context, it)
@@ -110,6 +125,13 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     var iconSet: PlayerIconSet = PlayerIconSet()
         set(value) {
+            field = value
+            applyStyle()
+        }
+
+    var playerSettings: PlayerSettings? = null
+        set(value) {
+            Log.d(TAG, "set playerSettings: $value")
             field = value
             applyStyle()
         }
@@ -146,6 +168,14 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val progressTextView by lazy {
         findViewById<TextView>(R.id.exo_position)
+    }
+
+    private val durationTextView by lazy {
+        findViewById<TextView>(R.id.exo_duration)
+    }
+
+    private val progressDurationDivider by lazy {
+        findViewById<View>(R.id.position_duration_divider)
     }
 
     private val timeBar by lazy {
@@ -197,13 +227,14 @@ class BunnyPlayerView @JvmOverloads constructor(
             popupMenu.inflate(R.menu.video_settings)
 
             val subtitlesConfig = bunnyPlayer?.getSubtitles()
+            val subtitlesEnabled = playerSettings?.subtitlesEnabled == true
 
             val subtitleMenuId = View.generateViewId()
             val subtitleMenuIds = mutableMapOf<Int, SubtitleInfo>()
 
             val speed = bunnyPlayer?.getSpeed()
 
-            if(subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
+            if(subtitlesEnabled && subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
                 val subtitlesMenu = popupMenu.menu.addSubMenu(
                     Menu.NONE,
                     subtitleMenuId,
@@ -225,6 +256,40 @@ class BunnyPlayerView @JvmOverloads constructor(
                 }
             }
 
+            val videoQualityOptions = bunnyPlayer?.getVideoQualityOptions()
+
+            val qualityMenuId = View.generateViewId()
+            val qualityMenuIds = mutableMapOf<Int, VideoQuality>()
+
+            if(videoQualityOptions != null) {
+                val qualityOptionsMenu = popupMenu.menu.addSubMenu(
+                    Menu.NONE,
+                    qualityMenuId,
+                    Menu.NONE,
+                    context.getString(R.string.label_video_settings_quality)
+                )
+
+                videoQualityOptions.options.forEach { option ->
+                    val id = generateViewId()
+                    qualityMenuIds[id] = option
+
+                    val title = if(option.width == Int.MAX_VALUE) {
+                        context.getString(R.string.label_video_quality_auto)
+                    } else {
+                        "${option.width} x ${option.height}"
+                    }
+
+                    val item = qualityOptionsMenu.add(
+                        Menu.NONE,
+                        id,
+                        Menu.NONE,
+                        title
+                    )
+                    item.isCheckable = true
+                    item.isChecked = videoQualityOptions.selectedOption == option
+                }
+            }
+
             val speedMenuItemId = when (speed) {
                 0.5F -> R.id.video_speed_0_5
                 0.75F -> R.id.video_speed_0_75
@@ -239,11 +304,22 @@ class BunnyPlayerView @JvmOverloads constructor(
             popupMenu.menu.findItem(speedMenuItemId)?.isChecked = true
 
             popupMenu.setOnMenuItemClickListener { item ->
+                Log.d(TAG, "setOnMenuItemClickListener")
+
                 val subtitleOption = subtitleMenuIds[item.itemId]
 
                 if(subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
                     subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
+                    return@setOnMenuItemClickListener true
+                }
+
+                val qualityOption = qualityMenuIds[item.itemId]
+
+                if(qualityOption != null) {
+                    bunnyPlayer?.selectQuality(qualityOption)
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
                 }
 
@@ -259,6 +335,9 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 true
             }
+
+            controllerHideOnTouch = true
+            controllerShowTimeoutMs = -1
 
             popupMenu.show()
         }
@@ -307,19 +386,10 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private fun applyStyle() {
         playPauseButton.setStateIcons(iconSet.playIcon, iconSet.pauseIcon)
-        playPauseButton.tintColor = iconSet.tintColor
-
         replyButton.setImageResource(iconSet.rewindIcon)
-        replyButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         forwardButton.setImageResource(iconSet.forwardIcon)
-        forwardButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         settingsButton.setImageResource(iconSet.settingsIcon)
-        settingsButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
-
         muteButton.setStateIcons(iconSet.volumeOnIcon, iconSet.volumeOffIcon)
-        muteButton.tintColor = iconSet.tintColor
 
         val fullScreenIcon = if(isFullscreen) {
             iconSet.fullscreenOffIcon
@@ -328,24 +398,25 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
         fullScreenButton.setImageResource(fullScreenIcon)
-        fullScreenButton.imageTintList = ColorStateList.valueOf(iconSet.tintColor)
 
-        progressTextView.setTextColor(iconSet.tintColor)
+        val settings = playerSettings
 
-//        timeBar.setPlayedColor(iconSet.tintColor)
-//        timeBar.setScrubberColor(iconSet.tintColor)
-//        timeBar.setAdMarkerColor(iconSet.tintColor)
-//        timeBar.pointColor.color = ColorUtils.setAlphaComponent(iconSet.tintColor, 90)
-//
-//        // 0 - fully transparent
-//        timeBar.setUnplayedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 80))
-//        timeBar.setBufferedColor(ColorUtils.setAlphaComponent(iconSet.tintColor, 150))
+        if(settings == null) {
+            timeBar.tintColor = Color.WHITE
+            subtitles.setStyle(CaptionStyleCompat.DEFAULT)
+        } else {
+            timeBar.tintColor = settings.keyColor
 
-        val style = CaptionStyleCompat(
-            Color.RED, Color.WHITE, Color.GREEN, EDGE_TYPE_NONE, Color.CYAN, null
-        )
+            subtitles.setStyle(getSubtitleStyle(settings.captionsFontColor, settings.captionsBackgroundColor))
+            subtitles.setFixedTextSize(Dimension.SP, settings.captionsFontSize.toFloat())
 
-        // subtitles.setStyle(style)
+            // Google fonts are usually capitalized, e.g. "rubik" is not found but "Rubik" is
+            fetchFont(settings.fontFamily.capitalizeWords())
+
+            updateControlsVisibility()
+        }
+
+        invalidate()
     }
 
     private fun initTimeBar() {
@@ -356,12 +427,11 @@ class BunnyPlayerView @JvmOverloads constructor(
                 previewLoader?.loadPreview(position, imageView)
             }
         })
-        thumbnailPreview.durationPerFrame(20 * 1000)
 
         timeBar.addListener(object : TimeBar.OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {
                 showController()
-                controllerShowTimeoutMs = 120 * 1000
+                controllerShowTimeoutMs = 120.seconds.inWholeMilliseconds.toInt()
             }
 
             override fun onScrubMove(timeBar: TimeBar, position: Long) {
@@ -371,7 +441,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
                 player?.seekTo(position)
                 timeBar.setPosition(position)
-                controllerShowTimeoutMs = 2 * 1000
+                controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
             }
         })
 
@@ -382,5 +452,70 @@ class BunnyPlayerView @JvmOverloads constructor(
                 timeBar.hideScrubber()
             }
         })
+    }
+
+    private fun fetchFont(fontFamily: String){
+        Log.d(TAG, "fetchFont: $fontFamily")
+        val handlerThread = HandlerThread("fonts").apply { start() }
+        val handler = Handler(handlerThread.looper)
+
+        val request = FontRequest(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            fontFamily,
+            R.array.com_google_android_gms_fonts_certs
+        )
+        val callback = object : FontsContractCompat.FontRequestCallback() {
+
+            override fun onTypefaceRetrieved(typeface: Typeface) {
+                Log.d(TAG, "onTypefaceRetrieved: $typeface")
+                updateFonts(typeface)
+            }
+
+            override fun onTypefaceRequestFailed(reason: Int) {
+                Log.d(TAG, "onTypefaceRequestFailed: $reason")
+            }
+        }
+        FontsContractCompat.requestFont(context, request, callback, handler)
+    }
+
+    private fun updateFonts(typeface: Typeface){
+        thumbnailPreview.updateTypeface(typeface)
+        progressTextView.typeface = typeface
+        durationTextView.typeface = typeface
+
+        playerSettings?.let {
+            subtitles.setStyle(getSubtitleStyle(it.captionsFontColor, it.captionsBackgroundColor, typeface))
+        }
+    }
+
+    private fun getSubtitleStyle(
+        fontColor: Int? = null,
+        backgroundColor: Int? = null,
+        typeface: Typeface? = null
+    ): CaptionStyleCompat {
+        return CaptionStyleCompat(
+            /* foregroundColor = */ fontColor ?: CaptionStyleCompat.DEFAULT.foregroundColor,
+            /* backgroundColor = */ backgroundColor ?: CaptionStyleCompat.DEFAULT.backgroundColor,
+            /* windowColor = */ CaptionStyleCompat.DEFAULT.windowColor,
+            /* edgeType = */ CaptionStyleCompat.DEFAULT.edgeType,
+            /* edgeColor = */ CaptionStyleCompat.DEFAULT.edgeColor,
+            /* typeface = */ typeface
+        )
+    }
+
+    private fun updateControlsVisibility() {
+        replyButton.isVisible = playerSettings?.rewindEnabled == true
+        forwardButton.isVisible = playerSettings?.fastForwardEnabled == true
+        progressTextView.isVisible = playerSettings?.currentTimeEnabled == true
+        durationTextView.isVisible = playerSettings?.durationEnabled == true
+        fullScreenButton.isVisible = playerSettings?.fullScreenEnabled == true
+        muteButton.isVisible = playerSettings?.muteEnabled == true
+        settingsButton.isVisible = playerSettings?.settingsEnabled == true
+        subtitle.isVisible = playerSettings?.subtitlesEnabled == true
+        timeBar.isVisible = playerSettings?.progressEnabled == true
+        playPauseButton.isVisible = playerSettings?.playButtonEnabled == true
+
+        progressDurationDivider.isVisible = progressTextView.isVisible && durationTextView.isVisible
     }
 }

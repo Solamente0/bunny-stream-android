@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -47,7 +48,7 @@ import kotlin.math.min
     private var latestScrub: Int = 0
     private var latestRect: Rect? = null
     private var latestNormedPosition = -1L
-    private var positionDiff = TimeUnit.SECONDS.toMillis(10)
+    private val positionDiff = TimeUnit.SECONDS.toMillis(20)
 
     private val View.screenLocation
         get(): IntArray {
@@ -78,10 +79,6 @@ import kotlin.math.min
         if (attrs != null) {
             processAttrs()
         }
-    }
-
-    fun durationPerFrame(duration: Long) {
-        this.positionDiff = duration
     }
 
     fun previewListener(listener: PreviewListener) = apply {
@@ -124,6 +121,11 @@ import kotlin.math.min
                 it.start()
             }
         }
+    }
+
+    fun updateTypeface(typeface: Typeface) {
+        titleTextView.typeface = typeface
+        timeTextView.typeface = typeface
     }
 
     internal fun updateTitle(chapterTitle: String?, momentTitle: String?) {

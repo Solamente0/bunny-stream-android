@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/video_settings_quality"
-        android:title="@string/label_video_settings_quality"/>
-
     <item android:id="@+id/video_settings_speed"
         android:title="@string/label_video_settings_speed">
         <menu>

@@ -7,10 +7,12 @@ import android.util.Log
 import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.C
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
@@ -18,19 +20,27 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.ima.ImaAdsLoader
 import androidx.media3.exoplayer.ima.ImaServerSideAdInsertionMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.androidsdk.settings.toUri
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
+import net.bunnystream.player.model.RetentionGraphEntry
 import net.bunnystream.player.model.SeekThumbnail
 import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
+import net.bunnystream.player.model.VideoQuality
+import net.bunnystream.player.model.VideoQualityOptions
 import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -38,10 +48,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     companion object {
         private const val TAG = "DefaultBunnyPlayer"
 
-        private const val TEST_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
-
         private const val SEEK_SKIP_MILLIS = 10 * 1000
-
         private const val THUMBNAILS_PER_IMAGE = 36
 
         @Volatile
@@ -61,6 +68,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
 
+    override var autoPaused = false
+
     private var chapters = listOf<Chapter>()
         set(value) {
             field = value
@@ -73,6 +82,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             playerStateListener?.onMomentsUpdated(moments)
         }
 
+    private var retentionData = listOf<RetentionGraphEntry>()
+        set(value) {
+            field = value
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
+        }
+
     override var playerStateListener: PlayerStateListener? = null
         set(value) {
             field = value
@@ -80,16 +95,20 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             playerStateListener?.onMutedChanged(isMuted())
             playerStateListener?.onChaptersUpdated(chapters)
             playerStateListener?.onMomentsUpdated(moments)
+            playerStateListener?.onRetentionGraphUpdated(retentionData)
         }
 
     private var mediaItem: MediaItem? = null
     private var mediaItemBuilder: MediaItem.Builder? = null
+
+    private var trackSelector: DefaultTrackSelector? = null
 
     private val httpDataSourceFactory: HttpDataSource.Factory =
         DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
 
     private val dataSourceFactory: DataSource.Factory = DataSource.Factory {
         val dataSource: HttpDataSource = httpDataSourceFactory.createDataSource()
+        // Needed if "Block Direct Url File Access" is enabled on Dashboard
         dataSource.setRequestProperty("Referer", "https://iframe.mediadelivery.net/")
         dataSource
     }
@@ -113,9 +132,16 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Log.d(TAG, "onIsLoadingChanged isLoading: $isLoading")
             playerStateListener?.onLoadingChanged(isLoading)
         }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            Log.d(TAG, "onTracksChanged tracks: $tracks")
+        }
     }
 
     override var seekThumbnail: SeekThumbnail? = null
+
+    override var playerSettings: PlayerSettings? = null
 
     init {
         castPlayer = CastPlayer(castContext).also {
@@ -144,18 +170,22 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video")
+    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
 
+        this.playerSettings = settings
         currentVideo = video
 
         val imaLoader = ImaAdsLoader.Builder(context).build()
 
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(dataSourceFactory)
-//            .setLocalAdInsertionComponents({ imaLoader }, playerView)
+            .setLocalAdInsertionComponents({ imaLoader }, playerView)
+
+        trackSelector = DefaultTrackSelector(context, AdaptiveTrackSelection.Factory())
 
         localPlayer = ExoPlayer.Builder(context)
+            .setTrackSelector(trackSelector!!)
             .setMediaSourceFactory(mediaSourceFactory)
             .build().also {
                 it.addListener(playerListener)
@@ -171,11 +201,16 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
-            // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
-            .setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
-        // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-        //.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+        if(settings?.drmEnabled == true) {
+            mediaItemBuilder!!.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+        }
+
+        val vastTagUri = settings?.vastTagUrl.toUri()
+
+        if(vastTagUri != null) {
+            mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
+        }
 
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
@@ -186,12 +221,18 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         initSeekThumbnailPreview(video)
 
         moments = video.moments?.map {
-            Moment(it.label, it.timestamp * 1000L)
+            Moment(it.label, it.timestamp.seconds.inWholeMilliseconds)
         } ?: listOf()
 
         chapters = video.chapters?.map {
-            Chapter(it.start * 1000L, it.end*1000L, it.title)
+            Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
+
+        if(settings?.showHeatmap == true) {
+            this.retentionData = retentionData.map {
+                RetentionGraphEntry(it.key, it.value)
+            }
+        }
     }
 
     override fun skipForward() {
@@ -289,6 +330,18 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         return selectedSubtitle != null
     }
 
+    override fun getVideoQualityOptions(): VideoQualityOptions? {
+        return getAvailableVideoQualityOptions()
+    }
+
+    override fun selectQuality(quality: VideoQuality) {
+        Log.d(TAG, "selectQuality: $quality")
+        trackSelector?.let {
+            val params = it.buildUponParameters().setMaxVideoSize(quality.width, quality.height)
+            it.setParameters(params)
+        }
+    }
+
     override fun release() {
         currentPlayer?.stop()
 
@@ -302,10 +355,17 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun play() {
+        val current = currentPlayer?.currentPosition ?: 0
+        val duration = currentPlayer?.duration ?: 0
+        // There can be few ms difference
+        if(current >= duration) {
+            currentPlayer?.seekTo(0)
+        }
         currentPlayer?.play()
     }
 
-    override fun pause() {
+    override fun pause(autoPaused: Boolean) {
+        this.autoPaused = autoPaused
         currentPlayer?.pause()
     }
 
@@ -385,5 +445,42 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         newPlayer.playWhenReady = newPlayWhenReady
         newPlayer.prepare()
+    }
+
+    private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
+        Log.d(TAG, "getAvailableVideoQualityOptions")
+
+        val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
+
+        val options = mutableListOf<VideoQuality>()
+
+        trackGroups.forEach {
+            for (trackIndex in 0 until it.length) {
+                if (it.isTrackSupported(trackIndex)) {
+                    val format = it.getTrackFormat(trackIndex)
+                    if (format.width != Format.NO_VALUE || format.height != Format.NO_VALUE) {
+                        options.add(VideoQuality(format.width, format.height))
+                    }
+                }
+            }
+        }
+
+        // Default option (resolution selected automatically by player)
+        var selectedOption = VideoQuality(Int.MAX_VALUE, Int.MAX_VALUE)
+
+        options.sortByDescending { it.width + it.height }
+        options.add(0, selectedOption)
+
+        trackSelector?.parameters?.let {
+            if(it.maxVideoWidth != Int.MAX_VALUE && it.maxVideoHeight != Int.MAX_VALUE){
+                selectedOption = VideoQuality(it.maxVideoWidth, it.maxVideoHeight)
+            }
+        }
+
+        val videoQualityOptions = VideoQualityOptions(options, selectedOption)
+
+        Log.d(TAG, "updateAvailableVideoQualityOptions videoQualityOptions=$videoQualityOptions")
+
+        return videoQualityOptions
     }
 }

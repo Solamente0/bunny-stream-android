@@ -19,6 +19,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -72,6 +73,7 @@ fun LibraryRoute(
     appState: AppState,
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
+    navigateToStreaming: () -> Unit,
     navigateToPlayer: (Long, Video) -> Unit,
     localPrefs: LocalPrefs,
     viewModel: LibraryViewModel = viewModel(),
@@ -182,7 +184,8 @@ fun LibraryRoute(
         },
         onVideoClicked = {
             navigateToPlayer(viewModel.libraryId, it)
-        }
+        },
+        navigateToStreaming = navigateToStreaming
     )
 }
 
@@ -203,6 +206,7 @@ private fun LibraryScreen(
     useTusUpload: Boolean,
     onDeleteVideoClicked: (Video) -> Unit,
     onVideoClicked: (Video) -> Unit,
+    navigateToStreaming: () -> Unit,
 ) {
 
     var libId by remember { mutableStateOf(libraryId.toString()) }
@@ -219,6 +223,12 @@ private fun LibraryScreen(
                         Text(stringResource(id = R.string.screen_library))
                     },
                     actions = {
+                        IconButton(onClick = navigateToStreaming) {
+                            Icon(
+                                imageVector = Icons.Filled.Face,
+                                contentDescription = null
+                            )
+                        }
                         IconButton(onClick = navigateToSettings) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
@@ -536,7 +546,8 @@ private fun LibraryScreenPreview() {
             onTusUploadOptionChanged = {},
             useTusUpload = true,
             onDeleteVideoClicked = {},
-            onVideoClicked = {}
+            onVideoClicked = {},
+            navigateToStreaming = {},
         )
     }
 }

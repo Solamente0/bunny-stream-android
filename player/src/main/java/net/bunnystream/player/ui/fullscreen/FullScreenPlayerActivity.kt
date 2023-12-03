@@ -96,6 +96,19 @@ class FullScreenPlayerActivity : AppCompatActivity() {
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(playerView.bunnyPlayer?.autoPaused == true) {
+            playerView.bunnyPlayer?.play()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val autoPaused = playerView.bunnyPlayer?.isPlaying() == true
+        playerView.bunnyPlayer?.pause(autoPaused)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         playerView.bunnyPlayer = null

@@ -4,6 +4,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
     id("org.openapi.generator")
     id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -22,6 +23,7 @@ android {
 
         buildConfigField("String", "TUS_UPLOAD_ENDPOINT", "\"https://video.bunnycdn.com/tusupload\"")
         buildConfigField("String", "BASE_API", "\"https://video.bunnycdn.com\"")
+        buildConfigField("String", "RTMP_ENDPOINT", "\"rtmp://94.130.242.34/ingest/\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -35,7 +37,17 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        getByName("debug") {
+
+        }
+
+        create("staging") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "BASE_API", "\"https://video.testfluffle.net/\"")
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -106,7 +118,10 @@ tasks.register("openApiGenerateAll") {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn("openApiGenerateAll")
+    dependsOn(
+        "downloadLatestOpenApiSpecs",
+        "openApiGenerateAll"
+    )
 }
 
 tasks.dokkaHtml.configure {
@@ -130,4 +145,10 @@ tasks.dokkaHtml.configure {
             }
         }
     }
+}
+
+tasks.register("downloadLatestOpenApiSpecs") {
+    val openApiSpecsUrl = "https://docs.bunny.net/openapi/6054a6cc63d1a0001e3d22fc"
+    val destinationFile = project.file("openapi/").resolve("StreamApi.json")
+    ant.invokeMethod("get", mapOf("src" to openApiSpecsUrl, "dest" to destinationFile))
 }
