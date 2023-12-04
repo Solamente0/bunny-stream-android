@@ -57,7 +57,7 @@ class BasicUploaderService(
                     val percentage = ((bytesSentTotal / contentLength.toFloat()) * 100).toInt()
                     if(percentage != uploadProcess) {
                         uploadProcess = percentage
-                        listener.onProgressUpdated(percentage)
+                        listener.onProgressUpdated(percentage, videoId)
                     }
                 }
             }
@@ -66,7 +66,7 @@ class BasicUploaderService(
                 val response = request.execute()
 
                 if(response.status.isSuccess()) {
-                    listener.onUploadDone()
+                    listener.onUploadDone(videoId)
                 } else {
                     when (response.status.value) {
                         HttpStatusCodes.UNAUTHORIZED -> Either.Left(UploadError.Unauthorized)
@@ -79,7 +79,7 @@ class BasicUploaderService(
             } catch (e: Exception) {
                 Log.w(TAG, "error uploading: ${e.message}")
                 e.printStackTrace()
-                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()))
+                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
             }
         }
 

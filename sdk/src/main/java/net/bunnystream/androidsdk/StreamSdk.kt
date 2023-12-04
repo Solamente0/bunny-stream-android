@@ -1,21 +1,14 @@
 package net.bunnystream.androidsdk
 
-import net.bunnystream.androidsdk.api.ManageCollectionsApi
 import net.bunnystream.androidsdk.api.ManageVideosApi
 import net.bunnystream.androidsdk.upload.VideoUploader
 
 interface StreamSdk {
     /**
-     * API endpoints for managing video collections
-     * @see ManageCollectionsApi
-     */
-    val collectionsApi: ManageCollectionsApi
-
-    /**
-     * API endpoints for managing videos
+     * API endpoints for managing videos and collections
      * @see ManageVideosApi
      */
-    val videosApi: ManageVideosApi
+    val streamApi: StreamApi
 
     /**
      * Component for managing video uploads

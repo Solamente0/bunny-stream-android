@@ -79,17 +79,17 @@ class TusUploaderService(
 
                     if(progress != uploadProgress) {
                         uploadProgress = progress
-                        listener.onProgressUpdated(progress)
+                        listener.onProgressUpdated(progress, videoId)
                     }
                 } while (uploader.uploadChunk() > -1)
 
                 uploader.finish()
                 Log.d(TAG, "upload done")
-                listener.onUploadDone()
+                listener.onUploadDone(videoId)
             } catch (e: Exception) {
                 Log.e(TAG, "error uploading: ${e.message}")
                 e.printStackTrace()
-                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()))
+                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
             }
         }
 

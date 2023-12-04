@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,6 +19,7 @@ import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.PlayerIconSet
+import net.bunnystream.player.model.getSanitizedRetentionData
 import net.bunnystream.player.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.player.ui.widget.BunnyPlayerView
 
@@ -23,7 +27,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr), BunnyPlayer {
 
     companion object {
         private const val TAG = "BunnyVideoPlayer"
@@ -40,13 +44,26 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         binding.playerView
     }
 
-    var iconSet: PlayerIconSet = PlayerIconSet()
+    override var iconSet: PlayerIconSet = PlayerIconSet()
         set(value) {
             field = value
             playerView.iconSet = value
         }
 
     private val bunnyPlayer = DefaultBunnyPlayer.getInstance(context)
+
+    private val lifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
+            if(bunnyPlayer.autoPaused) {
+                bunnyPlayer.play()
+            }
+        }
+
+        override fun onPause(owner: LifecycleOwner) {
+            val autoPaused = bunnyPlayer.isPlaying()
+            bunnyPlayer.pause(autoPaused)
+        }
+    }
 
     init {
         playerView.iconSet = iconSet
@@ -71,11 +88,14 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     pendingJob?.invoke()
                     pendingJob = null
                 }
+
+                findViewTreeLifecycleOwner()?.lifecycle?.addObserver(lifecycleObserver)
             }
 
             override fun onViewDetachedFromWindow(view: View) {
                 Log.d(TAG, "onViewDetachedFromWindow")
                 job?.cancel()
+                findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(lifecycleObserver)
             }
         })
     }
@@ -91,7 +111,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         bunnyPlayer.stop()
     }
 
-    fun playVideo(libraryId: Long, videoId: String) {
+    override fun playVideo(libraryId: Long, videoId: String) {
         Log.d(TAG, "playVideo libraryId=$libraryId videoId=$videoId")
 
         if(!BunnyStreamSdk.isInitialized()) {
@@ -105,11 +125,19 @@ class BunnyVideoPlayer @JvmOverloads constructor(
             scope!!.launch {
                 try {
                     val video = withContext(Dispatchers.IO) {
-                        BunnyStreamSdk.getInstance().videosApi.videoGetVideo(libraryId, videoId)
+                        BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(libraryId, videoId)
                     }
                     Log.d(TAG, "video=$video")
 
-                    bunnyPlayer.playVideo(binding.playerView, libraryId, video)
+                    val retentionData = withContext(Dispatchers.IO) {
+                        BunnyStreamSdk.getInstance().videosApi.videoGetVideoHeatmap(libraryId, videoId)
+                    }
+
+                    val retentionValues = retentionData.getSanitizedRetentionData()
+
+                    Log.d(TAG, "retentionData=$retentionData")
+
+                    bunnyPlayer.playVideo(binding.playerView, libraryId, video, retentionValues)
 
                     playerView.bunnyPlayer = bunnyPlayer
                 } catch (e: Exception) {
@@ -126,5 +154,13 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
         loadVideoJob = pendingJob?.invoke()
         pendingJob = null
+    }
+
+    override fun pause() {
+        bunnyPlayer.pause()
+    }
+
+    override fun play() {
+        bunnyPlayer.play()
     }
 }
