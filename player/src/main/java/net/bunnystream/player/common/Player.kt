@@ -87,4 +87,6 @@ interface BunnyPlayer {
     fun getVideoQualityOptions(): VideoQualityOptions?
 
     fun selectQuality(quality: VideoQuality)
+
+    fun getPlaybackSpeeds(): List<Float>
 }

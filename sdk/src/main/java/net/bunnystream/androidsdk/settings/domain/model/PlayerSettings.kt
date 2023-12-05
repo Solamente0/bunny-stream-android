@@ -10,7 +10,7 @@ data class PlayerSettings(
     val uiLanguage: String,
     val showHeatmap: Boolean,
     val fontFamily: String,
-    val playbackSpeeds: String,
+    val playbackSpeeds: List<Float>,
     val drmEnabled: Boolean,
     val vastTagUrl: String?
 ) {

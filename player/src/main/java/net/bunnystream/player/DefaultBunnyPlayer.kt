@@ -342,6 +342,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
+    override fun getPlaybackSpeeds(): List<Float> {
+        return playerSettings?.playbackSpeeds ?: listOf()
+    }
+
     override fun release() {
         currentPlayer?.stop()
 
@@ -405,8 +409,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun switchCurrentPlayer(newPlayer: Player) {
-        Log.d(TAG, "switchCurrentPlayer $newPlayer")
-
         if (this.currentPlayer === newPlayer) {
             return
         }
@@ -448,8 +450,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
-        Log.d(TAG, "getAvailableVideoQualityOptions")
-
         val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
 
         val options = mutableListOf<VideoQuality>()
@@ -478,8 +478,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
 
         val videoQualityOptions = VideoQualityOptions(options, selectedOption)
-
-        Log.d(TAG, "updateAvailableVideoQualityOptions videoQualityOptions=$videoQualityOptions")
 
         return videoQualityOptions
     }
