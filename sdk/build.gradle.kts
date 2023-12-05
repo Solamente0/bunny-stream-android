@@ -45,7 +45,7 @@ android {
 
         create("staging") {
             initWith(getByName("debug"))
-            buildConfigField("String", "BASE_API", "\"https://video.testfluffle.net/\"")
+            buildConfigField("String", "BASE_API", "\"https://video.testfluffle.net\"")
         }
     }
 

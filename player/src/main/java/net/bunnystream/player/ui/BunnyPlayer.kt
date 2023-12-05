@@ -12,10 +12,9 @@ interface BunnyPlayer {
     /**
      * Plays a video and fetches additional info, e.g. chapters, moments and subtitles
      *
-     * @param libraryId Video Library ID
      * @param videoId Video ID
      */
-    fun playVideo(libraryId: Long, videoId: String)
+    fun playVideo(videoId: String)
 
     /**
      * Pauses video

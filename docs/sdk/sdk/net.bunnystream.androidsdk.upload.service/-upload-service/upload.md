@@ -5,7 +5,7 @@
 [androidJvm]\
 abstract suspend fun [upload](upload.md)(libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), fileInfo: [FileInfo](../../net.bunnystream.androidsdk.upload.model/-file-info/index.md), listener: [UploadListener](../-upload-listener/index.md)): [UploadRequest](../-upload-request/index.md)
 
-Uploads content in for of [InputStream](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html) to provided url
+Uploads content in for of [InputStream](https://developer.android.com/reference/kotlin/java/io/InputStream.html) to provided url
 
 #### Return
 

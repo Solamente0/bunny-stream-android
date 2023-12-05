@@ -3,13 +3,13 @@
 # StreamContent
 
 [androidJvm]\
-class [StreamContent](index.md)(inputStream: [InputStream](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html)) : OutgoingContent.ReadChannelContent
+class [StreamContent](index.md)(inputStream: [InputStream](https://developer.android.com/reference/kotlin/java/io/InputStream.html)) : OutgoingContent.ReadChannelContent
 
 ## Constructors
 
 | | |
 |---|---|
-| [StreamContent](-stream-content.md) | [androidJvm]<br>constructor(inputStream: [InputStream](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html)) |
+| [StreamContent](-stream-content.md) | [androidJvm]<br>constructor(inputStream: [InputStream](https://developer.android.com/reference/kotlin/java/io/InputStream.html)) |
 
 ## Properties
 
