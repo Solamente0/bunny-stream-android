@@ -25,6 +25,8 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.androidsdk.settings.toUri
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.Chapter
@@ -46,10 +48,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     companion object {
         private const val TAG = "DefaultBunnyPlayer"
 
-        private const val TEST_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
-
         private const val SEEK_SKIP_MILLIS = 10 * 1000
-
         private const val THUMBNAILS_PER_IMAGE = 36
 
         @Volatile
@@ -109,6 +108,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     private val dataSourceFactory: DataSource.Factory = DataSource.Factory {
         val dataSource: HttpDataSource = httpDataSourceFactory.createDataSource()
+        // Needed if "Block Direct Url File Access" is enabled on Dashboard
         dataSource.setRequestProperty("Referer", "https://iframe.mediadelivery.net/")
         dataSource
     }
@@ -141,6 +141,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override var seekThumbnail: SeekThumbnail? = null
 
+    override var playerSettings: PlayerSettings? = null
+
     init {
         castPlayer = CastPlayer(castContext).also {
             it.addListener(playerListener)
@@ -168,9 +170,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
+    override fun playVideo(playerView: PlayerView, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData")
 
+        this.playerSettings = settings
         currentVideo = video
 
         val imaLoader = ImaAdsLoader.Builder(context).build()
@@ -193,16 +196,21 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
         val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
-        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/$libraryId/${video.guid}?contentId=${video.guid}"
+        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/${BunnyStreamSdk.libraryId}/${video.guid}?contentId=${video.guid}"
 
         mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
-            // TODO(Esed): suggest API changes to have DRM settings returned in VideoModel
-            //.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
 
-        // TODO(Esed): suggest API changes to have VAST tag returned in VideoModel
-//        .setAdsConfiguration(MediaItem.AdsConfiguration.Builder(Uri.parse(TEST_AD)).build())
+        if(settings?.drmEnabled == true) {
+            mediaItemBuilder!!.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+        }
+
+        val vastTagUri = settings?.vastTagUrl.toUri()
+
+        if(vastTagUri != null) {
+            mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
+        }
 
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
@@ -220,8 +228,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
-        this.retentionData = retentionData.map {
-            RetentionGraphEntry(it.key, it.value)
+        if(settings?.showHeatmap == true) {
+            this.retentionData = retentionData.map {
+                RetentionGraphEntry(it.key, it.value)
+            }
         }
     }
 
@@ -332,6 +342,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
+    override fun getPlaybackSpeeds(): List<Float> {
+        return playerSettings?.playbackSpeeds ?: listOf()
+    }
+
     override fun release() {
         currentPlayer?.stop()
 
@@ -345,6 +359,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun play() {
+        val current = currentPlayer?.currentPosition ?: 0
+        val duration = currentPlayer?.duration ?: 0
+        // There can be few ms difference
+        if(current >= duration) {
+            currentPlayer?.seekTo(0)
+        }
         currentPlayer?.play()
     }
 
@@ -389,8 +409,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun switchCurrentPlayer(newPlayer: Player) {
-        Log.d(TAG, "switchCurrentPlayer $newPlayer")
-
         if (this.currentPlayer === newPlayer) {
             return
         }
@@ -432,8 +450,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
-        Log.d(TAG, "getAvailableVideoQualityOptions")
-
         val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
 
         val options = mutableListOf<VideoQuality>()
@@ -462,8 +478,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
 
         val videoQualityOptions = VideoQualityOptions(options, selectedOption)
-
-        Log.d(TAG, "updateAvailableVideoQualityOptions videoQualityOptions=$videoQualityOptions")
 
         return videoQualityOptions
     }

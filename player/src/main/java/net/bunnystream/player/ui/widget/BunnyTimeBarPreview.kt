@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -120,6 +121,11 @@ import kotlin.math.min
                 it.start()
             }
         }
+    }
+
+    fun updateTypeface(typeface: Typeface) {
+        titleTextView.typeface = typeface
+        timeTextView.typeface = typeface
     }
 
     internal fun updateTitle(chapterTitle: String?, momentTitle: String?) {

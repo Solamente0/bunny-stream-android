@@ -17,7 +17,8 @@ fun NavController.navigateToLibrary(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.libraryScreen(
     appState: AppState,
     navigateToSettings: () -> Unit,
-    navigateToPlayer: (Long, Video) -> Unit,
+    navigateToPlayer: (Video) -> Unit,
+    navigateToStreaming: () -> Unit,
 ) {
     composable(
         route = LIBRARY_ROUTE,
@@ -25,7 +26,8 @@ fun NavGraphBuilder.libraryScreen(
         LibraryRoute(
             appState = appState,
             navigateToSettings = navigateToSettings,
-            navigateToPlayer = { libId, videoId -> navigateToPlayer(libId, videoId) },
+            navigateToStreaming = navigateToStreaming,
+            navigateToPlayer = { videoId -> navigateToPlayer(videoId) },
             localPrefs = App.di.localPrefs
         )
     }

@@ -27,6 +27,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="net.bunnystream.android.ui.streaming.StreamActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|colorMode|uiMode"/>
+
     </application>
 
 </manifest>

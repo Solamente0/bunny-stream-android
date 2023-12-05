@@ -1,6 +1,9 @@
 package net.bunnystream.androidsdk
 
+import arrow.core.Either
 import net.bunnystream.androidsdk.api.ManageVideosApi
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.androidsdk.settings.domain.SettingsRepository
 import net.bunnystream.androidsdk.upload.VideoUploader
 
 interface StreamSdk {
@@ -21,4 +24,8 @@ interface StreamSdk {
      * @see VideoUploader
      */
     val tusVideoUploader: VideoUploader
+
+    val settingsRepository: SettingsRepository
+
+    suspend fun fetchPlayerSettings(libraryId: Long, videoId: String): Either<String, PlayerSettings>
 }

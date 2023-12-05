@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -22,6 +22,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        getByName("debug") {
+
+        }
+
+        create("staging") {
+            initWith(getByName("debug"))
         }
     }
     compileOptions {
@@ -58,4 +66,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("io.arrow-kt:arrow-core:1.2.0")
 }
