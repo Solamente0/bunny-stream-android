@@ -129,7 +129,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             applyStyle()
         }
 
-    var playerSettings: PlayerSettings? = null
+    private var playerSettings: PlayerSettings? = null
         set(value) {
             Log.d(TAG, "set playerSettings: $value")
             field = value
@@ -226,82 +226,9 @@ class BunnyPlayerView @JvmOverloads constructor(
             val popupMenu = PopupMenu(context, it)
             popupMenu.inflate(R.menu.video_settings)
 
-            val subtitlesConfig = bunnyPlayer?.getSubtitles()
-            val subtitlesEnabled = playerSettings?.subtitlesEnabled == true
-
-            val subtitleMenuId = View.generateViewId()
-            val subtitleMenuIds = mutableMapOf<Int, SubtitleInfo>()
-
-            val speed = bunnyPlayer?.getSpeed()
-
-            if(subtitlesEnabled && subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
-                val subtitlesMenu = popupMenu.menu.addSubMenu(
-                    Menu.NONE,
-                    subtitleMenuId,
-                    Menu.NONE,
-                    context.getString(R.string.label_video_settings_captions)
-                )
-
-                subtitlesConfig.subtitles.forEach { info ->
-                    val id = View.generateViewId()
-                    subtitleMenuIds[id] = info
-                    val item = subtitlesMenu.add(
-                        Menu.NONE,
-                        id,
-                        Menu.NONE,
-                        "${info.title} (${info.language})"
-                    )
-                    item.isCheckable = true
-                    item.isChecked = subtitlesConfig.selectedSubtitle == info
-                }
-            }
-
-            val videoQualityOptions = bunnyPlayer?.getVideoQualityOptions()
-
-            val qualityMenuId = View.generateViewId()
-            val qualityMenuIds = mutableMapOf<Int, VideoQuality>()
-
-            if(videoQualityOptions != null) {
-                val qualityOptionsMenu = popupMenu.menu.addSubMenu(
-                    Menu.NONE,
-                    qualityMenuId,
-                    Menu.NONE,
-                    context.getString(R.string.label_video_settings_quality)
-                )
-
-                videoQualityOptions.options.forEach { option ->
-                    val id = generateViewId()
-                    qualityMenuIds[id] = option
-
-                    val title = if(option.width == Int.MAX_VALUE) {
-                        context.getString(R.string.label_video_quality_auto)
-                    } else {
-                        "${option.width} x ${option.height}"
-                    }
-
-                    val item = qualityOptionsMenu.add(
-                        Menu.NONE,
-                        id,
-                        Menu.NONE,
-                        title
-                    )
-                    item.isCheckable = true
-                    item.isChecked = videoQualityOptions.selectedOption == option
-                }
-            }
-
-            val speedMenuItemId = when (speed) {
-                0.5F -> R.id.video_speed_0_5
-                0.75F -> R.id.video_speed_0_75
-                1F -> R.id.video_speed_normal
-                1.25F -> R.id.video_speed_1_25
-                1.5F -> R.id.video_speed_1_5
-                2F -> R.id.video_speed_2
-                4F -> R.id.video_speed_4
-                else -> R.id.video_speed_normal
-            }
-
-            popupMenu.menu.findItem(speedMenuItemId)?.isChecked = true
+            val subtitleMenuIds = setupSubtitlesPopupMenu(popupMenu)
+            val qualityMenuIds = setupQualityPopupMenu(popupMenu)
+            val speedMenuIds = setupSpeedPopupMenu(popupMenu)
 
             popupMenu.setOnMenuItemClickListener { item ->
                 Log.d(TAG, "setOnMenuItemClickListener")
@@ -323,14 +250,12 @@ class BunnyPlayerView @JvmOverloads constructor(
                     return@setOnMenuItemClickListener true
                 }
 
-                when(item.itemId) {
-                    R.id.video_speed_0_5 -> bunnyPlayer?.setSpeed(0.5F)
-                    R.id.video_speed_0_75 -> bunnyPlayer?.setSpeed(0.75F)
-                    R.id.video_speed_normal -> bunnyPlayer?.setSpeed(1F)
-                    R.id.video_speed_1_25 -> bunnyPlayer?.setSpeed(1.25F)
-                    R.id.video_speed_1_5 -> bunnyPlayer?.setSpeed(1.5F)
-                    R.id.video_speed_2 -> bunnyPlayer?.setSpeed(2F)
-                    R.id.video_speed_4 -> bunnyPlayer?.setSpeed(4F)
+                val speedOption = speedMenuIds[item.itemId]
+
+                if(speedOption != null) {
+                    bunnyPlayer?.setSpeed(speedOption)
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
+                    return@setOnMenuItemClickListener true
                 }
 
                 true
@@ -357,6 +282,112 @@ class BunnyPlayerView @JvmOverloads constructor(
         subtitle.isVisible = bunnyPlayer?.getSubtitles()?.subtitles?.isNotEmpty() == true
 
         CastButtonFactory.setUpMediaRouteButton(context, castButton)
+    }
+
+    private fun setupSubtitlesPopupMenu(popupMenu: PopupMenu): Map<Int, SubtitleInfo> {
+        val subtitleMenuIds: MutableMap<Int, SubtitleInfo> = mutableMapOf()
+        val subtitlesConfig = bunnyPlayer?.getSubtitles()
+        val subtitlesEnabled = playerSettings?.subtitlesEnabled == true
+
+        val subtitleMenuId = View.generateViewId()
+
+        if(subtitlesEnabled && subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
+            val subtitlesMenu = popupMenu.menu.addSubMenu(
+                Menu.NONE,
+                subtitleMenuId,
+                Menu.NONE,
+                context.getString(R.string.label_video_settings_captions)
+            )
+
+            subtitlesConfig.subtitles.forEach { info ->
+                val id = View.generateViewId()
+                subtitleMenuIds[id] = info
+                val item = subtitlesMenu.add(
+                    Menu.NONE,
+                    id,
+                    Menu.NONE,
+                    "${info.title} (${info.language})"
+                )
+                item.isCheckable = true
+                item.isChecked = subtitlesConfig.selectedSubtitle == info
+            }
+
+            subtitlesMenu.setGroupCheckable(Menu.NONE, true, true)
+        }
+
+        return subtitleMenuIds
+    }
+
+    private fun setupQualityPopupMenu(popupMenu: PopupMenu): Map<Int, VideoQuality> {
+        val qualityMenuIds: MutableMap<Int, VideoQuality> = mutableMapOf()
+        val videoQualityOptions = bunnyPlayer?.getVideoQualityOptions()
+        val qualityMenuId = View.generateViewId()
+
+        if(videoQualityOptions != null) {
+            val qualityOptionsMenu = popupMenu.menu.addSubMenu(
+                Menu.NONE,
+                qualityMenuId,
+                Menu.NONE,
+                context.getString(R.string.label_video_settings_quality)
+            )
+
+            videoQualityOptions.options.forEach { option ->
+                val id = generateViewId()
+                qualityMenuIds[id] = option
+
+                val title = if(option.width == Int.MAX_VALUE) {
+                    context.getString(R.string.label_video_quality_auto)
+                } else {
+                    "${option.width} x ${option.height}"
+                }
+
+                val item = qualityOptionsMenu.add(
+                    Menu.NONE,
+                    id,
+                    Menu.NONE,
+                    title
+                )
+
+                item.isChecked = videoQualityOptions.selectedOption == option
+            }
+
+            qualityOptionsMenu.setGroupCheckable(Menu.NONE, true, true)
+        }
+        return qualityMenuIds
+    }
+
+    private fun setupSpeedPopupMenu(popupMenu: PopupMenu): Map<Int, Float> {
+        val speedMenuIds: MutableMap<Int, Float> = mutableMapOf()
+        val speed = bunnyPlayer?.getSpeed()
+        val speeds = bunnyPlayer?.getPlaybackSpeeds()
+
+        val speedMenuId = View.generateViewId()
+
+        if(!speeds.isNullOrEmpty()) {
+            val speedOptionsMenu = popupMenu.menu.addSubMenu(
+                Menu.NONE,
+                speedMenuId,
+                Menu.NONE,
+                context.getString(R.string.label_video_settings_speed)
+            )
+
+            speeds.forEach { option ->
+                val id = generateViewId()
+                speedMenuIds[id] = option
+
+                val item = speedOptionsMenu.add(
+                    Menu.NONE,
+                    id,
+                    Menu.NONE,
+                    option.toString()
+                )
+                item.isCheckable = true
+                item.isChecked = speed == option
+            }
+
+            speedOptionsMenu.setGroupCheckable(Menu.NONE, true, true)
+        }
+        return speedMenuIds
     }
 
     private fun updatePlayer(player: Player, playerType: PlayerType){
@@ -517,5 +548,9 @@ class BunnyPlayerView @JvmOverloads constructor(
         playPauseButton.isVisible = playerSettings?.playButtonEnabled == true
 
         progressDurationDivider.isVisible = progressTextView.isVisible && durationTextView.isVisible
+    }
+
+    private fun updateThumbnailPreview() {
+
     }
 }

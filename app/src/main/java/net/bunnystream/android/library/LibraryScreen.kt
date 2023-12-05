@@ -75,7 +75,7 @@ fun LibraryRoute(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
     navigateToStreaming: () -> Unit,
-    navigateToPlayer: (Long, Video) -> Unit,
+    navigateToPlayer: (Video) -> Unit,
     localPrefs: LocalPrefs,
     viewModel: LibraryViewModel = viewModel(),
 ) {
@@ -183,7 +183,7 @@ fun LibraryRoute(
             deleteVideo = it
         },
         onVideoClicked = {
-            navigateToPlayer(viewModel.libraryId, it)
+            navigateToPlayer(it)
         },
         navigateToStreaming = navigateToStreaming
     )

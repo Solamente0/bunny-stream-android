@@ -29,13 +29,11 @@ import net.bunnystream.player.ui.BunnyVideoPlayer
 @Composable
 fun PlayerRoute(
     appState: AppState,
-    libraryId: Long,
     videoId: String,
     modifier: Modifier = Modifier,
 ) {
     PlayerScreen(
         modifier = modifier,
-        libraryId = libraryId,
         videoId = videoId,
         onBackClicked = { appState.navController.popBackStack() },
     )
@@ -45,7 +43,6 @@ fun PlayerRoute(
 @Composable
 private fun PlayerScreen(
     modifier: Modifier = Modifier,
-    libraryId: Long,
     videoId: String,
     onBackClicked: () -> Unit,
 ) {
@@ -81,7 +78,6 @@ private fun PlayerScreen(
                 .padding(innerPadding),
         ) {
             BunnyPlayerComposable(
-                libraryId = libraryId,
                 videoId = videoId,
                 modifier = Modifier.fillMaxSize()
             )
@@ -91,7 +87,6 @@ private fun PlayerScreen(
 
 @Composable
 fun BunnyPlayerComposable(
-    libraryId: Long,
     videoId: String,
     modifier: Modifier = Modifier
 ) {
@@ -100,7 +95,7 @@ fun BunnyPlayerComposable(
             BunnyVideoPlayer(context)
         },
         update = {
-            it.playVideo(libraryId, videoId)
+            it.playVideo(videoId)
         },
         modifier = modifier.background(Color.Gray)
     )
@@ -111,7 +106,6 @@ fun BunnyPlayerComposable(
 private fun PlayerScreenPreview() {
     BunnyStreamTheme {
         BunnyPlayerComposable(
-            libraryId = 0,
             videoId = "",
             modifier = Modifier.fillMaxSize()
         )
