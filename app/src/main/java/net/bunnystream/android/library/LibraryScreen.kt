@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Face
@@ -27,13 +25,11 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,6 +37,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,14 +52,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.bunnystream.android.R
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
@@ -78,7 +75,7 @@ fun LibraryRoute(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
     navigateToStreaming: () -> Unit,
-    navigateToPlayer: (Long, Video) -> Unit,
+    navigateToPlayer: (Video) -> Unit,
     localPrefs: LocalPrefs,
     viewModel: LibraryViewModel = viewModel(),
 ) {
@@ -166,9 +163,8 @@ fun LibraryRoute(
         modifier = modifier,
         navigateToSettings = navigateToSettings,
         showAccessKeyNeeded = showAccessKeyNeeded,
-        onLoadLibraryClicked = viewModel::loadLibrary,
+        onLoadLibrary = viewModel::loadLibrary,
         uiState = uiState,
-        libraryId = viewModel.libraryId,
         onUploadVideoClicked = {
             pickVideoLauncher.launch(
                 PickVisualMediaRequest(
@@ -187,10 +183,12 @@ fun LibraryRoute(
             deleteVideo = it
         },
         onVideoClicked = {
-            navigateToPlayer(viewModel.libraryId, it)
+            navigateToPlayer(it)
         },
         navigateToStreaming = navigateToStreaming
     )
+
+    LaunchedEffect(key1 = "loadLibrary", block = { viewModel.loadLibrary() })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,8 +197,7 @@ private fun LibraryScreen(
     modifier: Modifier = Modifier,
     navigateToSettings: () -> Unit,
     showAccessKeyNeeded: Boolean,
-    onLoadLibraryClicked: (Long) -> Unit,
-    libraryId: Long,
+    onLoadLibrary: () -> Unit,
     uiState: LibraryUiState,
     onUploadVideoClicked: () -> Unit,
     uploadingUiState: VideoUploadUiState,
@@ -212,8 +209,6 @@ private fun LibraryScreen(
     onVideoClicked: (Video) -> Unit,
     navigateToStreaming: () -> Unit,
 ) {
-
-    var libId by remember { mutableStateOf(libraryId.toString()) }
 
     Scaffold(
         topBar = {
@@ -227,11 +222,13 @@ private fun LibraryScreen(
                         Text(stringResource(id = R.string.screen_library))
                     },
                     actions = {
-                        IconButton(onClick = navigateToStreaming) {
-                            Icon(
-                                imageVector = Icons.Filled.Face,
-                                contentDescription = null
-                            )
+                        if(!showAccessKeyNeeded) {
+                            IconButton(onClick = navigateToStreaming) {
+                                Icon(
+                                    imageVector = Icons.Filled.Face,
+                                    contentDescription = null
+                                )
+                            }
                         }
                         IconButton(onClick = navigateToSettings) {
                             Icon(
@@ -260,73 +257,56 @@ private fun LibraryScreen(
                     .fillMaxWidth()
                     .padding(16.dp)) {
 
-                    Row(modifier = modifier) {
-                        OutlinedTextField(
-                            modifier = modifier.weight(1F),
-                            value = libId,
-                            onValueChange = { if(it.isDigitsOnly()) { libId = it } },
-                            label = { Text(stringResource(id = R.string.hint_library_id)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
-                        Button(
-                            onClick = { onLoadLibraryClicked(libId.toLong()) },
-                            modifier = modifier
-                                .align(CenterVertically)
-                                .padding(start = 10.dp)
-                        ) {
-                            Text(text = stringResource(id = R.string.button_load))
-                        }
-                    }
-
-                    Column(modifier = modifier) {
-                        Box(modifier = modifier
-                            .fillMaxWidth()
-                            .weight(1F)){
-                            when (uiState) {
-                                LibraryUiState.LibraryUiEmpty -> {
-                                    Text(
-                                        modifier = modifier.align(Center),
-                                        text = stringResource(id = R.string.label_no_videos)
-                                    )
-                                }
-                                is LibraryUiState.LibraryUiLoaded -> {
-                                    LazyColumn(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 10.dp)
-                                    ){
-                                        items(
-                                            items = uiState.videos,
-                                            key = { video -> video.id }
+                    SwipeRefresh(
+                        modifier = modifier,
+                        state = rememberSwipeRefreshState(
+                            isRefreshing = uiState == LibraryUiState.LibraryUiLoading
+                        ),
+                        onRefresh = { onLoadLibrary() }
+                    ) {
+                        Column(modifier = modifier) {
+                            Box(modifier = modifier
+                                .fillMaxWidth()
+                                .weight(1F)){
+                                when (uiState) {
+                                    LibraryUiState.LibraryUiEmpty -> {
+                                        Text(
+                                            modifier = modifier.align(Center),
+                                            text = stringResource(id = R.string.label_no_videos)
+                                        )
+                                    }
+                                    is LibraryUiState.LibraryUiLoaded -> {
+                                        LazyColumn(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 0.dp)
                                         ){
-                                            VideoItem(
-                                                video = it,
-                                                onDeleteVideoClicked = { onDeleteVideoClicked(it) },
-                                                onVideoClicked = { onVideoClicked(it) }
-                                            )
+                                            items(
+                                                items = uiState.videos,
+                                                key = { video -> video.id }
+                                            ){
+                                                VideoItem(
+                                                    video = it,
+                                                    onDeleteVideoClicked = { onDeleteVideoClicked(it) },
+                                                    onVideoClicked = { onVideoClicked(it) }
+                                                )
+                                            }
                                         }
                                     }
-                                }
-                                LibraryUiState.LibraryUiLoading -> {
-                                    Box(modifier = modifier.fillMaxSize()){
-                                        CircularProgressIndicator(
-                                            modifier = modifier
-                                                .width(64.dp)
-                                                .align(Center),
-                                        )
+                                    LibraryUiState.LibraryUiLoading -> {
+                                        // no-op
                                     }
                                 }
                             }
+                            VideoUploadControls(
+                                uploadingUiState = uploadingUiState,
+                                onUploadVideoClicked = onUploadVideoClicked,
+                                onDismissUploadErrorClicked = onDismissUploadErrorClicked,
+                                onCancelUploadClicked = onCancelUploadClicked,
+                                onTusUploadOptionChanged = onTusUploadOptionChanged,
+                                useTusUpload = useTusUpload,
+                            )
                         }
-                        VideoUploadControls(
-                            uploadingUiState = uploadingUiState,
-                            onUploadVideoClicked = onUploadVideoClicked,
-                            onDismissUploadErrorClicked = onDismissUploadErrorClicked,
-                            onCancelUploadClicked = onCancelUploadClicked,
-                            onTusUploadOptionChanged = onTusUploadOptionChanged,
-                            useTusUpload = useTusUpload,
-                        )
                     }
                 }
             }
@@ -360,7 +340,10 @@ private fun VideoItem(
             contentScale = ContentScale.Crop,
         )
 
-        Column(modifier = modifier.weight(1F).align(CenterVertically).padding(start = 10.dp)) {
+        Column(modifier = modifier
+            .weight(1F)
+            .align(CenterVertically)
+            .padding(start = 10.dp)) {
             Text(
                 modifier = modifier,
                 text = video.name
@@ -557,9 +540,8 @@ private fun LibraryScreenPreview() {
         LibraryScreen(
             navigateToSettings = {},
             showAccessKeyNeeded = false,
-            onLoadLibraryClicked = {},
+            onLoadLibrary = {},
             uiState = LibraryUiState.LibraryUiEmpty,
-            libraryId = -1,
             onUploadVideoClicked = {},
             uploadingUiState = VideoUploadUiState.Uploading(50),
             onDismissUploadErrorClicked = {},

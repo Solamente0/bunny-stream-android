@@ -23,4 +23,5 @@
     <string name="dialog_message_end_streaming">Would you like to end streaming?</string>
     <string name="dialog_no">No</string>
     <string name="dialog_end_streaming">Yes, end streaming</string>
+    <string name="button_save_settings">Save</string>
 </resources>

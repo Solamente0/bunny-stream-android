@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "net.bunnystream.android"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -93,4 +93,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.25.1")
 }
