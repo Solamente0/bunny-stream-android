@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+  <net.bunnystream.stream.BunnyStreamView
+      android:id="@+id/stream_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:bsvDefaultCamera="front"
+      />
+
+  <FrameLayout
+      android:id="@+id/no_permissions_info"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:visibility="gone"
+      tools:visibility="visible">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/camera_and_mic_permissions_required"/>
+
+      <Button
+          android:id="@+id/open_settings"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/button_open_settings"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+
+  </FrameLayout>
+
+</FrameLayout>

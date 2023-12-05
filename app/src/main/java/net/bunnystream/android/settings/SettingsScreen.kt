@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,8 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,13 +39,29 @@ fun SettingsRoute(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel(),
 ) {
+
+    var accessKey by remember { mutableStateOf(viewModel.accessKey) }
+    var cdnHostname by remember { mutableStateOf(viewModel.cdnHostname) }
+    var libraryId by remember { mutableStateOf(viewModel.libraryId.toString()) }
+
+    val modified = accessKey != viewModel.accessKey
+            || cdnHostname != viewModel.cdnHostname
+            || libraryId != viewModel.libraryId.toString()
+
     SettingsScreen(
         modifier = modifier,
         onBackClicked = { appState.navController.popBackStack() },
-        accessKey = viewModel.accessKey,
-        onAccessKeyUpdated = { viewModel.updateKeys(it, viewModel.cdnHostname) },
-        cdnHostname = viewModel.cdnHostname,
-        onCdnHostnameUpdated = { viewModel.updateKeys(viewModel.accessKey, it) }
+        accessKey = accessKey,
+        onAccessKeyUpdated = { accessKey = it },
+        cdnHostname = cdnHostname,
+        onCdnHostnameUpdated = { cdnHostname = it },
+        libraryId = libraryId,
+        onLibraryIdUpdated = { libraryId = it },
+        onSaveClicked = {
+            viewModel.updateKeys(accessKey, cdnHostname, libraryId.toLongOrDefault(-1))
+            appState.navController.popBackStack()
+        },
+        settingsModified = modified
     )
 }
 
@@ -50,7 +73,11 @@ private fun SettingsScreen(
     accessKey: String,
     onAccessKeyUpdated: (String) -> Unit,
     cdnHostname: String,
-    onCdnHostnameUpdated: (String) -> Unit
+    onCdnHostnameUpdated: (String) -> Unit,
+    libraryId: String,
+    onLibraryIdUpdated: (String) -> Unit,
+    onSaveClicked: () -> Unit,
+    settingsModified: Boolean
 ) {
 
     Scaffold(
@@ -97,10 +124,29 @@ private fun SettingsScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp),
+                value = libraryId,
+                onValueChange = onLibraryIdUpdated,
+                label = { Text(stringResource(id = R.string.hint_library_id)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 value = cdnHostname,
                 onValueChange = onCdnHostnameUpdated,
                 label = { Text(stringResource(id = R.string.hint_cdn_hostname)) }
             )
+
+            Button(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = onSaveClicked,
+            ) {
+                Text(text = stringResource(id = R.string.button_save_settings))
+            }
         }
     }
 }
@@ -114,7 +160,11 @@ private fun SettingsScreenPreview() {
             accessKey = "",
             onAccessKeyUpdated = {},
             cdnHostname = "",
-            onCdnHostnameUpdated = {}
+            onCdnHostnameUpdated = {},
+            libraryId = "",
+            onLibraryIdUpdated = {},
+            onSaveClicked = {},
+            settingsModified = false
         )
     }
 }

@@ -10,6 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -17,3 +18,4 @@ rootProject.name = "Bunny Stream"
 include(":app")
 include(":sdk")
 include(":player")
+include(":streaming")

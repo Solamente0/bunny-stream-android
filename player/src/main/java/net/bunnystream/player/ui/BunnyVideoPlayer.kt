@@ -112,8 +112,8 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         bunnyPlayer.stop()
     }
 
-    override fun playVideo(libraryId: Long, videoId: String) {
-        Log.d(TAG, "playVideo libraryId=$libraryId videoId=$videoId")
+    override fun playVideo(videoId: String) {
+        Log.d(TAG, "playVideo videoId=$videoId")
 
         if(!BunnyStreamSdk.isInitialized()) {
             Log.e(TAG, "Unable to play video, initialize the player first using BunnyStreamSdk.initialize")
@@ -130,7 +130,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                 try {
                     video = withContext(Dispatchers.IO) {
                         BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(
-                            libraryId,
+                            BunnyStreamSdk.libraryId,
                             videoId
                         )
                     }
@@ -140,7 +140,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     return@launch
                 }
 
-                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(libraryId, videoId).getOrNull()
+                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(BunnyStreamSdk.libraryId, videoId).getOrNull()
 
                 var retentionData: Map<Int, Int> = mutableMapOf()
 
@@ -148,7 +148,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     try {
                         val retentionDataResponse = withContext(Dispatchers.IO) {
                             BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideoHeatmap(
-                                libraryId,
+                                BunnyStreamSdk.libraryId,
                                 videoId
                             )
                         }
@@ -158,7 +158,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     }
                 }
 
-                bunnyPlayer.playVideo(binding.playerView, libraryId, video, retentionData, settings)
+                bunnyPlayer.playVideo(binding.playerView, video, retentionData, settings)
 
                 playerView.bunnyPlayer = bunnyPlayer
             }

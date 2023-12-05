@@ -35,8 +35,9 @@ data class PlayerSettingsResponse(
     @SerialName("fontFamily")
     val fontFamily: String,
 
+    // "playbackSpeeds": "0.5,0.75,1,1.25,1.5,1.75,2,4"
     @SerialName("playbackSpeeds")
-    val playbackSpeeds: String,
+    val playbackSpeeds: String?,
 
     @SerialName("enableDRM")
     val drmEnabled: Boolean,
@@ -54,8 +55,16 @@ data class PlayerSettingsResponse(
         uiLanguage = uiLanguage,
         showHeatmap = showHeatmap,
         fontFamily = fontFamily,
-        playbackSpeeds = playbackSpeeds,
+        playbackSpeeds = parsePlaybackSpeeds(),
         drmEnabled = drmEnabled,
         vastTagUrl = vastTagUrl
     )
+
+    private fun parsePlaybackSpeeds(): List<Float> {
+        return try {
+            playbackSpeeds?.split(",")?.map { it.toFloat() } ?: listOf()
+        } catch (e: Exception) {
+            listOf()
+        }
+    }
 }

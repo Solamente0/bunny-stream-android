@@ -1,6 +1,7 @@
 package net.bunnystream.android.settings
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -16,9 +17,13 @@ class SettingsViewModel : ViewModel() {
     var cdnHostname by mutableStateOf(prefs.cdnHostname)
         private set
 
-    fun updateKeys(accessKey: String, cdnHostname: String){
+    var libraryId by mutableLongStateOf(prefs.libraryId)
+        private set
+
+    fun updateKeys(accessKey: String, cdnHostname: String, libraryId: Long){
         this.accessKey = accessKey
         this.cdnHostname = cdnHostname
-        App.di.updateKeys(accessKey, cdnHostname)
+        this.libraryId = libraryId
+        App.di.updateKeys(accessKey, cdnHostname, libraryId)
     }
 }
