@@ -22,4 +22,4 @@ interface [BunnyPlayer](index.md)
 |---|---|
 | [pause](pause.md) | [androidJvm]<br>abstract fun [pause](pause.md)()<br>Pauses video |
 | [play](play.md) | [androidJvm]<br>abstract fun [play](play.md)()<br>Resumes playing video |
-| [playVideo](play-video.md) | [androidJvm]<br>abstract fun [playVideo](play-video.md)(libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html))<br>Plays a video and fetches additional info, e.g. chapters, moments and subtitles |
+| [playVideo](play-video.md) | [androidJvm]<br>abstract fun [playVideo](play-video.md)(videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html))<br>Plays a video and fetches additional info, e.g. chapters, moments and subtitles |

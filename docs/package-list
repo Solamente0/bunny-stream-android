@@ -163,7 +163,7 @@ $dokka.location:net.bunnystream.player.common/BunnyPlayer/isPlaying/#/PointingTo
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/mute/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/mute.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/pause/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/pause.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play.md
-$dokka.location:net.bunnystream.player.common/BunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#kotlin.Long#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play-video.md
+$dokka.location:net.bunnystream.player.common/BunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play-video.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/playerSettings/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/player-settings.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/playerStateListener/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/player-state-listener.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/release/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/release.md
@@ -298,14 +298,14 @@ $dokka.location:net.bunnystream.player.ui/BunnyPlayer///PointingToDeclaration/p
 $dokka.location:net.bunnystream.player.ui/BunnyPlayer/iconSet/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-player/icon-set.md
 $dokka.location:net.bunnystream.player.ui/BunnyPlayer/pause/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-player/pause.md
 $dokka.location:net.bunnystream.player.ui/BunnyPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-player/play.md
-$dokka.location:net.bunnystream.player.ui/BunnyPlayer/playVideo/#kotlin.Long#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-player/play-video.md
+$dokka.location:net.bunnystream.player.ui/BunnyPlayer/playVideo/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-player/play-video.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer.Companion///PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/-companion/index.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer///PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/index.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/BunnyVideoPlayer/#android.content.Context#android.util.AttributeSet?#kotlin.Int/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/-bunny-video-player.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/iconSet/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/icon-set.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/pause/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/pause.md
 $dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/play.md
-$dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/playVideo/#kotlin.Long#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/play-video.md
+$dokka.location:net.bunnystream.player.ui/BunnyVideoPlayer/playVideo/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui/-bunny-video-player/play-video.md
 $dokka.location:net.bunnystream.player////PointingToDeclaration/player/player/net.bunnystream.player/index.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer.Companion///PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/-companion/index.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer.Companion/getInstance/#android.content.Context/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/-companion/get-instance.md
@@ -324,7 +324,7 @@ $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/isPlaying/#/PointingTo
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/mute/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/mute.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/pause/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/pause.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play.md
-$dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#kotlin.Long#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play-video.md
+$dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play-video.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playerSettings/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/player-settings.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playerStateListener/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/player-state-listener.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/release/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/release.md

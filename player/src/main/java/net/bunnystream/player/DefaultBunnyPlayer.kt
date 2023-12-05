@@ -170,8 +170,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
-        Log.d(TAG, "loadVideo libraryId=$libraryId video=$video retentionData=$retentionData")
+    override fun playVideo(playerView: PlayerView, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
+        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData")
 
         this.playerSettings = settings
         currentVideo = video
@@ -196,7 +196,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
         val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
-        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/$libraryId/${video.guid}?contentId=${video.guid}"
+        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/${BunnyStreamSdk.libraryId}/${video.guid}?contentId=${video.guid}"
 
         mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
@@ -342,6 +342,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
+    override fun getPlaybackSpeeds(): List<Float> {
+        return playerSettings?.playbackSpeeds ?: listOf()
+    }
+
     override fun release() {
         currentPlayer?.stop()
 
@@ -405,8 +409,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun switchCurrentPlayer(newPlayer: Player) {
-        Log.d(TAG, "switchCurrentPlayer $newPlayer")
-
         if (this.currentPlayer === newPlayer) {
             return
         }
@@ -448,8 +450,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
-        Log.d(TAG, "getAvailableVideoQualityOptions")
-
         val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
 
         val options = mutableListOf<VideoQuality>()
@@ -478,8 +478,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
 
         val videoQualityOptions = VideoQualityOptions(options, selectedOption)
-
-        Log.d(TAG, "updateAvailableVideoQualityOptions videoQualityOptions=$videoQualityOptions")
 
         return videoQualityOptions
     }

@@ -3,4 +3,4 @@
 # StreamContent
 
 [androidJvm]\
-constructor(inputStream: [InputStream](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html))
+constructor(inputStream: [InputStream](https://developer.android.com/reference/kotlin/java/io/InputStream.html))
