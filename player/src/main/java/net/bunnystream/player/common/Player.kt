@@ -3,6 +3,7 @@ package net.bunnystream.player.common
 import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.model.SeekThumbnail
 import net.bunnystream.player.model.SubtitleInfo
@@ -20,6 +21,8 @@ interface BunnyPlayer {
     var seekThumbnail: SeekThumbnail?
 
     var autoPaused: Boolean
+
+    var playerSettings: PlayerSettings?
 
     /* Releases the resources held by the player, such as codecs. */
     fun release()
@@ -63,7 +66,7 @@ interface BunnyPlayer {
     /* Returns the current playback position. */
     fun getCurrentPosition(): Long
 
-    fun playVideo(playerView: PlayerView, libraryId: Long, video: VideoModel, retentionData: Map<Int, Int>)
+    fun playVideo(playerView: PlayerView, video: VideoModel, retentionData: Map<Int, Int>, playerSettings: PlayerSettings?)
 
     fun skipForward()
 
@@ -84,4 +87,6 @@ interface BunnyPlayer {
     fun getVideoQualityOptions(): VideoQualityOptions?
 
     fun selectQuality(quality: VideoQuality)
+
+    fun getPlaybackSpeeds(): List<Float>
 }

@@ -1,18 +1,12 @@
 package net.bunnystream.player.model
 
-import android.graphics.Color
 import android.os.Parcelable
-import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import kotlinx.parcelize.Parcelize
 import net.bunnystream.player.R
 
 @Parcelize
 data class PlayerIconSet(
-
-    @ColorInt
-    val tintColor: Int = Color.WHITE,
-
     @DrawableRes
     val playIcon: Int = R.drawable.ic_play_48dp,
 
