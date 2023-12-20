@@ -13,4 +13,5 @@
     <string name="label_video_settings_quality">Quality</string>
 
     <string name="label_video_quality_auto">Auto</string>
+    <string name="error_playing_video">Couldn\'t play video</string>
 </resources>
