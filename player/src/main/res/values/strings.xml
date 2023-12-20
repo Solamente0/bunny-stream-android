@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bunny_play_pause_description">Play or pause video</string>
-    <string name="bunny_rewind_description">Rewind video</string>
-    <string name="bunny_fast_forward_description">Fast forward video</string>
-    <string name="bunny_sound_description">Mute/unmute sound of video</string>
-    <string name="bunny_settings_description">Open settings for video</string>
-    <string name="bunny_streaming_description">Stream video to another device</string>
-    <string name="bunny_fullscreen_description">Fullscreen mode video</string>
-    <string name="bunny_divider" translatable="false">/</string>
     <string name="label_video_settings_captions">Captions</string>
     <string name="label_video_settings_speed">Speed</string>
     <string name="label_video_settings_quality">Quality</string>
-
     <string name="label_video_quality_auto">Auto</string>
 </resources>

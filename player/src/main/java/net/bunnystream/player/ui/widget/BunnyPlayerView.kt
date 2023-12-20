@@ -33,6 +33,7 @@ import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R
 import net.bunnystream.player.common.BunnyPlayer
+import net.bunnystream.player.common.I18n
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.PlayerIconSet
@@ -194,6 +195,8 @@ class BunnyPlayerView @JvmOverloads constructor(
         findViewById<ToggleableImageButton>(R.id.bunny_subtitle)
     }
 
+    private val i18n = I18n(context)
+
     private fun setPlayerControls(){
         playPauseButton.setOnClickListener {
             if (bunnyPlayer?.isPlaying() == true) {
@@ -296,7 +299,7 @@ class BunnyPlayerView @JvmOverloads constructor(
                 Menu.NONE,
                 subtitleMenuId,
                 Menu.NONE,
-                context.getString(R.string.label_video_settings_captions)
+                i18n.getTranslation("captions", context.getString(R.string.label_video_settings_captions))
             )
 
             subtitlesConfig.subtitles.forEach { info ->
@@ -328,7 +331,7 @@ class BunnyPlayerView @JvmOverloads constructor(
                 Menu.NONE,
                 qualityMenuId,
                 Menu.NONE,
-                context.getString(R.string.label_video_settings_quality)
+                i18n.getTranslation("quality", context.getString(R.string.label_video_settings_quality))
             )
 
             videoQualityOptions.options.forEach { option ->
@@ -368,7 +371,7 @@ class BunnyPlayerView @JvmOverloads constructor(
                 Menu.NONE,
                 speedMenuId,
                 Menu.NONE,
-                context.getString(R.string.label_video_settings_speed)
+                i18n.getTranslation("speed", context.getString(R.string.label_video_settings_speed))
             )
 
             speeds.forEach { option ->
@@ -445,6 +448,8 @@ class BunnyPlayerView @JvmOverloads constructor(
             fetchFont(settings.fontFamily.capitalizeWords())
 
             updateControlsVisibility()
+
+            i18n.load(settings.uiLanguage)
         }
 
         invalidate()
