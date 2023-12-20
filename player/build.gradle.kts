@@ -68,4 +68,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("io.arrow-kt:arrow-core:1.2.0")
+
+    implementation("com.charleskorn.kaml:kaml:0.56.0")
 }
