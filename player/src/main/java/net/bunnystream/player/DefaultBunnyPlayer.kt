@@ -10,6 +10,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
@@ -136,6 +137,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         override fun onTracksChanged(tracks: Tracks) {
             super.onTracksChanged(tracks)
             Log.d(TAG, "onTracksChanged tracks: $tracks")
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            Log.d(TAG, "onPlayerError error=$error")
+            playerStateListener?.onPlayerError("${error.errorCodeName}: ${error.message}")
         }
     }
 

@@ -14,4 +14,5 @@ interface PlayerStateListener {
     fun onChaptersUpdated(chapters: List<Chapter>)
     fun onMomentsUpdated(moments: List<Moment>)
     fun onRetentionGraphUpdated(points: List<RetentionGraphEntry>)
+    fun onPlayerError(message: String)
 }

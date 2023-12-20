@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -70,6 +71,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             } else {
                 ToggleableImageButton.State.STATE_DEFAULT
             }
+            errorWrapper.isVisible = false
         }
 
         override fun onMutedChanged(isMuted: Boolean) {
@@ -104,6 +106,11 @@ class BunnyPlayerView @JvmOverloads constructor(
 
         override fun onPlayerTypeChanged(player: Player, playerType: PlayerType) {
             updatePlayer(player, playerType)
+        }
+
+        override fun onPlayerError(message: String) {
+            errorWrapper.isVisible = true
+            errorMessage.text = message
         }
     }
 
@@ -193,6 +200,14 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val subtitle by lazy {
         findViewById<ToggleableImageButton>(R.id.bunny_subtitle)
+    }
+
+    private val errorWrapper by lazy {
+        findViewById<ViewGroup>(R.id.errorWrapper)
+    }
+
+    private val errorMessage by lazy {
+        findViewById<TextView>(R.id.errorMessage)
     }
 
     private val i18n = I18n(context)

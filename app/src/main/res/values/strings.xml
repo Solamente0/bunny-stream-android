@@ -16,7 +16,7 @@
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="label_no_videos">No videos</string>
-    <string name="hint_cdn_hostname">CDN Hostname (incl. https://)</string>
+    <string name="hint_cdn_hostname">CDN Hostname</string>
     <string name="camera_and_mic_permissions_required">Camera and Microphone permissions are required</string>
     <string name="button_open_settings">Open settings</string>
     <string name="dialog_title_streaming_active">Streaming in progress</string>

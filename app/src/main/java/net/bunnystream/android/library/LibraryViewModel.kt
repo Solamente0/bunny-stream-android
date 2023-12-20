@@ -90,14 +90,15 @@ class LibraryViewModel : ViewModel() {
     init {
         Log.d(TAG, "<init> $this")
         App.di.videoUploadService.uploadListener = uploadListener
-
-        if(libraryId != -1L && BunnyStreamSdk.isInitialized()) {
-            loadLibrary()
-        }
     }
 
     fun loadLibrary() {
         Log.d(TAG, "loadLibrary")
+
+        if(libraryId == -1L || !BunnyStreamSdk.isInitialized()) {
+            return
+        }
+
         mutableUiState.value = LibraryUiState.LibraryUiLoading
 
         scope.launch {
