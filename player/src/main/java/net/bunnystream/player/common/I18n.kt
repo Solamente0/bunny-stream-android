@@ -17,7 +17,7 @@ class I18n(private val context: Context) {
     fun load(lang: String) {
         try {
             val id = context.resources.getIdentifier(
-                lang,
+                lang.lowercase(),
                 "raw",
                 context.packageName
             )
