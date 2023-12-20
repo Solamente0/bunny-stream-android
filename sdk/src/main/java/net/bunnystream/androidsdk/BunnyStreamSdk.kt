@@ -36,7 +36,11 @@ class BunnyStreamSdk private constructor(
                 accessKey,
             )
 
-            this.cdnHostname = cdnHostname
+            this.cdnHostname = if(cdnHostname.startsWith("http://") || cdnHostname.startsWith("https://")){
+                cdnHostname
+            } else {
+                "https://$cdnHostname"
+            }
             this.libraryId = libraryId
             ApiClient.apiKey["AccessKey"] = accessKey
         }
