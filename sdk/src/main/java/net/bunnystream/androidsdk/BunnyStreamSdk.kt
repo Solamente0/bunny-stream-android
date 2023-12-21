@@ -36,8 +36,10 @@ class BunnyStreamSdk private constructor(
                 accessKey,
             )
 
-            this.cdnHostname = if(cdnHostname.startsWith("http://") || cdnHostname.startsWith("https://")){
+            this.cdnHostname = if(cdnHostname.startsWith("https://")){
                 cdnHostname
+            } else if(cdnHostname.startsWith("http://")) {
+                cdnHostname.replace("http://", "https://", true)
             } else {
                 "https://$cdnHostname"
             }
