@@ -129,10 +129,7 @@ import kotlin.math.min
     }
 
     internal fun updateTitle(chapterTitle: String?, momentTitle: String?) {
-        val title = if(chapterTitle != null && momentTitle != null) {
-            "$chapterTitle • $momentTitle"
-        } else chapterTitle ?: (momentTitle ?: "")
-
+        val title = momentTitle ?: chapterTitle ?: ""
         titleTextView.text = title
     }
 
