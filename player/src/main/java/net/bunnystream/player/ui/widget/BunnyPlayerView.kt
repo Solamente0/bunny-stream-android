@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -27,6 +28,7 @@ import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.media3.ui.SubtitleView
 import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.MediaRouteButton
+import com.bumptech.glide.Glide
 import com.google.android.gms.cast.framework.CastButtonFactory
 import net.bunnystream.androidsdk.settings.capitalizeWords
 import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
@@ -72,6 +74,9 @@ class BunnyPlayerView @JvmOverloads constructor(
                 ToggleableImageButton.State.STATE_DEFAULT
             }
             errorWrapper.isVisible = false
+            if(isPlaying) {
+                overlay.removeAllViews()
+            }
         }
 
         override fun onMutedChanged(isMuted: Boolean) {
@@ -190,7 +195,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         findViewById<BunnyTimeBar>(R.id.exo_progress)
     }
 
-    private val thumbnailPreview by lazy {
+    private val timeBarPreview by lazy {
         findViewById<BunnyTimeBarPreview>(R.id.youtubeTimeBarPreview)
     }
 
@@ -208,6 +213,10 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val errorMessage by lazy {
         findViewById<TextView>(R.id.errorMessage)
+    }
+
+    private val overlay by lazy {
+        findViewById<FrameLayout>(androidx.media3.ui.R.id.exo_overlay)
     }
 
     private val i18n = I18n(context)
@@ -471,9 +480,9 @@ class BunnyPlayerView @JvmOverloads constructor(
     }
 
     private fun initTimeBar() {
-        timeBar.timeBarPreview(thumbnailPreview)
+        timeBar.timeBarPreview(timeBarPreview)
 
-        thumbnailPreview.previewListener(object : BunnyTimeBarPreview.PreviewListener {
+        timeBarPreview.previewListener(object : BunnyTimeBarPreview.PreviewListener {
             override fun loadThumbnail(imageView: ImageView, position: Long) {
                 previewLoader?.loadPreview(position, imageView)
             }
@@ -531,7 +540,7 @@ class BunnyPlayerView @JvmOverloads constructor(
     }
 
     private fun updateFonts(typeface: Typeface){
-        thumbnailPreview.updateTypeface(typeface)
+        timeBarPreview.updateTypeface(typeface)
         progressTextView.typeface = typeface
         durationTextView.typeface = typeface
 
@@ -570,7 +579,11 @@ class BunnyPlayerView @JvmOverloads constructor(
         progressDurationDivider.isVisible = progressTextView.isVisible && durationTextView.isVisible
     }
 
-    private fun updateThumbnailPreview() {
-
+    fun showPreviewThumbnail(url: String) {
+        Log.d(TAG, "onShowPreviewThumbnail: $url")
+        val thumbnail = ImageView(context)
+        overlay.removeAllViews()
+        overlay.addView(thumbnail)
+        Glide.with(context).load(url).into(thumbnail)
     }
 }

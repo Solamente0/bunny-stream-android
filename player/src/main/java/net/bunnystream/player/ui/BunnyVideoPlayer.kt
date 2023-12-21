@@ -142,6 +142,10 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
                 val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(BunnyStreamSdk.libraryId, videoId).getOrNull()
 
+                settings?.thumbnailUrl?.let {
+                    playerView.showPreviewThumbnail(it)
+                }
+
                 var retentionData: Map<Int, Int> = mutableMapOf()
 
                 if(settings?.showHeatmap == true) {
