@@ -264,7 +264,11 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 if(subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
-                    subtitle.state = ToggleableImageButton.State.STATE_TOGGLED
+                    subtitle.state = if(subtitleOption.language == "") {
+                        ToggleableImageButton.State.STATE_DEFAULT
+                    } else {
+                        ToggleableImageButton.State.STATE_TOGGLED
+                    }
                     controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
                 }
@@ -325,6 +329,24 @@ class BunnyPlayerView @JvmOverloads constructor(
                 Menu.NONE,
                 i18n.getTranslation("captions", context.getString(R.string.label_video_settings_captions))
             )
+
+            val disabledTitle = i18n.getTranslation(
+                "disabled",
+                context.getString(R.string.label_video_settings_captions_disabled)
+            )
+
+            val disabled = SubtitleInfo(disabledTitle, "")
+
+            val disabledId = View.generateViewId()
+            subtitleMenuIds[disabledId] = disabled
+            val item = subtitlesMenu.add(
+                Menu.NONE,
+                disabledId,
+                Menu.NONE,
+                disabledTitle
+            )
+            item.isCheckable = true
+            item.isChecked = subtitlesConfig.selectedSubtitle == null || subtitlesConfig.selectedSubtitle == disabled
 
             subtitlesConfig.subtitles.forEach { info ->
                 val id = View.generateViewId()

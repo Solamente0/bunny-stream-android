@@ -68,6 +68,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     private var currentVideo: VideoModel? = null
     private var selectedSubtitle: SubtitleInfo? = null
+    private var subtitlesEnabled = false
 
     override var autoPaused = false
 
@@ -290,40 +291,50 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             currentVideo?.captions?.map {
                 SubtitleInfo(it.label!!, it.srclang!!)
             } ?: listOf(),
-            selectedSubtitle
+            if(subtitlesEnabled) selectedSubtitle else null
         )
     }
 
     override fun selectSubtitle(subtitleInfo: SubtitleInfo) {
         Log.d(TAG, "selectSubtitle: $subtitleInfo")
         selectedSubtitle = subtitleInfo
+        subtitlesEnabled = subtitleInfo.language != ""
 
         val currentProgress = currentPlayer?.currentPosition ?: 0
 
-        val subUri = Uri.parse("${BunnyStreamSdk.cdnHostname}/${currentVideo?.guid}/captions/${subtitleInfo.language}.vtt?ver=1")
+        mediaItemBuilder = if(subtitlesEnabled) {
+            val subUri = Uri.parse("${BunnyStreamSdk.cdnHostname}/${currentVideo?.guid}/captions/${subtitleInfo.language}.vtt?ver=1")
 
-        val subtitle = MediaItem.SubtitleConfiguration.Builder(subUri)
-            .setMimeType(MimeTypes.TEXT_VTT)
-            .setLanguage(subtitleInfo.language)
-            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-            .build()
+            val subtitle = MediaItem.SubtitleConfiguration.Builder(subUri)
+                .setMimeType(MimeTypes.TEXT_VTT)
+                .setLanguage(subtitleInfo.language)
+                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                .build()
 
-        mediaItemBuilder = mediaItemBuilder!!.setSubtitleConfigurations(listOf(subtitle))
+            mediaItemBuilder!!.setSubtitleConfigurations(listOf(subtitle))
+        } else {
+            mediaItemBuilder!!.setSubtitleConfigurations(listOf())
+        }
+
         mediaItem = mediaItemBuilder!!.build()
-
         currentPlayer?.setMediaItem(mediaItem!!, currentProgress)
         currentPlayer?.prepare()
     }
 
     override fun setSubtitlesEnabled(enabled: Boolean) {
+        subtitlesEnabled = enabled
+
         if(enabled) {
-            val caption = currentVideo?.captions?.firstOrNull()
-            if (caption != null) {
-                selectedSubtitle = SubtitleInfo(caption.label!!, caption.srclang!!)
+            if(selectedSubtitle != null) {
                 selectSubtitle(selectedSubtitle!!)
+            } else {
+                val caption = currentVideo?.captions?.firstOrNull()
+                if (caption != null) {
+                    selectedSubtitle = SubtitleInfo(caption.label!!, caption.srclang!!)
+                    selectSubtitle(selectedSubtitle!!)
+                }
             }
         } else {
-            selectedSubtitle = null
             val currentProgress = currentPlayer?.currentPosition ?: 0
             mediaItemBuilder = mediaItemBuilder!!.setSubtitleConfigurations(listOf())
             mediaItem = mediaItemBuilder!!.build()
@@ -334,7 +345,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun areSubtitlesEnabled(): Boolean {
-        return selectedSubtitle != null
+        return subtitlesEnabled
     }
 
     override fun getVideoQualityOptions(): VideoQualityOptions? {
