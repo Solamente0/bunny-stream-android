@@ -116,7 +116,7 @@ class BunnyStreamView @JvmOverloads constructor(
 
         binding.startStop.setOnClickListener {
             if(!streamHandler.isStreaming()) {
-                streamHandler.startStreaming(libraryId)
+                streamHandler.startStreaming(libraryId, null)
             } else {
                 streamHandler.stopStreaming()
             }
@@ -154,8 +154,8 @@ class BunnyStreamView @JvmOverloads constructor(
         }
     }
 
-    override fun startStreaming(){
-        streamHandler.startStreaming(libraryId)
+    override fun startStreaming(videoId: String?){
+        streamHandler.startStreaming(libraryId, videoId)
     }
 
     override fun stopStreaming(){

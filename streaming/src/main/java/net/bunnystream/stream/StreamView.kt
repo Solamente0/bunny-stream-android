@@ -33,8 +33,9 @@ interface StreamView {
 
     /**
      * Initiates streaming
+     * @param videoId Optional video ID to be used for recording. Should be new ID for each call
      */
-    fun startStreaming()
+    fun startStreaming(videoId: String?)
 
     /**
      * Stops streaming

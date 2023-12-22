@@ -134,20 +134,27 @@ class DefaultStreamHandler(
         }
     }
 
-    override fun startStreaming(libraryId: Long){
+    override fun startStreaming(libraryId: Long, videoId: String?){
         streamStateListener?.onStreamInitializing()
         scope.launch {
-            val result = streamRepository.prepareStreaming(libraryId)
 
-            when(result) {
-                is Either.Left -> {
-                    MainScope().launch {
-                        streamStateListener?.onStreamConnectionFailed(result.value)
-                    }
+            if(videoId != null) {
+                if (camera.isRecording || camera.prepareAudio() && camera.prepareVideo()) {
+                    camera.startStream(videoId)
                 }
-                is Either.Right -> {
-                    if (camera.isRecording || camera.prepareAudio() && camera.prepareVideo()) {
-                        camera.startStream(result.value)
+            } else {
+                val result = streamRepository.prepareStreaming(libraryId)
+
+                when(result) {
+                    is Either.Left -> {
+                        MainScope().launch {
+                            streamStateListener?.onStreamConnectionFailed(result.value)
+                        }
+                    }
+                    is Either.Right -> {
+                        if (camera.isRecording || camera.prepareAudio() && camera.prepareVideo()) {
+                            camera.startStream(result.value)
+                        }
                     }
                 }
             }

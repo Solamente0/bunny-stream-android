@@ -12,7 +12,7 @@ interface StreamHandler {
 
     fun initialize(container: ViewGroup, deviceCamera: DeviceCamera)
 
-    fun startStreaming(libraryId: Long)
+    fun startStreaming(libraryId: Long, videoId: String?)
 
     fun stopStreaming()
 
