@@ -12,7 +12,7 @@ import net.bunnystream.android.player.playerScreen
 import net.bunnystream.android.settings.navigateToSettings
 import net.bunnystream.android.settings.settingsScreen
 import net.bunnystream.android.ui.AppState
-import net.bunnystream.android.ui.streaming.StreamActivity
+import net.bunnystream.android.ui.recording.RecordingActivity
 
 @Composable
 fun AppNavHost(
@@ -33,7 +33,7 @@ fun AppNavHost(
             navigateToSettings = navController::navigateToSettings,
             navigateToPlayer = navController::navigateToPlayer,
             navigateToStreaming = {
-                context.startActivity(Intent(context, StreamActivity::class.java))
+                context.startActivity(Intent(context, RecordingActivity::class.java))
             }
         )
         settingsScreen(appState = appState)

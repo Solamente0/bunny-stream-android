@@ -18,4 +18,4 @@ rootProject.name = "Bunny Stream"
 include(":app")
 include(":sdk")
 include(":player")
-include(":streaming")
+include(":recording")
