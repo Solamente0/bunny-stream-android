@@ -5,30 +5,34 @@ $dokka.location:net.bunnystream.androidsdk.ktor//defaultJson/#/PointingToDeclara
 $dokka.location:net.bunnystream.androidsdk.ktor//initHttpClient/#kotlin.String/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.ktor/init-http-client.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model////PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse///PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/index.md
-$dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/PlayerSettingsResponse/#kotlin.String#kotlin.String#kotlin.String#kotlin.Int#kotlin.String?#kotlin.String?#kotlin.String#kotlin.Boolean#kotlin.String#kotlin.String#kotlin.Boolean#kotlin.String?/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/-player-settings-response.md
+$dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/PlayerSettingsResponse/#kotlin.String#kotlin.String#kotlin.String#kotlin.Int#kotlin.String?#kotlin.String?#kotlin.String#kotlin.Boolean#kotlin.String#kotlin.String?#kotlin.Boolean#kotlin.String?#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/-player-settings-response.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/captionsBackgroundColor/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/captions-background-color.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/captionsFontColor/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/captions-font-color.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/captionsFontSize/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/captions-font-size.md
+$dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/captionsPath/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/captions-path.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/controls/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/controls.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/drmEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/drm-enabled.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/fontFamily/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/font-family.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/keyColor/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/key-color.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/playbackSpeeds/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/playback-speeds.md
+$dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/seekPath/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/seek-path.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/showHeatmap/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/show-heatmap.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/thumbnailUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/thumbnail-url.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/toModel/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/to-model.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/uiLanguage/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/ui-language.md
 $dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/vastTagUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/vast-tag-url.md
+$dokka.location:net.bunnystream.androidsdk.settings.data.model/PlayerSettingsResponse/videoUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data.model/-player-settings-response/video-url.md
 $dokka.location:net.bunnystream.androidsdk.settings.data////PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.data/DefaultSettingsRepository///PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data/-default-settings-repository/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.data/DefaultSettingsRepository/DefaultSettingsRepository/#io.ktor.client.HttpClient#kotlinx.coroutines.CoroutineDispatcher/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data/-default-settings-repository/-default-settings-repository.md
 $dokka.location:net.bunnystream.androidsdk.settings.data/DefaultSettingsRepository/fetchSettings/#kotlin.Long#kotlin.String/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.data/-default-settings-repository/fetch-settings.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model////PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings///PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/index.md
-$dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/PlayerSettings/#kotlin.String#kotlin.String#kotlin.Int#kotlin.Int#kotlin.Int?#kotlin.Int?#kotlin.String#kotlin.Boolean#kotlin.String#kotlin.String#kotlin.Boolean#kotlin.String?/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/-player-settings.md
+$dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/PlayerSettings/#kotlin.String#kotlin.String#kotlin.Int#kotlin.Int#kotlin.Int?#kotlin.Int?#kotlin.String#kotlin.Boolean#kotlin.String#kotlin.collections.List[kotlin.Float]#kotlin.Boolean#kotlin.String?#kotlin.String#kotlin.String#kotlin.String/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/-player-settings.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/captionsBackgroundColor/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/captions-background-color.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/captionsFontColor/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/captions-font-color.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/captionsFontSize/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/captions-font-size.md
+$dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/captionsPath/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/captions-path.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/controls/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/controls.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/currentTimeEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/current-time-enabled.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/drmEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/drm-enabled.md
@@ -42,12 +46,14 @@ $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/playbackSpeeds/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/playback-speeds.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/progressEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/progress-enabled.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/rewindEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/rewind-enabled.md
+$dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/seekPath/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/seek-path.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/settingsEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/settings-enabled.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/showHeatmap/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/show-heatmap.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/subtitlesEnabled/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/subtitles-enabled.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/thumbnailUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/thumbnail-url.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/uiLanguage/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/ui-language.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/vastTagUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/vast-tag-url.md
+$dokka.location:net.bunnystream.androidsdk.settings.domain.model/PlayerSettings/videoUrl/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain.model/-player-settings/video-url.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain////PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain/SettingsRepository///PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain/-settings-repository/index.md
 $dokka.location:net.bunnystream.androidsdk.settings.domain/SettingsRepository/fetchSettings/#kotlin.Long#kotlin.String/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk.settings.domain/-settings-repository/fetch-settings.md
@@ -127,7 +133,7 @@ $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion///PointingTo
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/baseApi/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/base-api.md
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/cdnHostname/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/cdn-hostname.md
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/getInstance/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/get-instance.md
-$dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/initialize/#android.content.Context#kotlin.String#kotlin.String#kotlin.Long/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/initialize.md
+$dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/initialize/#android.content.Context#kotlin.String#kotlin.Long/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/initialize.md
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/isInitialized/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/is-initialized.md
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/libraryId/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/library-id.md
 $dokka.location:net.bunnystream.androidsdk/BunnyStreamSdk.Companion/release/#/PointingToDeclaration/sdk/sdk/net.bunnystream.androidsdk/-bunny-stream-sdk/-companion/release.md
@@ -154,6 +160,7 @@ $dokka.location:net.bunnystream.player.common/BunnyPlayer/autoPaused/#/PointingT
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/currentPlayer/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/current-player.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/getCurrentPosition/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-current-position.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/getDuration/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-duration.md
+$dokka.location:net.bunnystream.player.common/BunnyPlayer/getPlaybackSpeeds/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-playback-speeds.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/getSpeed/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-speed.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/getSubtitles/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-subtitles.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/getVideoQualityOptions/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/get-video-quality-options.md
@@ -163,7 +170,7 @@ $dokka.location:net.bunnystream.player.common/BunnyPlayer/isPlaying/#/PointingTo
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/mute/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/mute.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/pause/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/pause.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play.md
-$dokka.location:net.bunnystream.player.common/BunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play-video.md
+$dokka.location:net.bunnystream.player.common/BunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/play-video.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/playerSettings/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/player-settings.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/playerStateListener/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/player-state-listener.md
 $dokka.location:net.bunnystream.player.common/BunnyPlayer/release/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-bunny-player/release.md
@@ -184,6 +191,11 @@ $dokka.location:net.bunnystream.player.common/GlideThumbnailTransformation/Glide
 $dokka.location:net.bunnystream.player.common/GlideThumbnailTransformation/equals/#kotlin.Any?/PointingToDeclaration/player/player/net.bunnystream.player.common/-glide-thumbnail-transformation/equals.md
 $dokka.location:net.bunnystream.player.common/GlideThumbnailTransformation/hashCode/#/PointingToDeclaration/player/player/net.bunnystream.player.common/-glide-thumbnail-transformation/hash-code.md
 $dokka.location:net.bunnystream.player.common/GlideThumbnailTransformation/updateDiskCacheKey/#java.security.MessageDigest/PointingToDeclaration/player/player/net.bunnystream.player.common/-glide-thumbnail-transformation/update-disk-cache-key.md
+$dokka.location:net.bunnystream.player.common/I18n.Companion///PointingToDeclaration/player/player/net.bunnystream.player.common/-i18n/-companion/index.md
+$dokka.location:net.bunnystream.player.common/I18n///PointingToDeclaration/player/player/net.bunnystream.player.common/-i18n/index.md
+$dokka.location:net.bunnystream.player.common/I18n/I18n/#android.content.Context/PointingToDeclaration/player/player/net.bunnystream.player.common/-i18n/-i18n.md
+$dokka.location:net.bunnystream.player.common/I18n/getTranslation/#kotlin.String#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.common/-i18n/get-translation.md
+$dokka.location:net.bunnystream.player.common/I18n/load/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.common/-i18n/load.md
 $dokka.location:net.bunnystream.player.model////PointingToDeclaration/player/player/net.bunnystream.player.model/index.md
 $dokka.location:net.bunnystream.player.model//getSanitizedRetentionData/org.openapitools.client.models.VideoHeatmapModel#/PointingToDeclaration/player/player/net.bunnystream.player.model/get-sanitized-retention-data.md
 $dokka.location:net.bunnystream.player.model/Chapter///PointingToDeclaration/player/player/net.bunnystream.player.model/-chapter/index.md
@@ -247,7 +259,8 @@ $dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/bunnyPlayer/#/P
 $dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/fullscreenListener/#/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/fullscreen-listener.md
 $dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/iconSet/#/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/icon-set.md
 $dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/isFullscreen/#/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/is-fullscreen.md
-$dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/playerSettings/#/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/player-settings.md
+$dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/showError/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/show-error.md
+$dokka.location:net.bunnystream.player.ui.widget/BunnyPlayerView/showPreviewThumbnail/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-player-view/show-preview-thumbnail.md
 $dokka.location:net.bunnystream.player.ui.widget/BunnyTimeBar.Companion///PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-time-bar/-companion/index.md
 $dokka.location:net.bunnystream.player.ui.widget/BunnyTimeBar///PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-time-bar/index.md
 $dokka.location:net.bunnystream.player.ui.widget/BunnyTimeBar/BunnyTimeBar/#android.content.Context#android.util.AttributeSet?#kotlin.Int/PointingToDeclaration/player/player/net.bunnystream.player.ui.widget/-bunny-time-bar/-bunny-time-bar.md
@@ -315,6 +328,7 @@ $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/autoPaused/#/PointingT
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/currentPlayer/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/current-player.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getCurrentPosition/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-current-position.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getDuration/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-duration.md
+$dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getPlaybackSpeeds/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-playback-speeds.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getSpeed/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-speed.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getSubtitles/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-subtitles.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/getVideoQualityOptions/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/get-video-quality-options.md
@@ -324,7 +338,7 @@ $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/isPlaying/#/PointingTo
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/mute/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/mute.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/pause/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/pause.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/play/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play.md
-$dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings?/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play-video.md
+$dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playVideo/#androidx.media3.ui.PlayerView#org.openapitools.client.models.VideoModel#kotlin.collections.Map[kotlin.Int,kotlin.Int]#net.bunnystream.androidsdk.settings.domain.model.PlayerSettings/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/play-video.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playerSettings/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/player-settings.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/playerStateListener/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/player-state-listener.md
 $dokka.location:net.bunnystream.player/DefaultBunnyPlayer/release/#/PointingToDeclaration/player/player/net.bunnystream.player/-default-bunny-player/release.md
@@ -345,6 +359,7 @@ $dokka.location:net.bunnystream.player/PlayerStateListener/onLoadingChanged/#kot
 $dokka.location:net.bunnystream.player/PlayerStateListener/onMomentsUpdated/#kotlin.collections.List[net.bunnystream.player.model.Moment]/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-moments-updated.md
 $dokka.location:net.bunnystream.player/PlayerStateListener/onMutedChanged/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-muted-changed.md
 $dokka.location:net.bunnystream.player/PlayerStateListener/onPlaybackSpeedChanged/#kotlin.Float/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-playback-speed-changed.md
+$dokka.location:net.bunnystream.player/PlayerStateListener/onPlayerError/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-player-error.md
 $dokka.location:net.bunnystream.player/PlayerStateListener/onPlayerTypeChanged/#androidx.media3.common.Player#net.bunnystream.player.PlayerType/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-player-type-changed.md
 $dokka.location:net.bunnystream.player/PlayerStateListener/onPlayingChanged/#kotlin.Boolean/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-playing-changed.md
 $dokka.location:net.bunnystream.player/PlayerStateListener/onRetentionGraphUpdated/#kotlin.collections.List[net.bunnystream.player.model.RetentionGraphEntry]/PointingToDeclaration/player/player/net.bunnystream.player/-player-state-listener/on-retention-graph-updated.md
@@ -354,81 +369,81 @@ $dokka.location:net.bunnystream.player/PlayerType///PointingToDeclaration/playe
 $dokka.location:net.bunnystream.player/PlayerType/entries/#/PointingToDeclaration/player/player/net.bunnystream.player/-player-type/entries.md
 $dokka.location:net.bunnystream.player/PlayerType/valueOf/#kotlin.String/PointingToDeclaration/player/player/net.bunnystream.player/-player-type/value-of.md
 $dokka.location:net.bunnystream.player/PlayerType/values/#/PointingToDeclaration/player/player/net.bunnystream.player/-player-type/values.md
-$dokka.location:net.bunnystream.stream.data////PointingToDeclaration/streaming/streaming/net.bunnystream.stream.data/index.md
-$dokka.location:net.bunnystream.stream.data/DefaultStreamRepository.Companion///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.data/-default-stream-repository/-companion/index.md
-$dokka.location:net.bunnystream.stream.data/DefaultStreamRepository///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.data/-default-stream-repository/index.md
-$dokka.location:net.bunnystream.stream.data/DefaultStreamRepository/DefaultStreamRepository/#kotlinx.coroutines.CoroutineDispatcher/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.data/-default-stream-repository/-default-stream-repository.md
-$dokka.location:net.bunnystream.stream.data/DefaultStreamRepository/prepareStreaming/#kotlin.Long/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.data/-default-stream-repository/prepare-streaming.md
-$dokka.location:net.bunnystream.stream.domain////PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/index.md
-$dokka.location:net.bunnystream.stream.domain//toFormattedDuration/kotlin.Long#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/to-formatted-duration.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler.Companion///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/-companion/index.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/index.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/DefaultStreamHandler/#net.bunnystream.stream.domain.StreamRepository#kotlinx.coroutines.CoroutineDispatcher/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/-default-stream-handler.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/initialize/#android.view.ViewGroup#net.bunnystream.stream.DeviceCamera/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/initialize.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/isMuted/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/is-muted.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/isStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/is-streaming.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/selectCamera/#net.bunnystream.stream.DeviceCamera/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/select-camera.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/setMuted/#kotlin.Boolean/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/set-muted.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/startStreaming/#kotlin.Long/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/start-streaming.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/stopStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/stop-streaming.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/streamDurationListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/stream-duration-listener.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/streamStateListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/stream-state-listener.md
-$dokka.location:net.bunnystream.stream.domain/DefaultStreamHandler/switchCamera/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-default-stream-handler/switch-camera.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/index.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/initialize/#android.view.ViewGroup#net.bunnystream.stream.DeviceCamera/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/initialize.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/isMuted/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/is-muted.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/isStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/is-streaming.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/selectCamera/#net.bunnystream.stream.DeviceCamera/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/select-camera.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/setMuted/#kotlin.Boolean/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/set-muted.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/startStreaming/#kotlin.Long/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/start-streaming.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/stopStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/stop-streaming.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/streamDurationListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/stream-duration-listener.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/streamStateListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/stream-state-listener.md
-$dokka.location:net.bunnystream.stream.domain/StreamHandler/switchCamera/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-handler/switch-camera.md
-$dokka.location:net.bunnystream.stream.domain/StreamRepository///PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-repository/index.md
-$dokka.location:net.bunnystream.stream.domain/StreamRepository/prepareStreaming/#kotlin.Long/PointingToDeclaration/streaming/streaming/net.bunnystream.stream.domain/-stream-repository/prepare-streaming.md
-$dokka.location:net.bunnystream.stream////PointingToDeclaration/streaming/streaming/net.bunnystream.stream/index.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView.Companion///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/-companion/index.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/index.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/BunnyStreamView/#android.content.Context#android.util.AttributeSet?#kotlin.Int/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/-bunny-stream-view.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/closeStreamClickListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/close-stream-click-listener.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/hideDefaultControls/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/hide-default-controls.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/isStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/is-streaming.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/setAudioMuted/#kotlin.Boolean/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/set-audio-muted.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/startPreview/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/start-preview.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/startStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/start-streaming.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/stopStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/stop-streaming.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/streamDurationListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/stream-duration-listener.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/streamStateListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/stream-state-listener.md
-$dokka.location:net.bunnystream.stream/BunnyStreamView/switchCamera/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-bunny-stream-view/switch-camera.md
-$dokka.location:net.bunnystream.stream/DeviceCamera.BACK///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}streaming/streaming/net.bunnystream.stream/-device-camera/-b-a-c-k/index.md
-$dokka.location:net.bunnystream.stream/DeviceCamera.FRONT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}streaming/streaming/net.bunnystream.stream/-device-camera/-f-r-o-n-t/index.md
-$dokka.location:net.bunnystream.stream/DeviceCamera///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-device-camera/index.md
-$dokka.location:net.bunnystream.stream/DeviceCamera/entries/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-device-camera/entries.md
-$dokka.location:net.bunnystream.stream/DeviceCamera/valueOf/#kotlin.String/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-device-camera/value-of.md
-$dokka.location:net.bunnystream.stream/DeviceCamera/values/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-device-camera/values.md
-$dokka.location:net.bunnystream.stream/StreamDurationListener///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-duration-listener/index.md
-$dokka.location:net.bunnystream.stream/StreamDurationListener/onDurationUpdated/#kotlin.Long#kotlin.String/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-duration-listener/on-duration-updated.md
-$dokka.location:net.bunnystream.stream/StreamStateListener///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/index.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onAudioMuted/#kotlin.Boolean/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-audio-muted.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onCameraChanged/#net.bunnystream.stream.DeviceCamera/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-camera-changed.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamAuthError/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-auth-error.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamConnected/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-connected.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamConnectionFailed/#kotlin.String/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-connection-failed.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamDisconnected/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-disconnected.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamInitializing/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-initializing.md
-$dokka.location:net.bunnystream.stream/StreamStateListener/onStreamStopped/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-state-listener/on-stream-stopped.md
-$dokka.location:net.bunnystream.stream/StreamView///PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/index.md
-$dokka.location:net.bunnystream.stream/StreamView/closeStreamClickListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/close-stream-click-listener.md
-$dokka.location:net.bunnystream.stream/StreamView/hideDefaultControls/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/hide-default-controls.md
-$dokka.location:net.bunnystream.stream/StreamView/isStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/is-streaming.md
-$dokka.location:net.bunnystream.stream/StreamView/setAudioMuted/#kotlin.Boolean/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/set-audio-muted.md
-$dokka.location:net.bunnystream.stream/StreamView/startPreview/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/start-preview.md
-$dokka.location:net.bunnystream.stream/StreamView/startStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/start-streaming.md
-$dokka.location:net.bunnystream.stream/StreamView/stopStreaming/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/stop-streaming.md
-$dokka.location:net.bunnystream.stream/StreamView/streamDurationListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/stream-duration-listener.md
-$dokka.location:net.bunnystream.stream/StreamView/streamStateListener/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/stream-state-listener.md
-$dokka.location:net.bunnystream.stream/StreamView/switchCamera/#/PointingToDeclaration/streaming/streaming/net.bunnystream.stream/-stream-view/switch-camera.md
+$dokka.location:net.bunnystream.recording.data////PointingToDeclaration/recording/recording/net.bunnystream.recording.data/index.md
+$dokka.location:net.bunnystream.recording.data/DefaultRecordingRepository.Companion///PointingToDeclaration/recording/recording/net.bunnystream.recording.data/-default-recording-repository/-companion/index.md
+$dokka.location:net.bunnystream.recording.data/DefaultRecordingRepository///PointingToDeclaration/recording/recording/net.bunnystream.recording.data/-default-recording-repository/index.md
+$dokka.location:net.bunnystream.recording.data/DefaultRecordingRepository/DefaultRecordingRepository/#kotlinx.coroutines.CoroutineDispatcher/PointingToDeclaration/recording/recording/net.bunnystream.recording.data/-default-recording-repository/-default-recording-repository.md
+$dokka.location:net.bunnystream.recording.data/DefaultRecordingRepository/prepareRecording/#kotlin.Long/PointingToDeclaration/recording/recording/net.bunnystream.recording.data/-default-recording-repository/prepare-recording.md
+$dokka.location:net.bunnystream.recording.domain////PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/index.md
+$dokka.location:net.bunnystream.recording.domain//toFormattedDuration/kotlin.Long#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/to-formatted-duration.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler.Companion///PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/-companion/index.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler///PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/index.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/DefaultStreamHandler/#net.bunnystream.recording.domain.RecordingRepository#kotlinx.coroutines.CoroutineDispatcher/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/-default-stream-handler.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/initialize/#android.view.ViewGroup#net.bunnystream.recording.DeviceCamera/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/initialize.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/isMuted/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/is-muted.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/isStreaming/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/is-streaming.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/recordingDurationListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/recording-duration-listener.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/recordingStateListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/recording-state-listener.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/selectCamera/#net.bunnystream.recording.DeviceCamera/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/select-camera.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/setMuted/#kotlin.Boolean/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/set-muted.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/startStreaming/#kotlin.Long#kotlin.String?/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/start-streaming.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/stopStreaming/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/stop-streaming.md
+$dokka.location:net.bunnystream.recording.domain/DefaultStreamHandler/switchCamera/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-default-stream-handler/switch-camera.md
+$dokka.location:net.bunnystream.recording.domain/RecordingRepository///PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-recording-repository/index.md
+$dokka.location:net.bunnystream.recording.domain/RecordingRepository/prepareRecording/#kotlin.Long/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-recording-repository/prepare-recording.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler///PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/index.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/initialize/#android.view.ViewGroup#net.bunnystream.recording.DeviceCamera/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/initialize.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/isMuted/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/is-muted.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/isStreaming/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/is-streaming.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/recordingDurationListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/recording-duration-listener.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/recordingStateListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/recording-state-listener.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/selectCamera/#net.bunnystream.recording.DeviceCamera/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/select-camera.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/setMuted/#kotlin.Boolean/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/set-muted.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/startStreaming/#kotlin.Long#kotlin.String?/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/start-streaming.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/stopStreaming/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/stop-streaming.md
+$dokka.location:net.bunnystream.recording.domain/StreamHandler/switchCamera/#/PointingToDeclaration/recording/recording/net.bunnystream.recording.domain/-stream-handler/switch-camera.md
+$dokka.location:net.bunnystream.recording////PointingToDeclaration/recording/recording/net.bunnystream.recording/index.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView.Companion///PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/-companion/index.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView///PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/index.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/BunnyRecordingView/#android.content.Context#android.util.AttributeSet?#kotlin.Int/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/-bunny-recording-view.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/closeStreamClickListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/close-stream-click-listener.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/hideDefaultControls/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/hide-default-controls.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/isRecording/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/is-recording.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/setAudioMuted/#kotlin.Boolean/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/set-audio-muted.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/startPreview/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/start-preview.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/startRecording/#kotlin.String?/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/start-recording.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/stopRecording/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/stop-recording.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/streamDurationListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/stream-duration-listener.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/streamStateListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/stream-state-listener.md
+$dokka.location:net.bunnystream.recording/BunnyRecordingView/switchCamera/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-bunny-recording-view/switch-camera.md
+$dokka.location:net.bunnystream.recording/DeviceCamera.BACK///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}recording/recording/net.bunnystream.recording/-device-camera/-b-a-c-k/index.md
+$dokka.location:net.bunnystream.recording/DeviceCamera.FRONT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}recording/recording/net.bunnystream.recording/-device-camera/-f-r-o-n-t/index.md
+$dokka.location:net.bunnystream.recording/DeviceCamera///PointingToDeclaration/recording/recording/net.bunnystream.recording/-device-camera/index.md
+$dokka.location:net.bunnystream.recording/DeviceCamera/entries/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-device-camera/entries.md
+$dokka.location:net.bunnystream.recording/DeviceCamera/valueOf/#kotlin.String/PointingToDeclaration/recording/recording/net.bunnystream.recording/-device-camera/value-of.md
+$dokka.location:net.bunnystream.recording/DeviceCamera/values/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-device-camera/values.md
+$dokka.location:net.bunnystream.recording/RecordingDurationListener///PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-duration-listener/index.md
+$dokka.location:net.bunnystream.recording/RecordingDurationListener/onDurationUpdated/#kotlin.Long#kotlin.String/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-duration-listener/on-duration-updated.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener///PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/index.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onAudioMuted/#kotlin.Boolean/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-audio-muted.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onCameraChanged/#net.bunnystream.recording.DeviceCamera/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-camera-changed.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamAuthError/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-auth-error.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamConnected/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-connected.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamConnectionFailed/#kotlin.String/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-connection-failed.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamDisconnected/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-disconnected.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamInitializing/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-initializing.md
+$dokka.location:net.bunnystream.recording/RecordingStateListener/onStreamStopped/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-state-listener/on-stream-stopped.md
+$dokka.location:net.bunnystream.recording/RecordingView///PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/index.md
+$dokka.location:net.bunnystream.recording/RecordingView/closeStreamClickListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/close-stream-click-listener.md
+$dokka.location:net.bunnystream.recording/RecordingView/hideDefaultControls/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/hide-default-controls.md
+$dokka.location:net.bunnystream.recording/RecordingView/isRecording/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/is-recording.md
+$dokka.location:net.bunnystream.recording/RecordingView/setAudioMuted/#kotlin.Boolean/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/set-audio-muted.md
+$dokka.location:net.bunnystream.recording/RecordingView/startPreview/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/start-preview.md
+$dokka.location:net.bunnystream.recording/RecordingView/startRecording/#kotlin.String?/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/start-recording.md
+$dokka.location:net.bunnystream.recording/RecordingView/stopRecording/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/stop-recording.md
+$dokka.location:net.bunnystream.recording/RecordingView/streamDurationListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/stream-duration-listener.md
+$dokka.location:net.bunnystream.recording/RecordingView/streamStateListener/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/stream-state-listener.md
+$dokka.location:net.bunnystream.recording/RecordingView/switchCamera/#/PointingToDeclaration/recording/recording/net.bunnystream.recording/-recording-view/switch-camera.md
 module:player
 net.bunnystream.player
 net.bunnystream.player.common
@@ -436,6 +451,10 @@ net.bunnystream.player.model
 net.bunnystream.player.ui
 net.bunnystream.player.ui.fullscreen
 net.bunnystream.player.ui.widget
+module:recording
+net.bunnystream.recording
+net.bunnystream.recording.data
+net.bunnystream.recording.domain
 module:sdk
 net.bunnystream.androidsdk
 net.bunnystream.androidsdk.ktor
@@ -449,7 +468,3 @@ net.bunnystream.androidsdk.upload.model
 net.bunnystream.androidsdk.upload.service
 net.bunnystream.androidsdk.upload.service.basic
 net.bunnystream.androidsdk.upload.service.tus
-module:streaming
-net.bunnystream.stream
-net.bunnystream.stream.data
-net.bunnystream.stream.domain

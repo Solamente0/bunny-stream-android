@@ -17,9 +17,9 @@ SDK includes Bunny API client, Video Player and streaming implementation
 Before using the core SDK, player or streaming SDK first initialize the SDK by calling:
 
 ```kotlin
-BunnyStreamSdk.initialize(context, accessKey, cdnHostname, libraryId)
+BunnyStreamSdk.initialize(context, accessKey, libraryId)
 ```
-You can find `accessKey`, `cdnHostname` and `libraryId` on the [bunny.net dashboard](dash.bunny.net).
+You can find `accessKey`, and `libraryId` on the [bunny.net dashboard](dash.bunny.net).
 
 ## Player
 
@@ -31,15 +31,15 @@ To use player in XML views, add `BunnyVideoPlayer` widget in layout and call `pl
 
 You can supply your own icons for player by setting `iconSet` field. Check [PlayerIconSet](player/src/main/java/net/bunnystream/player/model/PlayerIconSet.kt).
 
-## Streaming
+## Recording
 
-Use [BunnyStreamView](streaming/src/main/java/net/bunnystream/stream/BunnyStreamView.kt) to implement video streaming. 
+Use [BunnyRecordingView](recording/src/main/java/net/bunnystream/recording/BunnyRecordingView.kt) to implement video recording. 
 
-You can use default UI or use your own by instantiating `BunnyStreamView` in `Box` (Jetpack Compose) or `FrameLayout` (XML) and setting `hideDefaultControls` to `true` or `app:bsvHideDefaultControls="true"` in XML.
+You can use default UI or use your own by instantiating `BunnyStreamView` in `Box` (Jetpack Compose) or `FrameLayout` (XML) and setting `hideDefaultControls` to `true` or `app:brvHideDefaultControls="true"` in XML.
 
-If you opt for your own UI, set `streamStateListener` see [StreamStateListener](streaming/src/main/java/net/bunnystream/stream/StreamStateListener.kt) and `streamDurationListener`, see [StreamDurationListener](streaming/src/main/java/net/bunnystream/stream/StreamDurationListener.kt) to get events and update UI accordingly.
+If you opt for your own UI, set `recordingStateListener` see [RecordingStateListener](recording/src/main/java/net/bunnystream/recording/RecordingStateListener.kt) and `recordingDurationListener`, see [RecordingDurationListener](recording/src/main/java/net/bunnystream/recording/RecordingDurationListener.kt) to get events and update UI accordingly.
 
-See [StreamActivity](app/src/main/java/net/bunnystream/android/ui/streaming/StreamActivity.kt) as an example of usage.
+See [RecordingActivity](app/src/main/java/net/bunnystream/android/ui/recording/RecordingActivity.kt) as an example of usage.
 
 ## Other examples
 

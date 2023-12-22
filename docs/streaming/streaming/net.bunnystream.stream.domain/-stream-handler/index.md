@@ -26,6 +26,6 @@ interface [StreamHandler](index.md)
 | [isStreaming](is-streaming.md) | [androidJvm]<br>abstract fun [isStreaming](is-streaming.md)(): [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [selectCamera](select-camera.md) | [androidJvm]<br>abstract fun [selectCamera](select-camera.md)(deviceCamera: [DeviceCamera](../../net.bunnystream.stream/-device-camera/index.md)) |
 | [setMuted](set-muted.md) | [androidJvm]<br>abstract fun [setMuted](set-muted.md)(muted: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)) |
-| [startStreaming](start-streaming.md) | [androidJvm]<br>abstract fun [startStreaming](start-streaming.md)(libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)) |
+| [startStreaming](start-streaming.md) | [androidJvm]<br>abstract fun [startStreaming](start-streaming.md)(libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?) |
 | [stopStreaming](stop-streaming.md) | [androidJvm]<br>abstract fun [stopStreaming](stop-streaming.md)() |
 | [switchCamera](switch-camera.md) | [androidJvm]<br>abstract fun [switchCamera](switch-camera.md)() |

@@ -678,7 +678,7 @@ class [BunnyStreamView](index.md)@[JvmOverloads](https://kotlinlang.org/api/late
 | [startLayoutAnimation](index.md#-2024330459%2FFunctions%2F1137960318) | [androidJvm]<br>open fun [startLayoutAnimation](index.md#-2024330459%2FFunctions%2F1137960318)() |
 | [startNestedScroll](index.md#1247036596%2FFunctions%2F1137960318) | [androidJvm]<br>open fun [startNestedScroll](index.md#1247036596%2FFunctions%2F1137960318)(p0: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)): [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [startPreview](start-preview.md) | [androidJvm]<br>open override fun [startPreview](start-preview.md)()<br>Starts camera preview |
-| [startStreaming](start-streaming.md) | [androidJvm]<br>open override fun [startStreaming](start-streaming.md)()<br>Initiates streaming |
+| [startStreaming](start-streaming.md) | [androidJvm]<br>open override fun [startStreaming](start-streaming.md)(videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?)<br>Initiates streaming |
 | [startViewTransition](index.md#69946450%2FFunctions%2F1137960318) | [androidJvm]<br>open fun [startViewTransition](index.md#69946450%2FFunctions%2F1137960318)(p0: [View](https://developer.android.com/reference/kotlin/android/view/View.html)) |
 | [stopNestedScroll](index.md#1585642136%2FFunctions%2F1137960318) | [androidJvm]<br>open fun [stopNestedScroll](index.md#1585642136%2FFunctions%2F1137960318)() |
 | [stopStreaming](stop-streaming.md) | [androidJvm]<br>open override fun [stopStreaming](stop-streaming.md)()<br>Stops streaming |

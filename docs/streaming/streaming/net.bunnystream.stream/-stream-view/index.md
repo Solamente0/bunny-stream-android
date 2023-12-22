@@ -26,6 +26,6 @@ interface [StreamView](index.md)
 | [isStreaming](is-streaming.md) | [androidJvm]<br>abstract fun [isStreaming](is-streaming.md)(): [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)<br>Check if streaming is in progress |
 | [setAudioMuted](set-audio-muted.md) | [androidJvm]<br>abstract fun [setAudioMuted](set-audio-muted.md)(muted: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html))<br>Mutes/un-mutes audio |
 | [startPreview](start-preview.md) | [androidJvm]<br>abstract fun [startPreview](start-preview.md)()<br>Starts camera preview |
-| [startStreaming](start-streaming.md) | [androidJvm]<br>abstract fun [startStreaming](start-streaming.md)()<br>Initiates streaming |
+| [startStreaming](start-streaming.md) | [androidJvm]<br>abstract fun [startStreaming](start-streaming.md)(videoId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?)<br>Initiates streaming |
 | [stopStreaming](stop-streaming.md) | [androidJvm]<br>abstract fun [stopStreaming](stop-streaming.md)()<br>Stops streaming |
 | [switchCamera](switch-camera.md) | [androidJvm]<br>abstract fun [switchCamera](switch-camera.md)()<br>Switches stream camera |

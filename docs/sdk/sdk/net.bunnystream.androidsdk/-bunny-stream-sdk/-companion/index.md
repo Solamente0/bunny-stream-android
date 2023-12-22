@@ -18,6 +18,6 @@ object [Companion](index.md)
 | Name | Summary |
 |---|---|
 | [getInstance](get-instance.md) | [androidJvm]<br>fun [getInstance](get-instance.md)(): [StreamSdk](../../-stream-sdk/index.md) |
-| [initialize](initialize.md) | [androidJvm]<br>fun [initialize](initialize.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), accessKey: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), cdnHostname: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)) |
+| [initialize](initialize.md) | [androidJvm]<br>fun [initialize](initialize.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), accessKey: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), libraryId: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)) |
 | [isInitialized](is-initialized.md) | [androidJvm]<br>fun [isInitialized](is-initialized.md)(): [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [release](release.md) | [androidJvm]<br>fun [release](release.md)() |
