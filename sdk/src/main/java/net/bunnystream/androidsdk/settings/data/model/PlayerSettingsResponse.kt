@@ -43,7 +43,16 @@ data class PlayerSettingsResponse(
     val drmEnabled: Boolean,
 
     @SerialName("vastTagUrl")
-    val vastTagUrl: String?
+    val vastTagUrl: String?,
+
+    @SerialName("captionsPath")
+    val captionsPath: String,
+
+    @SerialName("seekPath")
+    val seekPath: String,
+
+    @SerialName("videoPlaylistUrl")
+    val videoUrl: String
 ) {
     fun toModel() = PlayerSettings(
         thumbnailUrl = thumbnailUrl,
@@ -57,7 +66,10 @@ data class PlayerSettingsResponse(
         fontFamily = fontFamily,
         playbackSpeeds = parsePlaybackSpeeds(),
         drmEnabled = drmEnabled,
-        vastTagUrl = vastTagUrl
+        vastTagUrl = vastTagUrl,
+        captionsPath = captionsPath,
+        seekPath = seekPath,
+        videoUrl = videoUrl
     )
 
     private fun parsePlaybackSpeeds(): List<Float> {

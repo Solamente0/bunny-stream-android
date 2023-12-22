@@ -206,13 +206,7 @@ class LibraryViewModel : ViewModel() {
                 6  -> VideoStatus.UPLOAD_FAILED
                 else  -> VideoStatus.ERROR
             },
-            thumbnail = getVideoThumbnail(guid, thumbnailFileName)
         )
-    }
-
-    private fun getVideoThumbnail(videoId: String?, thumbnailFileName: String?): String? {
-        videoId ?: return null
-        return "${BunnyStreamSdk.cdnHostname}/$videoId/$thumbnailFileName"
     }
 
     override fun onCleared() {

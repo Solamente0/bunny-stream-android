@@ -16,6 +16,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.PlayerIconSet
@@ -140,31 +141,12 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     return@launch
                 }
 
-                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(BunnyStreamSdk.libraryId, videoId).getOrNull()
+                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(BunnyStreamSdk.libraryId, videoId)
 
-                settings?.thumbnailUrl?.let {
-                    playerView.showPreviewThumbnail(it)
-                }
-
-                var retentionData: Map<Int, Int> = mutableMapOf()
-
-                if(settings?.showHeatmap == true) {
-                    try {
-                        val retentionDataResponse = withContext(Dispatchers.IO) {
-                            BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideoHeatmap(
-                                BunnyStreamSdk.libraryId,
-                                videoId
-                            )
-                        }
-                        retentionData = retentionDataResponse.getSanitizedRetentionData()
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Error fetching video heatmap")
-                    }
-                }
-
-                bunnyPlayer.playVideo(binding.playerView, video, retentionData, settings)
-
-                playerView.bunnyPlayer = bunnyPlayer
+                settings.fold(
+                    ifLeft = { playerView.showError(it) },
+                    ifRight = { initializeVideo(video, it) }
+                )
             }
         }
 
@@ -183,5 +165,28 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
     override fun play() {
         bunnyPlayer.play()
+    }
+
+    private suspend fun initializeVideo(video: VideoModel, playerSettings: PlayerSettings){
+        playerView.showPreviewThumbnail(playerSettings.thumbnailUrl)
+
+        var retentionData: Map<Int, Int> = mutableMapOf()
+
+        if(playerSettings.showHeatmap) {
+            try {
+                val retentionDataResponse = withContext(Dispatchers.IO) {
+                    BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideoHeatmap(
+                        BunnyStreamSdk.libraryId,
+                        video.guid!!
+                    )
+                }
+                retentionData = retentionDataResponse.getSanitizedRetentionData()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error fetching video heatmap")
+            }
+        }
+
+        bunnyPlayer.playVideo(binding.playerView, video, retentionData, playerSettings)
+        playerView.bunnyPlayer = bunnyPlayer
     }
 }

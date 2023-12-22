@@ -114,8 +114,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         }
 
         override fun onPlayerError(message: String) {
-            errorWrapper.isVisible = true
-            errorMessage.text = message
+            showError(message)
         }
     }
 
@@ -607,5 +606,10 @@ class BunnyPlayerView @JvmOverloads constructor(
         overlay.removeAllViews()
         overlay.addView(thumbnail)
         Glide.with(context).load(url).into(thumbnail)
+    }
+
+    fun showError(message: String) {
+        errorWrapper.isVisible = true
+        errorMessage.text = message
     }
 }

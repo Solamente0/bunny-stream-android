@@ -12,7 +12,10 @@ data class PlayerSettings(
     val fontFamily: String,
     val playbackSpeeds: List<Float>,
     val drmEnabled: Boolean,
-    val vastTagUrl: String?
+    val vastTagUrl: String?,
+    val videoUrl: String,
+    val seekPath: String,
+    val captionsPath: String,
 ) {
     // "rewind,fast-forward,play-large,captions,current-time,duration,fullscreen,mute,pip,play,progress,settings,volume"
     val subtitlesEnabled = controls.contains("captions")

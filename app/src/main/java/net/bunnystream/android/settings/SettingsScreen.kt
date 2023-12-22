@@ -39,29 +39,20 @@ fun SettingsRoute(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel(),
 ) {
-
     var accessKey by remember { mutableStateOf(viewModel.accessKey) }
-    var cdnHostname by remember { mutableStateOf(viewModel.cdnHostname) }
     var libraryId by remember { mutableStateOf(viewModel.libraryId.toString()) }
-
-    val modified = accessKey != viewModel.accessKey
-            || cdnHostname != viewModel.cdnHostname
-            || libraryId != viewModel.libraryId.toString()
 
     SettingsScreen(
         modifier = modifier,
         onBackClicked = { appState.navController.popBackStack() },
         accessKey = accessKey,
         onAccessKeyUpdated = { accessKey = it },
-        cdnHostname = cdnHostname,
-        onCdnHostnameUpdated = { cdnHostname = it },
         libraryId = libraryId,
         onLibraryIdUpdated = { libraryId = it },
         onSaveClicked = {
-            viewModel.updateKeys(accessKey, cdnHostname, libraryId.toLongOrDefault(-1))
+            viewModel.updateKeys(accessKey, libraryId.toLongOrDefault(-1))
             appState.navController.popBackStack()
         },
-        settingsModified = modified
     )
 }
 
@@ -72,12 +63,9 @@ private fun SettingsScreen(
     onBackClicked: () -> Unit,
     accessKey: String,
     onAccessKeyUpdated: (String) -> Unit,
-    cdnHostname: String,
-    onCdnHostnameUpdated: (String) -> Unit,
     libraryId: String,
     onLibraryIdUpdated: (String) -> Unit,
     onSaveClicked: () -> Unit,
-    settingsModified: Boolean
 ) {
 
     Scaffold(
@@ -130,15 +118,6 @@ private fun SettingsScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
-            OutlinedTextField(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                value = cdnHostname,
-                onValueChange = onCdnHostnameUpdated,
-                label = { Text(stringResource(id = R.string.hint_cdn_hostname)) }
-            )
-
             Button(
                 modifier = modifier
                     .fillMaxWidth()
@@ -159,12 +138,9 @@ private fun SettingsScreenPreview() {
             onBackClicked = {},
             accessKey = "",
             onAccessKeyUpdated = {},
-            cdnHostname = "",
-            onCdnHostnameUpdated = {},
             libraryId = "",
             onLibraryIdUpdated = {},
             onSaveClicked = {},
-            settingsModified = false
         )
     }
 }

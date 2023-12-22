@@ -14,16 +14,12 @@ class SettingsViewModel : ViewModel() {
     var accessKey by mutableStateOf(prefs.accessKey)
         private set
 
-    var cdnHostname by mutableStateOf(prefs.cdnHostname)
-        private set
-
     var libraryId by mutableLongStateOf(prefs.libraryId)
         private set
 
-    fun updateKeys(accessKey: String, cdnHostname: String, libraryId: Long){
+    fun updateKeys(accessKey: String, libraryId: Long){
         this.accessKey = accessKey
-        this.cdnHostname = cdnHostname
         this.libraryId = libraryId
-        App.di.updateKeys(accessKey, cdnHostname, libraryId)
+        App.di.updateKeys(accessKey, libraryId)
     }
 }

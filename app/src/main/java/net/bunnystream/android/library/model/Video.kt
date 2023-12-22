@@ -5,7 +5,6 @@ data class Video(
     val name: String,
     val duration: String,
     val status: VideoStatus,
-    val thumbnail: String? = null,
 )
 
 enum class VideoStatus(private val value: Int) {

@@ -178,10 +178,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    override fun playVideo(playerView: PlayerView, video: VideoModel, retentionData: Map<Int, Int>, settings: PlayerSettings?) {
-        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData")
+    override fun playVideo(
+        playerView: PlayerView,
+        video: VideoModel,
+        retentionData: Map<Int, Int>,
+        playerSettings: PlayerSettings
+    ) {
+        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData playerSettings=$playerSettings")
 
-        this.playerSettings = settings
+        this.playerSettings = playerSettings
         currentVideo = video
 
         val imaLoader = ImaAdsLoader.Builder(context).build()
@@ -203,18 +208,17 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         imaLoader.setPlayer(currentPlayer)
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
-        val url = "${BunnyStreamSdk.cdnHostname}/${video.guid}/playlist.m3u8"
         val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/${BunnyStreamSdk.libraryId}/${video.guid}?contentId=${video.guid}"
 
         mediaItemBuilder = MediaItem.Builder()
-            .setUri(url)
+            .setUri(playerSettings.videoUrl)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
 
-        if(settings?.drmEnabled == true) {
+        if(playerSettings.drmEnabled) {
             mediaItemBuilder!!.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
         }
 
-        val vastTagUri = settings?.vastTagUrl.toUri()
+        val vastTagUri = playerSettings.vastTagUrl.toUri()
 
         if(vastTagUri != null) {
             mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
@@ -226,7 +230,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         currentPlayer?.playWhenReady = true
         currentPlayer?.prepare()
 
-        initSeekThumbnailPreview(video)
+        initSeekThumbnailPreview(video, playerSettings.seekPath)
 
         moments = video.moments?.map {
             Moment(it.label, it.timestamp.seconds.inWholeMilliseconds)
@@ -236,7 +240,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
         } ?: listOf()
 
-        if(settings?.showHeatmap == true) {
+        if(playerSettings.showHeatmap) {
             this.retentionData = retentionData.map {
                 RetentionGraphEntry(it.key, it.value)
             }
@@ -261,12 +265,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
-    private fun initSeekThumbnailPreview(video: VideoModel) {
+    private fun initSeekThumbnailPreview(video: VideoModel, seekPath: String) {
         val thumbnailPreviewsList: MutableList<String> = mutableListOf()
         val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
         var i = 0
         do {
-            thumbnailPreviewsList.add("${BunnyStreamSdk.cdnHostname}/${video.guid}/seek/_${i}.jpg")
+            thumbnailPreviewsList.add("$seekPath/_${i}.jpg")
             i++
         } while (i < numberOfPreviews)
 
@@ -303,7 +307,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         val currentProgress = currentPlayer?.currentPosition ?: 0
 
         mediaItemBuilder = if(subtitlesEnabled) {
-            val subUri = Uri.parse("${BunnyStreamSdk.cdnHostname}/${currentVideo?.guid}/captions/${subtitleInfo.language}.vtt?ver=1")
+            val subUri = Uri.parse("${playerSettings?.captionsPath}${subtitleInfo.language}.vtt?ver=1")
 
             val subtitle = MediaItem.SubtitleConfiguration.Builder(subUri)
                 .setMimeType(MimeTypes.TEXT_VTT)

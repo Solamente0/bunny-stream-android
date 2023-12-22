@@ -14,7 +14,7 @@ class Di(private val context: Context) {
     val localPrefs = LocalPrefs(prefs)
 
     init {
-        BunnyStreamSdk.initialize(context, localPrefs.accessKey, localPrefs.cdnHostname, localPrefs.libraryId)
+        BunnyStreamSdk.initialize(context, localPrefs.accessKey, localPrefs.libraryId)
     }
 
     var streamSdk: StreamSdk = BunnyStreamSdk.getInstance()
@@ -24,11 +24,10 @@ class Di(private val context: Context) {
 
     var tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
 
-    fun updateKeys(accessKey: String, cdnHostname: String, libraryId: Long) {
+    fun updateKeys(accessKey: String, libraryId: Long) {
         localPrefs.accessKey = accessKey
-        localPrefs.cdnHostname = cdnHostname
         localPrefs.libraryId = libraryId
-        BunnyStreamSdk.initialize(context, accessKey, cdnHostname, libraryId)
+        BunnyStreamSdk.initialize(context, accessKey, libraryId)
         streamSdk = BunnyStreamSdk.getInstance()
         videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
         tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)

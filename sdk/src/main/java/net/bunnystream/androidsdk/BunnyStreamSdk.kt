@@ -30,19 +30,12 @@ class BunnyStreamSdk private constructor(
         @Volatile
         private var instance: StreamSdk? = null
 
-        fun initialize(context: Context, accessKey: String, cdnHostname: String, libraryId: Long) {
+        fun initialize(context: Context, accessKey: String, libraryId: Long) {
             instance = BunnyStreamSdk(
                 context.applicationContext,
                 accessKey,
             )
 
-            this.cdnHostname = if(cdnHostname.startsWith("https://")){
-                cdnHostname
-            } else if(cdnHostname.startsWith("http://")) {
-                cdnHostname.replace("http://", "https://", true)
-            } else {
-                "https://$cdnHostname"
-            }
             this.libraryId = libraryId
             ApiClient.apiKey["AccessKey"] = accessKey
         }
