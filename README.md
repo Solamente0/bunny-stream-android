@@ -44,4 +44,8 @@ See [RecordingActivity](app/src/main/java/net/bunnystream/android/ui/recording/R
 ## Other examples
 
 Check `app` module for examples for other SDK usages and file uploading.
+
+## Documentation
+
+To (re)generate documentation in GFMD foramt, run `./gradlew dokkaGfmMultimodule`. Documentation will be available in `docs` folder in project root.
  
