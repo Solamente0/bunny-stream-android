@@ -224,8 +224,22 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
         }
 
+        val subtitles = video.captions?.map {
+            val subUri = Uri.parse("${playerSettings.captionsPath}${it.srclang}.vtt?ver=1")
+
+            MediaItem.SubtitleConfiguration.Builder(subUri)
+                .setMimeType(MimeTypes.TEXT_VTT)
+                .setLanguage(it.srclang)
+                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                .build()
+        } ?: listOf()
+
+        mediaItemBuilder!!.setSubtitleConfigurations(subtitles)
+
         mediaItem = mediaItemBuilder!!.build()
         currentPlayer?.setMediaItem(mediaItem!!)
+
+        selectSubtitleTrack(null)
 
         currentPlayer?.playWhenReady = true
         currentPlayer?.prepare()
@@ -295,7 +309,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             currentVideo?.captions?.map {
                 SubtitleInfo(it.label!!, it.srclang!!)
             } ?: listOf(),
-            if(subtitlesEnabled) selectedSubtitle else null
+            if(subtitlesEnabled) {
+                selectedSubtitle
+            } else {
+                null
+            }
         )
     }
 
@@ -304,25 +322,13 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         selectedSubtitle = subtitleInfo
         subtitlesEnabled = subtitleInfo.language != ""
 
-        val currentProgress = currentPlayer?.currentPosition ?: 0
-
-        mediaItemBuilder = if(subtitlesEnabled) {
-            val subUri = Uri.parse("${playerSettings?.captionsPath}${subtitleInfo.language}.vtt?ver=1")
-
-            val subtitle = MediaItem.SubtitleConfiguration.Builder(subUri)
-                .setMimeType(MimeTypes.TEXT_VTT)
-                .setLanguage(subtitleInfo.language)
-                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                .build()
-
-            mediaItemBuilder!!.setSubtitleConfigurations(listOf(subtitle))
+        val lang = if(subtitlesEnabled) {
+            subtitleInfo.language
         } else {
-            mediaItemBuilder!!.setSubtitleConfigurations(listOf())
+            null
         }
 
-        mediaItem = mediaItemBuilder!!.build()
-        currentPlayer?.setMediaItem(mediaItem!!, currentProgress)
-        currentPlayer?.prepare()
+        selectSubtitleTrack(lang)
     }
 
     override fun setSubtitlesEnabled(enabled: Boolean) {
@@ -339,12 +345,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
                 }
             }
         } else {
-            val currentProgress = currentPlayer?.currentPosition ?: 0
-            mediaItemBuilder = mediaItemBuilder!!.setSubtitleConfigurations(listOf())
-            mediaItem = mediaItemBuilder!!.build()
-
-            currentPlayer?.setMediaItem(mediaItem!!, currentProgress)
-            currentPlayer?.prepare()
+            selectSubtitleTrack(null)
         }
     }
 
@@ -472,7 +473,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     private fun getAvailableVideoQualityOptions(): VideoQualityOptions? {
-        val trackGroups = currentPlayer?.currentTracks?.groups  ?: return null
+        val trackGroups = currentPlayer?.currentTracks?.groups ?: return null
 
         val options = mutableListOf<VideoQuality>()
 
@@ -494,13 +495,21 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         options.add(0, selectedOption)
 
         trackSelector?.parameters?.let {
-            if(it.maxVideoWidth != Int.MAX_VALUE && it.maxVideoHeight != Int.MAX_VALUE){
+            if (it.maxVideoWidth != Int.MAX_VALUE && it.maxVideoHeight != Int.MAX_VALUE) {
                 selectedOption = VideoQuality(it.maxVideoWidth, it.maxVideoHeight)
             }
         }
 
-        val videoQualityOptions = VideoQualityOptions(options, selectedOption)
+        return VideoQualityOptions(options, selectedOption)
+    }
 
-        return videoQualityOptions
+    private fun selectSubtitleTrack(lang: String?) {
+        val trackSelectionParameters = currentPlayer?.trackSelectionParameters ?: return
+        currentPlayer?.trackSelectionParameters = trackSelectionParameters
+            .buildUpon()
+            .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+            .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
+            .setPreferredTextLanguage(lang)
+            .build()
     }
 }
