@@ -319,13 +319,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun selectSubtitle(subtitleInfo: SubtitleInfo) {
         Log.d(TAG, "selectSubtitle: $subtitleInfo")
-        selectedSubtitle = subtitleInfo
         subtitlesEnabled = subtitleInfo.language != ""
 
-        val lang = if(subtitlesEnabled) {
-            subtitleInfo.language
+        val lang: String?
+        if(subtitlesEnabled){
+            selectedSubtitle = subtitleInfo
+            lang = subtitleInfo.language
         } else {
-            null
+            selectedSubtitle = null
+            lang = null
         }
 
         selectSubtitleTrack(lang)
@@ -338,7 +340,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             if(selectedSubtitle != null) {
                 selectSubtitle(selectedSubtitle!!)
             } else {
-                val caption = currentVideo?.captions?.firstOrNull()
+                val caption = currentVideo?.captions?.get(0)
                 if (caption != null) {
                     selectedSubtitle = SubtitleInfo(caption.label!!, caption.srclang!!)
                     selectSubtitle(selectedSubtitle!!)
