@@ -18,7 +18,7 @@ import net.bunnystream.androidsdk.upload.service.UploadRequest
 import net.bunnystream.androidsdk.upload.service.UploadService
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
-import org.openapitools.client.models.CreateVideoModel
+import org.openapitools.client.models.VideoCreateVideoRequest
 import java.util.UUID
 
 class DefaultVideoUploader(
@@ -146,14 +146,14 @@ class DefaultVideoUploader(
         collectionId: String? = null,
         thumbnailTime: Int? = null
     ): String? {
-        val createVideoModel = CreateVideoModel(
+        val createVideoRequest = VideoCreateVideoRequest(
             title = title,
             collectionId = collectionId,
             thumbnailTime = thumbnailTime
         )
         val result = videosApi.videoCreateVideo(
             libraryId = libraryId,
-            createVideoModel = createVideoModel
+            videoCreateVideoRequest = createVideoRequest
         )
 
         return result.guid
@@ -164,7 +164,7 @@ class DefaultVideoUploader(
         Log.d(TAG, "deleteVideo libraryId=$libraryId videoId=$videoId")
         try {
             val result = videosApi.videoDeleteVideo(libraryId, videoId)
-            if(result.success) {
+            if(result.success == true) {
                 Log.d(TAG, "Video deleted")
             } else {
                 Log.e(TAG, "Error deleting video: $result")

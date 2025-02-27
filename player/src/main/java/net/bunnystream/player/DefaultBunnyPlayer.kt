@@ -247,11 +247,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         initSeekThumbnailPreview(video, playerSettings.seekPath)
 
         moments = video.moments?.map {
-            Moment(it.label, it.timestamp.seconds.inWholeMilliseconds)
+            Moment(it.label, it.timestamp?.seconds?.inWholeMilliseconds ?: 0)
         } ?: listOf()
 
         chapters = video.chapters?.map {
-            Chapter(it.start.seconds.inWholeMilliseconds, it.end.seconds.inWholeMilliseconds, it.title)
+            Chapter(
+                it.start?.seconds?.inWholeMilliseconds ?: 0,
+                it.end?.seconds?.inWholeMilliseconds ?: 0,
+                it.title
+            )
         } ?: listOf()
 
         if(playerSettings.showHeatmap) {
@@ -281,7 +285,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     private fun initSeekThumbnailPreview(video: VideoModel, seekPath: String) {
         val thumbnailPreviewsList: MutableList<String> = mutableListOf()
-        val numberOfPreviews = round(video.thumbnailCount.toFloat() / THUMBNAILS_PER_IMAGE).toInt()
+        val numberOfPreviews = round((video.thumbnailCount?.toFloat() ?: 0.0F) / THUMBNAILS_PER_IMAGE).toInt()
         var i = 0
         do {
             thumbnailPreviewsList.add("$seekPath/_${i}.jpg")
@@ -290,8 +294,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         seekThumbnail = SeekThumbnail(
             seekThumbnailUrls = thumbnailPreviewsList,
-            frameDurationPerThumbnail = ceil((video.length.toFloat() * 1000) / video.thumbnailCount).toInt(),
-            totalThumbnailCount = video.thumbnailCount,
+            frameDurationPerThumbnail = ceil((((video.length?.toFloat()) ?: 0.0F) * 1000) / (video.thumbnailCount ?: 1)).toInt(),
+            totalThumbnailCount = video.thumbnailCount ?: 0,
             thumbnailsPerImage = THUMBNAILS_PER_IMAGE,
         )
     }

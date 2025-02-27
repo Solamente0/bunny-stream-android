@@ -165,7 +165,7 @@ class LibraryViewModel : ViewModel() {
             try {
                 val result = App.di.streamSdk.streamApi.videosApi.videoDeleteVideo(libraryId, video.id)
 
-                if(result.success) {
+                if(result.success == true) {
                     Log.d(TAG, "Video deleted")
 
                     loadedVideos -= video
@@ -194,7 +194,7 @@ class LibraryViewModel : ViewModel() {
         return Video(
             id = guid ?: UUID.randomUUID().toString(),
             name = title ?: "N/A",
-            duration = length.toDuration(DurationUnit.SECONDS).toString(),
+            duration = length?.toDuration(DurationUnit.SECONDS).toString(),
             status =  when(status?.value){
                 null -> VideoStatus.ERROR
                 0  -> VideoStatus.CREATED
