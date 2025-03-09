@@ -50,7 +50,7 @@ private fun PlayerScreen(
         topBar = {
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),

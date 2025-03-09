@@ -191,6 +191,7 @@ class LibraryViewModel : ViewModel() {
     }
 
     private fun VideoModel.toVideo(): Video {
+        Log.d(TAG, "thumbnailFileName=$thumbnailFileName")
         return Video(
             id = guid ?: UUID.randomUUID().toString(),
             name = title ?: "N/A",

@@ -9,6 +9,7 @@ import net.bunnystream.android.ui.theme.BunnyStreamTheme
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //enableEdgeToEdge()
         setContent {
             BunnyStreamTheme {
                 App()
