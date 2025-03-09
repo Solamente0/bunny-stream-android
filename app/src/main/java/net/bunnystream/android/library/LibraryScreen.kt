@@ -316,8 +316,8 @@ private fun VideoItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 10.dp)
             .clickable(onClick = onVideoClicked)
+            .padding(vertical = 10.dp)
     ) {
 
         Column(modifier = modifier
@@ -330,11 +330,7 @@ private fun VideoItem(
             )
             Text(
                 modifier = modifier,
-                text = video.status.name
-            )
-            Text(
-                modifier = modifier,
-                text = video.duration
+                text = listOfNotNull(video.status.name, video.duration).joinToString(" • ")
             )
         }
 
