@@ -7,7 +7,7 @@ import net.bunnystream.androidsdk.BuildConfig
 import net.bunnystream.androidsdk.BunnyStreamSdk
 import net.bunnystream.recording.domain.RecordingRepository
 import org.openapitools.client.infrastructure.ApiClient
-import org.openapitools.client.models.CreateVideoModel
+import org.openapitools.client.models.VideoCreateVideoRequest
 
 class DefaultRecordingRepository(
    private val coroutineDispatcher: CoroutineDispatcher
@@ -18,7 +18,7 @@ class DefaultRecordingRepository(
     }
 
     override suspend fun prepareRecording(libraryId: Long): Either<String, String> = withContext(coroutineDispatcher) {
-        val createVideoModel = CreateVideoModel(
+        val createVideoRequest = VideoCreateVideoRequest(
             title = "recording-${System.currentTimeMillis()}",
             collectionId = null,
             thumbnailTime = null
@@ -27,7 +27,7 @@ class DefaultRecordingRepository(
         try {
             val result = BunnyStreamSdk.getInstance().streamApi.videosApi.videoCreateVideo(
                 libraryId = libraryId,
-                createVideoModel = createVideoModel
+                videoCreateVideoRequest = createVideoRequest
             )
 
             val endpoint = "${BuildConfig.RTMP_ENDPOINT}?vid=${result.guid}&accessKey=${ApiClient.apiKey["AccessKey"]}&lib=$libraryId"

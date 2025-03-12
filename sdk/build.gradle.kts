@@ -14,10 +14,10 @@ android {
         buildConfig = true
     }
 
-    sourceSets["main"].java.srcDirs("$buildDir/generated/api")
+    sourceSets["main"].java.srcDir(layout.buildDirectory.dir("generated/api"))
 
     namespace = "net.bunnystream.androidsdk"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
@@ -102,12 +102,23 @@ specs.forEach {
     tasks.create("openApiGenerate-${it.key}", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
         generatorName.set("kotlin")
         inputSpec.set(it.value)
-        outputDir.set("$buildDir/generated/api")
+        outputDir.set(layout.buildDirectory.dir("generated/api").get().asFile.absolutePath)
         apiPackage.set("net.bunnystream.androidsdk.api")
+        generateApiTests.set(false)
+        generateModelTests.set(false)
+
+        additionalProperties.set(mapOf(
+            "kotlinEnums" to "true",
+            "useEnumExtension" to "true"
+        ))
 
         configOptions.set(mapOf(
             "dateLibrary" to "string",
-            "serializationLibrary" to "gson"
+            "serializationLibrary" to "gson",
+        ))
+
+        typeMappings.set(mapOf(
+            "VideoModelStatus" to "net.bunnystream.androidsdk.model.VideoModelStatus"
         ))
     }
 }
