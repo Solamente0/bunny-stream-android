@@ -5,6 +5,8 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
+import net.bunnystream.player.model.AudioTrackInfo
+import net.bunnystream.player.model.AudioTrackInfoOptions
 import net.bunnystream.player.model.SeekThumbnail
 import net.bunnystream.player.model.SubtitleInfo
 import net.bunnystream.player.model.Subtitles
@@ -86,7 +88,11 @@ interface BunnyPlayer {
 
     fun getVideoQualityOptions(): VideoQualityOptions?
 
+    fun getAudioTrackOptions(): AudioTrackInfoOptions?
+
     fun selectQuality(quality: VideoQuality)
+
+    fun selectAudioTrack(audioTrackInfo: AudioTrackInfo)
 
     fun getPlaybackSpeeds(): List<Float>
 }

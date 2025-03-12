@@ -30,6 +30,8 @@ import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
 import net.bunnystream.androidsdk.settings.toUri
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
+import net.bunnystream.player.model.AudioTrackInfo
+import net.bunnystream.player.model.AudioTrackInfoOptions
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.RetentionGraphEntry
@@ -42,6 +44,7 @@ import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
+
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -363,10 +366,23 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         return getAvailableVideoQualityOptions()
     }
 
+    override fun getAudioTrackOptions(): AudioTrackInfoOptions? {
+        return getAvailableAudioTrackOptions()
+    }
+
     override fun selectQuality(quality: VideoQuality) {
         Log.d(TAG, "selectQuality: $quality")
         trackSelector?.let {
             val params = it.buildUponParameters().setMaxVideoSize(quality.width, quality.height)
+            it.setParameters(params)
+        }
+    }
+
+    override fun selectAudioTrack(audioTrackInfo: AudioTrackInfo) {
+        Log.d(TAG, "selectAudioTrack: $audioTrackInfo")
+
+        trackSelector?.let {
+            val params = it.buildUponParameters().setPreferredAudioLanguage(audioTrackInfo.languageCode)
             it.setParameters(params)
         }
     }
@@ -507,6 +523,34 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
 
         return VideoQualityOptions(options, selectedOption)
+    }
+
+    private fun getAvailableAudioTrackOptions(): AudioTrackInfoOptions? {
+        val audioTracks: MutableList<AudioTrackInfo> = mutableListOf()
+        var selectedTrack: AudioTrackInfo? = null
+        val tracks: Tracks = currentPlayer?.currentTracks ?: return null
+        for (trackGroup in tracks.groups) {
+            if (trackGroup.type == C.TRACK_TYPE_AUDIO) {
+                for (i in 0 until trackGroup.length) {
+                    val format = trackGroup.getTrackFormat(i)
+                    val isSelected = trackGroup.isTrackSelected(i)
+
+                    val track = AudioTrackInfo(
+                        index = i,
+                        trackId = format.id,
+                        label = format.label,
+                        languageCode = format.language,
+                    )
+
+                    audioTracks.add(track)
+                    if(isSelected) {
+                        selectedTrack = track
+                    }
+                }
+            }
+        }
+
+        return AudioTrackInfoOptions(audioTracks, selectedTrack)
     }
 
     private fun selectSubtitleTrack(lang: String?) {

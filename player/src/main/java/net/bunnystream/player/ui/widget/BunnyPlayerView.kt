@@ -37,6 +37,7 @@ import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.common.I18n
+import net.bunnystream.player.model.AudioTrackInfo
 import net.bunnystream.player.model.Chapter
 import net.bunnystream.player.model.Moment
 import net.bunnystream.player.model.PlayerIconSet
@@ -254,6 +255,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
             val subtitleMenuIds = setupSubtitlesPopupMenu(popupMenu)
             val qualityMenuIds = setupQualityPopupMenu(popupMenu)
+            val audioTracksMenuIds = setupAudioTracksPopupMenu(popupMenu)
             val speedMenuIds = setupSpeedPopupMenu(popupMenu)
 
             popupMenu.setOnMenuItemClickListener { item ->
@@ -276,6 +278,14 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 if(qualityOption != null) {
                     bunnyPlayer?.selectQuality(qualityOption)
+                    controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
+                    return@setOnMenuItemClickListener true
+                }
+
+                val audioTrackOption = audioTracksMenuIds[item.itemId]
+
+                if(audioTrackOption != null) {
+                    bunnyPlayer?.selectAudioTrack(audioTrackOption)
                     controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
                 }
@@ -401,7 +411,41 @@ class BunnyPlayerView @JvmOverloads constructor(
 
             qualityOptionsMenu.setGroupCheckable(Menu.NONE, true, true)
         }
+
         return qualityMenuIds
+    }
+
+    private fun setupAudioTracksPopupMenu(popupMenu: PopupMenu): Map<Int, AudioTrackInfo> {
+        val audioTracksMenuIds: MutableMap<Int, AudioTrackInfo> = mutableMapOf()
+        val audioTrackOptions = bunnyPlayer?.getAudioTrackOptions()
+        val audioTracksMenuId = View.generateViewId()
+
+        if(audioTrackOptions != null) {
+            val qualityOptionsMenu = popupMenu.menu.addSubMenu(
+                Menu.NONE,
+                audioTracksMenuId,
+                Menu.NONE,
+                i18n.getTranslation("audioTrack", context.getString(R.string.label_video_settings_audio_track))
+            )
+
+            audioTrackOptions.options.forEach { option ->
+                val id = generateViewId()
+                audioTracksMenuIds[id] = option
+
+                val item = qualityOptionsMenu.add(
+                    Menu.NONE,
+                    id,
+                    Menu.NONE,
+                    option.label ?: "N/A"
+                )
+
+                item.isChecked = audioTrackOptions.selectedOption == option
+            }
+
+            qualityOptionsMenu.setGroupCheckable(Menu.NONE, true, true)
+        }
+
+        return audioTracksMenuIds
     }
 
     private fun setupSpeedPopupMenu(popupMenu: PopupMenu): Map<Int, Float> {
