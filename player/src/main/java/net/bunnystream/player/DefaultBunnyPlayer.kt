@@ -344,7 +344,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             if(selectedSubtitle != null) {
                 selectSubtitle(selectedSubtitle!!)
             } else {
-                val caption = currentVideo?.captions?.get(0)
+                val caption = currentVideo?.captions?.getOrNull(0)
                 if (caption != null) {
                     selectedSubtitle = SubtitleInfo(caption.label!!, caption.srclang!!)
                     selectSubtitle(selectedSubtitle!!)

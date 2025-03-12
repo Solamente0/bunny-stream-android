@@ -30,6 +30,7 @@ class RecordingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // enableEdgeToEdge()
 
         binding = ActivityRecordingBinding.inflate(layoutInflater)
         setContentView(binding.root)

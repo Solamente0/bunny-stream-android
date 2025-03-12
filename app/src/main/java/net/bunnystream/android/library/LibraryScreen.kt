@@ -44,11 +44,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -207,7 +207,7 @@ private fun LibraryScreen(
         topBar = {
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
@@ -316,8 +316,8 @@ private fun VideoItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 10.dp)
             .clickable(onClick = onVideoClicked)
+            .padding(vertical = 10.dp)
     ) {
 
         Column(modifier = modifier
@@ -330,11 +330,7 @@ private fun VideoItem(
             )
             Text(
                 modifier = modifier,
-                text = video.status.name
-            )
-            Text(
-                modifier = modifier,
-                text = video.duration
+                text = listOfNotNull(video.status.name, video.duration).joinToString(" • ")
             )
         }
 
