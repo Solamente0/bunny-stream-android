@@ -1,5 +1,6 @@
 package net.bunnystream.recording.data
 
+import android.util.Log
 import arrow.core.Either
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -31,6 +32,8 @@ class DefaultRecordingRepository(
             )
 
             val endpoint = "${BuildConfig.RTMP_ENDPOINT}?vid=${result.guid}&accessKey=${ApiClient.apiKey["AccessKey"]}&lib=$libraryId"
+
+            Log.d(TAG, "endpoint=$endpoint")
 
             Either.Right(endpoint)
         } catch (e: Exception) {
