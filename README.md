@@ -1,7 +1,7 @@
 # Bunny Stream Android
 
 <p align="center">
-  <img src="Resources/Images/bunnynet.svg" width="70%" alt="BunnyNet" />
+  <img src="resources/bunnynet.svg" width="70%" alt="BunnyNet" />
 </p>
 <p align="center">
     <a href="https://www.swift.org" alt="Swift">
@@ -27,11 +27,11 @@ Bunny Stream is a comprehensive Swift Package Manager (SPM) package designed to 
 
 The Bunny Stream is organized into several specialized modules, each focusing on specific functionality:
 
-| Module                                                       | Description                                                                                                                                                                                                                                                                                                                               |
-|--------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **[api](api/README.md)**                                     | The core module that provides interface to Bunny's REST Stream API. It handles all API communication, request authentication, and response parsing, allowing you to easily manage your video content, retrieve analytics, and control CDN settings. Features include video management, collection organization, and thumbnail generation. |
-| **[recording](Documentation/Reference/BunnyStreamUploader)** | Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
-| **[player](Documentation/Reference/BunnyStreamPlayer)**      | A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.      |
+| Module                               | Description                                                                                                                                                                                                                                                                                                                               |
+|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **[api](api/README.md)**             | The core module that provides interface to Bunny's REST Stream API. It handles all API communication, request authentication, and response parsing, allowing you to easily manage your video content, retrieve analytics, and control CDN settings. Features include video management, collection organization, and thumbnail generation. |
+| **[recording](recording/README.md)** | Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
+| **[player](player/README.md)**       | A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.      |
 
 ## Minimum supported Android version
 
@@ -312,4 +312,4 @@ Full usage example and permissions handling can be found in demo app.
 
 ## License
 
-Bunny Stream iOS is licensed under the [MIT License](LICENSE). See the LICENSE file for more details.
+Bunny Stream Android is licensed under the [MIT License](LICENSE). See the LICENSE file for more details.

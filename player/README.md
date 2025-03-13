@@ -1,0 +1,105 @@
+# BunnyStreamPlayer - Video Playback
+
+A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.
+
+## Installation
+
+Declare dependency in your project's `build.gradle.kts`:
+```
+implementation("net.bunnystream.player:1.0.0")
+```
+
+## Initialization
+
+After installation, you'll need to configure the package with your Bunny credentials. Initialization is common for all modules.
+
+```kotlin
+// Initialize with your access key and library ID
+BunnyStreamApi.initialize(context, accessKey, libraryId)
+```
+
+### Using `BunnyVideoPlayer` in Compose
+
+```kotlin
+@Composable
+fun BunnyPlayerComposable(
+    videoId: String,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        factory = { context ->
+            BunnyVideoPlayer(context)
+        },
+        update = {
+            it.playVideo(videoId)
+        },
+        modifier = modifier.background(Color.Gray)
+    )
+}
+```
+
+Full usage example can be found in demo app.
+
+### Using `BunnyVideoPlayer` in XML Views
+
+1. Add `BunnyVideoPlayer` into your layout:
+```
+<net.bunnystream.player.ui.BunnyVideoPlayer
+      android:id="@+id/videoPlayer"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"/>
+```
+2. Call `playVideo()`:
+```
+bunnyVideoPlayer.playVideo(videoId)
+```
+
+`bunnyVideoPlayer` comes from `findViewById()` or from View binding.
+
+**Customizing Player:**
+
+You can customize the BunnyVideoPlayer by passing custom icons. Other costumizations like primary color, font, handling control visibilty, captions, heatmap can be controlled from the Bunny dashboard.
+
+1. Override icons you want to change from `PlayerIconSet` class:
+
+```kotlin
+@Parcelize
+data class PlayerIconSet(
+    @DrawableRes
+    val playIcon: Int = R.drawable.ic_play_48dp,
+
+    @DrawableRes
+    val pauseIcon: Int = R.drawable.ic_pause_48dp,
+
+    @DrawableRes
+    val rewindIcon: Int = R.drawable.ic_replay_10s_48dp,
+
+    @DrawableRes
+    val forwardIcon: Int = R.drawable.ic_forward_10s_48dp,
+
+    @DrawableRes
+    val settingsIcon: Int = R.drawable.ic_settings_24dp,
+
+    @DrawableRes
+    val volumeOnIcon: Int = R.drawable.ic_volume_on_24dp,
+
+    @DrawableRes
+    val volumeOffIcon: Int = R.drawable.ic_volume_off_24dp,
+
+    @DrawableRes
+    val fullscreenOnIcon: Int = R.drawable.ic_fullscreen_24dp,
+
+    @DrawableRes
+    val fullscreenOffIcon: Int = R.drawable.ic_fullscreen_exit_24dp,
+) : Parcelable
+```
+2. Set new icon set:
+```
+bunnyVideoPlayer.iconSet = newIconSet
+```
+
+Full player usage example and permissions handling can be found in demo app.
+
+## License
+
+Bunny Stream Android is licensed under the [MIT License](LICENSE). See the LICENSE file for more details.
