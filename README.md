@@ -4,9 +4,6 @@
   <img src="resources/bunnynet.svg" width="70%" alt="BunnyNet" />
 </p>
 <p align="center">
-    <a href="https://www.swift.org" alt="Swift">
-        <img src="https://img.shields.io/badge/Swift-5.9-orange.svg" />
-    </a>
     <a href="./LICENSE" alt="License">
         <img src="https://img.shields.io/badge/Licence-MIT-green.svg" />
     </a>
@@ -14,7 +11,7 @@
 
 ## What is Bunny Stream?
 
-Bunny Stream is a comprehensive Swift Package Manager (SPM) package designed to seamlessly integrate Bunny's powerful video streaming capabilities into your iOS applications. The package provides a robust set of tools for video management, playback, uploading, and camera-based video uploads, all through an intuitive Swift API.
+Bunny Stream is an Android library designed to seamlessly integrate Bunny's powerful video streaming capabilities into your Android applications. The package provides a robust set of tools for video management, playback, uploading, and camera-based video uploads, all through an intuitive Kotlin API.
 
 ### Key Features
 
@@ -23,7 +20,7 @@ Bunny Stream is a comprehensive Swift Package Manager (SPM) package designed to 
 - **Advanced Video Player**: Custom-built player with full Bunny CDN integration
 - **Camera Upload Support**: Built-in capabilities for recording and uploading videos directly from device camera
 
-## Packages
+## Modules
 
 The Bunny Stream is organized into several specialized modules, each focusing on specific functionality:
 
@@ -39,13 +36,17 @@ The Bunny Stream is organized into several specialized modules, each focusing on
 
 ## Installation
 
+You can choose to use only modules you need. For example, you could only declare `api` dependency if you plan to use your own player implementation and just want to get access to your library.
+
+If you plan to use `BunnyVideoPlayer` declare dependency on `api` and `player` modules.
+
 Declare desired dependencies in your project's `build.gradle.kts`:
 
 - You can use only `api`:
    ```
    implementation("net.bunnystream.api:1.0.0")
    ```
-- If you need `player`:
+- If you also need `player`:
    ```
    implementation("net.bunnystream.player:1.0.0")
    ```

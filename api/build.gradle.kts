@@ -129,14 +129,16 @@ tasks.register("openApiGenerateAll") {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn(
-        "downloadLatestOpenApiSpecs",
-        "openApiGenerateAll"
+        // "downloadLatestOpenApiSpecs",
+        "openApiGenerateAll",
+        "copyGeneratedDocs"
     )
 }
 
 tasks.withType<DokkaTaskPartial> {
     dependsOn(
-        "openApiGenerateAll"
+        "openApiGenerateAll",
+        "copyGeneratedDocs"
     )
 }
 
@@ -144,4 +146,13 @@ tasks.register("downloadLatestOpenApiSpecs") {
     val openApiSpecsUrl = "https://docs.bunny.net/openapi/6054a6cc63d1a0001e3d22fc"
     val destinationFile = project.file("openapi/").resolve("StreamApi.json")
     ant.invokeMethod("get", mapOf("src" to openApiSpecsUrl, "dest" to destinationFile))
+}
+
+tasks.register<Copy>("copyGeneratedDocs") {
+    dependsOn("openApiGenerateAll")
+    from(layout.buildDirectory.dir("generated/api/docs"))
+    into(file("../docs"))
+    doLast {
+        logger.lifecycle("Successfully copied generated API docs to ../docs")
+    }
 }

@@ -4,11 +4,11 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **viewsChart** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | The constructed chart of checked requests threats |  [optional] |
-| **watchTimeChart** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | The constructed chart of the total watch time |  [optional] |
-| **countryViewCounts** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | The country view count constructed chart |  [optional] |
-| **countryWatchTime** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | The country watch time constructed chart |  [optional] |
-| **engagementScore** | **kotlin.Int** |  |  [optional] |
+| **viewsChart** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | A chart representing view counts over time. |  [optional] |
+| **watchTimeChart** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | A chart representing total watch time over time. |  [optional] |
+| **countryViewCounts** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | View counts grouped by country. |  [optional] |
+| **countryWatchTime** | **kotlin.collections.Map&lt;kotlin.String, kotlin.Long&gt;** | Total watch time grouped by country. |  [optional] |
+| **engagementScore** | **kotlin.Int** | A score representing viewer engagement. |  [optional] |
 
 
 

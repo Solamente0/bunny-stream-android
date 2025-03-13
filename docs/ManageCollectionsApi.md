@@ -17,6 +17,8 @@ All URIs are relative to *https://video.bunnycdn.com*
 
 Create Collection
 
+Creates a new collection in the specified video library using the provided collection details.
+
 ### Example
 ```kotlin
 // Import classes:
@@ -24,8 +26,8 @@ Create Collection
 //import org.openapitools.client.models.*
 
 val apiInstance = ManageCollectionsApi()
-val libraryId : kotlin.Long = 789 // kotlin.Long | 
-val collectionUpdateCollectionRequest : CollectionUpdateCollectionRequest =  // CollectionUpdateCollectionRequest | 
+val libraryId : kotlin.Long = 789 // kotlin.Long | The ID of the video library where the new collection will be created.
+val collectionUpdateCollectionRequest : CollectionUpdateCollectionRequest =  // CollectionUpdateCollectionRequest | Collection model containing the details for the new collection.
 try {
     val result : CollectionModel = apiInstance.collectionCreateCollection(libraryId, collectionUpdateCollectionRequest)
     println(result)
@@ -39,10 +41,10 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**|  | |
+| **libraryId** | **kotlin.Long**| The ID of the video library where the new collection will be created. | |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)|  | |
+| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the details for the new collection. | |
 
 ### Return type
 
@@ -66,6 +68,8 @@ Configure AccessKey:
 
 Delete Collection
 
+Deletes the specified collection permanently from the video library.
+
 ### Example
 ```kotlin
 // Import classes:
@@ -73,8 +77,8 @@ Delete Collection
 //import org.openapitools.client.models.*
 
 val apiInstance = ManageCollectionsApi()
-val libraryId : kotlin.Long = 789 // kotlin.Long | 
-val collectionId : kotlin.String = collectionId_example // kotlin.String | 
+val libraryId : kotlin.Long = 789 // kotlin.Long | The ID of the video library containing the collection.
+val collectionId : kotlin.String = collectionId_example // kotlin.String | The unique identifier of the collection to be deleted.
 try {
     val result : StatusModel = apiInstance.collectionDeleteCollection(libraryId, collectionId)
     println(result)
@@ -88,10 +92,10 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**|  | |
+| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **collectionId** | **kotlin.String**|  | |
+| **collectionId** | **kotlin.String**| The unique identifier of the collection to be deleted. | |
 
 ### Return type
 
@@ -115,6 +119,8 @@ Configure AccessKey:
 
 Get Collection
 
+Retrieves details of a specific collection. Use the query parameter &#39;includeThumbnails&#39; to include preview images if available.
+
 ### Example
 ```kotlin
 // Import classes:
@@ -122,9 +128,9 @@ Get Collection
 //import org.openapitools.client.models.*
 
 val apiInstance = ManageCollectionsApi()
-val libraryId : kotlin.Long = 789 // kotlin.Long | 
-val collectionId : kotlin.String = collectionId_example // kotlin.String | 
-val includeThumbnails : kotlin.Boolean = true // kotlin.Boolean | 
+val libraryId : kotlin.Long = 789 // kotlin.Long | The ID of the video library containing the collection.
+val collectionId : kotlin.String = collectionId_example // kotlin.String | The unique identifier of the collection.
+val includeThumbnails : kotlin.Boolean = true // kotlin.Boolean | If true, the response will include preview image URLs for the collection.
 try {
     val result : CollectionModel = apiInstance.collectionGetCollection(libraryId, collectionId, includeThumbnails)
     println(result)
@@ -138,11 +144,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**|  | |
-| **collectionId** | **kotlin.String**|  | |
+| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
+| **collectionId** | **kotlin.String**| The unique identifier of the collection. | |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **includeThumbnails** | **kotlin.Boolean**|  | [optional] [default to false] |
+| **includeThumbnails** | **kotlin.Boolean**| If true, the response will include preview image URLs for the collection. | [optional] [default to false] |
 
 ### Return type
 
@@ -166,6 +172,8 @@ Configure AccessKey:
 
 Get Collection List
 
+Retrieves a paginated list of collections for the specified video library. Optional query parameters allow for filtering, pagination, and ordering the results.
+
 ### Example
 ```kotlin
 // Import classes:
@@ -173,12 +181,12 @@ Get Collection List
 //import org.openapitools.client.models.*
 
 val apiInstance = ManageCollectionsApi()
-val libraryId : kotlin.Long = 789 // kotlin.Long | 
-val page : kotlin.Int = 56 // kotlin.Int | 
-val itemsPerPage : kotlin.Int = 56 // kotlin.Int | 
-val search : kotlin.String = search_example // kotlin.String | 
-val orderBy : kotlin.String = orderBy_example // kotlin.String | 
-val includeThumbnails : kotlin.Boolean = true // kotlin.Boolean | 
+val libraryId : kotlin.Long = 789 // kotlin.Long | The ID of the video library.
+val page : kotlin.Int = 56 // kotlin.Int | The page number to retrieve.
+val itemsPerPage : kotlin.Int = 56 // kotlin.Int | The number of items per page.
+val search : kotlin.String = search_example // kotlin.String | A search term to filter collections by name or other metadata.
+val orderBy : kotlin.String = orderBy_example // kotlin.String | Specifies the field by which to order the results.
+val includeThumbnails : kotlin.Boolean = true // kotlin.Boolean | If true, includes thumbnail image URLs in the response.
 try {
     val result : PaginationListOfCollectionModel = apiInstance.collectionList(libraryId, page, itemsPerPage, search, orderBy, includeThumbnails)
     println(result)
@@ -192,14 +200,14 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**|  | |
-| **page** | **kotlin.Int**|  | [optional] [default to 1] |
-| **itemsPerPage** | **kotlin.Int**|  | [optional] [default to 100] |
-| **search** | **kotlin.String**|  | [optional] [default to &quot;&quot;] |
-| **orderBy** | **kotlin.String**|  | [optional] [default to &quot;date&quot;] |
+| **libraryId** | **kotlin.Long**| The ID of the video library. | |
+| **page** | **kotlin.Int**| The page number to retrieve. | [optional] [default to 1] |
+| **itemsPerPage** | **kotlin.Int**| The number of items per page. | [optional] [default to 100] |
+| **search** | **kotlin.String**| A search term to filter collections by name or other metadata. | [optional] [default to &quot;&quot;] |
+| **orderBy** | **kotlin.String**| Specifies the field by which to order the results. | [optional] [default to &quot;date&quot;] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **includeThumbnails** | **kotlin.Boolean**|  | [optional] [default to false] |
+| **includeThumbnails** | **kotlin.Boolean**| If true, includes thumbnail image URLs in the response. | [optional] [default to false] |
 
 ### Return type
 
@@ -223,6 +231,8 @@ Configure AccessKey:
 
 Update Collection
 
+Updates an existing collection. Provide the new collection details in the request body using the UpdateCollectionModel.
+
 ### Example
 ```kotlin
 // Import classes:
@@ -230,9 +240,9 @@ Update Collection
 //import org.openapitools.client.models.*
 
 val apiInstance = ManageCollectionsApi()
-val libraryId : kotlin.Long = 789 // kotlin.Long | 
-val collectionId : kotlin.String = collectionId_example // kotlin.String | 
-val collectionUpdateCollectionRequest : CollectionUpdateCollectionRequest =  // CollectionUpdateCollectionRequest | 
+val libraryId : kotlin.Long = 789 // kotlin.Long | The ID of the video library containing the collection.
+val collectionId : kotlin.String = collectionId_example // kotlin.String | The unique identifier of the collection to be updated.
+val collectionUpdateCollectionRequest : CollectionUpdateCollectionRequest =  // CollectionUpdateCollectionRequest | Collection model containing the fields to be updated.
 try {
     val result : StatusModel = apiInstance.collectionUpdateCollection(libraryId, collectionId, collectionUpdateCollectionRequest)
     println(result)
@@ -246,11 +256,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**|  | |
-| **collectionId** | **kotlin.String**|  | |
+| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
+| **collectionId** | **kotlin.String**| The unique identifier of the collection to be updated. | |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)|  | |
+| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the fields to be updated. | |
 
 ### Return type
 
