@@ -130,7 +130,7 @@ Full example can be found in demo app.
 
 ### Full API reference
 
-[Collections API](../docs/ManageCollectionsApi.md)
-[Videos API](../docs/ManageVideosApi.md)
+- [Collections API](../docs/ManageCollectionsApi.md)
+- [Videos API](../docs/ManageVideosApi.md)
 
 Bunny Stream Android is licensed under the [MIT License](LICENSE). See the LICENSE file for more details.

@@ -170,6 +170,8 @@ BunnyStreamApi.getInstance().tusVideoUploader.cancelUpload(uploadId)
 
 Full example can be found in demo app.
 
+Checkout full [API reference](api/README.md#full-api-reference) 
+
 ## 2. BunnyStreamPlayer - Video Playback
 
 Before attempting video playback, make sure `BunnyStreamApi` is initialized:
