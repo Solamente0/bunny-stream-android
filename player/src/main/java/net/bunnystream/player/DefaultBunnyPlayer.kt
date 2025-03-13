@@ -25,9 +25,9 @@ import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
-import net.bunnystream.androidsdk.BunnyStreamSdk
-import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
-import net.bunnystream.androidsdk.settings.toUri
+import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.settings.domain.model.PlayerSettings
+import net.bunnystream.api.settings.toUri
 import net.bunnystream.player.common.BunnyPlayer
 import net.bunnystream.player.context.AppCastContext
 import net.bunnystream.player.model.AudioTrackInfo
@@ -211,7 +211,7 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         imaLoader.setPlayer(currentPlayer)
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
-        val drmLicenseUri = "${BunnyStreamSdk.baseApi}/WidevineLicense/${BunnyStreamSdk.libraryId}/${video.guid}?contentId=${video.guid}"
+        val drmLicenseUri = "${BunnyStreamApi.baseApi}/WidevineLicense/${BunnyStreamApi.libraryId}/${video.guid}?contentId=${video.guid}"
 
         mediaItemBuilder = MediaItem.Builder()
             .setUri(playerSettings.videoUrl)

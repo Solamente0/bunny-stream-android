@@ -15,8 +15,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.bunnystream.androidsdk.BunnyStreamSdk
-import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.player.DefaultBunnyPlayer
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import net.bunnystream.player.model.PlayerIconSet
@@ -116,7 +116,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
     override fun playVideo(videoId: String) {
         Log.d(TAG, "playVideo videoId=$videoId")
 
-        if(!BunnyStreamSdk.isInitialized()) {
+        if(!BunnyStreamApi.isInitialized()) {
             Log.e(TAG, "Unable to play video, initialize the player first using BunnyStreamSdk.initialize")
             return
         }
@@ -130,8 +130,8 @@ class BunnyVideoPlayer @JvmOverloads constructor(
 
                 try {
                     video = withContext(Dispatchers.IO) {
-                        BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideo(
-                            BunnyStreamSdk.libraryId,
+                        BunnyStreamApi.getInstance().videosApi.videoGetVideo(
+                            BunnyStreamApi.libraryId,
                             videoId
                         )
                     }
@@ -141,7 +141,7 @@ class BunnyVideoPlayer @JvmOverloads constructor(
                     return@launch
                 }
 
-                val settings = BunnyStreamSdk.getInstance().fetchPlayerSettings(BunnyStreamSdk.libraryId, videoId)
+                val settings = BunnyStreamApi.getInstance().fetchPlayerSettings(BunnyStreamApi.libraryId, videoId)
 
                 settings.fold(
                     ifLeft = { playerView.showError(it) },
@@ -175,8 +175,8 @@ class BunnyVideoPlayer @JvmOverloads constructor(
         if(playerSettings.showHeatmap) {
             try {
                 val retentionDataResponse = withContext(Dispatchers.IO) {
-                    BunnyStreamSdk.getInstance().streamApi.videosApi.videoGetVideoHeatmap(
-                        BunnyStreamSdk.libraryId,
+                    BunnyStreamApi.getInstance().videosApi.videoGetVideoHeatmap(
+                        BunnyStreamApi.libraryId,
                         video.guid!!
                     )
                 }

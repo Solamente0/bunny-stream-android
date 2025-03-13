@@ -5,7 +5,7 @@ import net.bunnystream.recording.DeviceCamera
 import net.bunnystream.recording.RecordingDurationListener
 import net.bunnystream.recording.RecordingStateListener
 
-interface StreamHandler {
+internal interface StreamHandler {
     var recordingStateListener: RecordingStateListener?
 
     var recordingDurationListener: RecordingDurationListener?

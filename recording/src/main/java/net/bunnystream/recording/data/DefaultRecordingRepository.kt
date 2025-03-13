@@ -3,8 +3,8 @@ package net.bunnystream.recording.data
 import arrow.core.Either
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import net.bunnystream.androidsdk.BuildConfig
-import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.api.BuildConfig
+import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.recording.domain.RecordingRepository
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.VideoCreateVideoRequest
@@ -25,7 +25,7 @@ class DefaultRecordingRepository(
         )
 
         try {
-            val result = BunnyStreamSdk.getInstance().streamApi.videosApi.videoCreateVideo(
+            val result = BunnyStreamApi.getInstance().videosApi.videoCreateVideo(
                 libraryId = libraryId,
                 videoCreateVideoRequest = createVideoRequest
             )

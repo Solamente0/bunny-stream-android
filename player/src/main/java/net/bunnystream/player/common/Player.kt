@@ -3,7 +3,7 @@ package net.bunnystream.player.common
 import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
-import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.model.AudioTrackInfo
 import net.bunnystream.player.model.AudioTrackInfoOptions
