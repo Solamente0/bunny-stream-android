@@ -1,0 +1,6 @@
+//[BunnyStreamPlayer](../../../index.md)/[net.bunnystream.bunnystreamplayer.common](../index.md)/[BunnyPlayer](index.md)/[getCurrentPosition](get-current-position.md)
+
+# getCurrentPosition
+
+[androidJvm]\
+abstract fun [getCurrentPosition](get-current-position.md)(): [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html)

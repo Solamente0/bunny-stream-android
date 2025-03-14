@@ -1,0 +1,28 @@
+package net.bunnystream.bunnystreamplayer.ui
+
+import net.bunnystream.bunnystreamplayer.model.PlayerIconSet
+
+interface BunnyPlayer {
+
+    /**
+     * Apply custom icons to video player interface
+     */
+    var iconSet: PlayerIconSet
+
+    /**
+     * Plays a video and fetches additional info, e.g. chapters, moments and subtitles
+     *
+     * @param videoId Video ID
+     */
+    fun playVideo(videoId: String)
+
+    /**
+     * Pauses video
+     */
+    fun pause()
+
+    /**
+     * Resumes playing video
+     */
+    fun play()
+}
