@@ -1,4 +1,4 @@
-# Camera recording and upload using BunnyRecordingView
+# Camera recording and upload using BunnyStreamCameraUpload
 
 Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
 
@@ -6,7 +6,7 @@ Integrated camera solution that enables recording and direct upload of videos fr
 
 Declare dependency in your project's `build.gradle.kts`:
 ```
-implementation("net.bunnystream.recording:1.0.0")
+implementation("net.bunnystream.bunny-stream-camera-upload:1.0.0")
 ```
 
 ## Initialization
@@ -18,7 +18,7 @@ After installation, you'll need to configure the package with your Bunny credent
 BunnyStreamApi.initialize(context, accessKey, libraryId)
 ```
 
-**`BunnyRecordingView` requires `CAMERA` and `RECORD_AUDIO` permissions:**
+**`BunnyStreamCameraUpload` requires `CAMERA` and `RECORD_AUDIO` permissions:**
 
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
@@ -28,7 +28,7 @@ BunnyStreamApi.initialize(context, accessKey, libraryId)
 1. Add `BunnyRecordingView` to your layout
 
 ```xml
-<net.bunnystream.recording.BunnyRecordingView
+<net.bunnystream.recording.BunnyStreamCameraUpload
       android:id="@+id/recordingView"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
@@ -66,7 +66,7 @@ if(camGranted && micGranted){
 }
 ```
 
-If you don't want to use default UI controls you can hide them using `hideDefaultControls()` and control the streaming by calling functions from `RecordingView` interface that `BunnyRecordingView` implements.
+If you don't want to use default UI controls you can hide them using `hideDefaultControls()` and control the streaming by calling functions from `StreamCameraUploadView` interface that `BunnyRecordingView` implements.
 
 Full usage example and permissions handling can be found in demo app.
 
