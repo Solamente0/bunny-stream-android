@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -42,8 +43,18 @@ android {
     viewBinding.enable = true
 }
 
-dependencies {
+tasks.dokkaGfm {
+    outputDirectory.set(file("docs"))
+    dependsOn("compileDebugKotlin", "compileDebugSources")
 
+    dokkaSourceSets {
+        named("main") {
+            moduleName.set("BunnyVideoPlayer")
+        }
+    }
+}
+
+dependencies {
     implementation(project(":api"))
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")

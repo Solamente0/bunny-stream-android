@@ -9,35 +9,35 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.10"
 }
 
-subprojects {
-    if(this.name != "app") {
-
-        apply(plugin = "org.jetbrains.dokka")
-
-        tasks.dokkaGfm {
-            outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
-            moduleName.set("player")
-            dokkaSourceSets {
-                configureEach {
-                    displayName.set("player")
-                    suppressGeneratedFiles.set(false)
-                    perPackageOption {
-                        matchingRegex.set("kotlin($|\\.).*")
-                        skipDeprecated.set(false)
-                        reportUndocumented.set(true)
-                        includeNonPublic.set(false)
-                    }
-
-                    // Suppress a package
-                    perPackageOption {
-                        matchingRegex.set(".*.internal.*")
-                        suppress.set(true)
-                    }
-                }
-            }
-        }
-    }
-}
+//subprojects {
+//    if(this.name != "app") {
+//
+//        apply(plugin = "org.jetbrains.dokka")
+//
+//        tasks.dokkaGfm {
+//            outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
+//            moduleName.set("player")
+//            dokkaSourceSets {
+//                configureEach {
+//                    displayName.set("player")
+//                    suppressGeneratedFiles.set(false)
+//                    perPackageOption {
+//                        matchingRegex.set("kotlin($|\\.).*")
+//                        skipDeprecated.set(false)
+//                        reportUndocumented.set(true)
+//                        includeNonPublic.set(false)
+//                    }
+//
+//                    // Suppress a package
+//                    perPackageOption {
+//                        matchingRegex.set(".*.internal.*")
+//                        suppress.set(true)
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 tasks.dokkaGfmMultiModule {
     moduleName.set("Bunny Stream Android API")

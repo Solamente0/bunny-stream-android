@@ -66,10 +66,14 @@ BunnyStreamApi.initialize(context, accessKey, libraryId)
 
 ## 1. Getting Started with video management using BunnyStreamApi
 
+Initialize BunnyStreamApi:
+```
 BunnyStreamApi.initialize(context, accessKey, libraryId)
+```
+
+## Below are some BunnyStreamApi usage examples
 
 ### List videos from library
-
  ```
  try {
     val response: PaginationListOfVideoModel = BunnyStreamApi.videosApi.videoList(

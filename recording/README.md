@@ -70,6 +70,8 @@ If you don't want to use default UI controls you can hide them using `hideDefaul
 
 Full usage example and permissions handling can be found in demo app.
 
+Checkout [class level documentation](docs/index.md)
+
 ## License
 
 Bunny Stream Android is licensed under the [MIT License](LICENSE). See the LICENSE file for more details.

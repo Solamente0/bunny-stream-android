@@ -1,7 +1,17 @@
-# BunnyStreamPlayer - Video Playback
+# BunnyVideoPlayer - Video Playback
 
-A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.
+BunnyVideoPlayer is an Android library that provides an easy-to-use video player implementation built on top of media3 APIs (previously ExoPlayer).
 
+## Overview
+
+This library simplifies video playback in Android applications by providing:
+
+- A flexible player component for seamless integration
+- Support for multiple video formats including HLS
+- Customizable UI components
+- Cast support for Chromecast devices
+- Built-in fullscreen handling
+- 
 ## Installation
 
 Declare dependency in your project's `build.gradle.kts`:
@@ -99,6 +109,8 @@ bunnyVideoPlayer.iconSet = newIconSet
 ```
 
 Full player usage example and permissions handling can be found in demo app.
+
+Checkout [class level documentation](docs/index.md)
 
 ## License
 

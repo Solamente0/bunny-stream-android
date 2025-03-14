@@ -18,6 +18,9 @@ import net.bunnystream.player.R
 import net.bunnystream.player.model.PlayerIconSet
 import net.bunnystream.player.ui.widget.BunnyPlayerView
 
+/**
+ * @suppress
+ */
 class FullScreenPlayerActivity : AppCompatActivity() {
 
     companion object {
