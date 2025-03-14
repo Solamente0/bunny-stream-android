@@ -24,7 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import net.bunnystream.android.demo.R
 import net.bunnystream.android.demo.ui.AppState
 import net.bunnystream.android.demo.ui.theme.BunnyStreamTheme
-import net.bunnystream.player.ui.BunnyVideoPlayer
+import net.bunnystream.bunnystreamplayer.ui.BunnyStreamPlayer
 
 @Composable
 fun PlayerRoute(
@@ -92,7 +92,7 @@ fun BunnyPlayerComposable(
 ) {
     AndroidView(
         factory = { context ->
-            BunnyVideoPlayer(context)
+            BunnyStreamPlayer(context)
         },
         update = {
             it.playVideo(videoId)
