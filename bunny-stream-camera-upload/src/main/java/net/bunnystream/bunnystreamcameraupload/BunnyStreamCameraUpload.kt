@@ -28,7 +28,7 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr), StreamCameraUploadView {
 
     companion object {
-        private const val TAG = "BunnyRecordingView"
+        private const val TAG = "BunnyStreamCameraUpload"
     }
 
     private val binding = RecordingViewBinding.inflate(LayoutInflater.from(context), this)

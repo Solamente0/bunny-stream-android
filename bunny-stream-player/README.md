@@ -1,6 +1,6 @@
-# BunnyVideoPlayer - Video Playback
+# BunnyStreamPlayer - Video Playback
 
-BunnyVideoPlayer is an Android library that provides an easy-to-use video player implementation built on top of media3 APIs (previously ExoPlayer).
+BunnyStreamPlayer is an Android library that provides an easy-to-use video player implementation built on top of media3 APIs (previously ExoPlayer).
 
 ## Overview
 
@@ -16,7 +16,7 @@ This library simplifies video playback in Android applications by providing:
 
 Declare dependency in your project's `build.gradle.kts`:
 ```
-implementation("net.bunnystream.player:1.0.0")
+implementation("net.bunnystream.bunny-stream-player:1.0.0")
 ```
 
 ## Initialization
@@ -28,17 +28,17 @@ After installation, you'll need to configure the package with your Bunny credent
 BunnyStreamApi.initialize(context, accessKey, libraryId)
 ```
 
-### Using `BunnyVideoPlayer` in Compose
+### Using `BunnyStreamPlayer` in Compose
 
 ```kotlin
 @Composable
-fun BunnyPlayerComposable(
+fun BunnyStreamPlayerComposable(
     videoId: String,
     modifier: Modifier = Modifier
 ) {
     AndroidView(
         factory = { context ->
-            BunnyVideoPlayer(context)
+            BunnyStreamPlayer(context)
         },
         update = {
             it.playVideo(videoId)
@@ -50,25 +50,25 @@ fun BunnyPlayerComposable(
 
 Full usage example can be found in demo app.
 
-### Using `BunnyVideoPlayer` in XML Views
+### Using `BunnyStreamPlayer` in XML Views
 
-1. Add `BunnyVideoPlayer` into your layout:
+1. Add `BunnyStreamPlayer` into your layout:
 ```
-<net.bunnystream.player.ui.BunnyVideoPlayer
+<net.bunnystream.player.ui.BunnyStreamPlayer
       android:id="@+id/videoPlayer"
       android:layout_width="match_parent"
       android:layout_height="match_parent"/>
 ```
 2. Call `playVideo()`:
 ```
-bunnyVideoPlayer.playVideo(videoId)
+bunnyStreamPlayer.playVideo(videoId)
 ```
 
-`bunnyVideoPlayer` comes from `findViewById()` or from View binding.
+`bunnyStreamPlayer` comes from `findViewById()` or from View binding.
 
 **Customizing Player:**
 
-You can customize the BunnyVideoPlayer by passing custom icons. Other costumizations like primary color, font, handling control visibilty, captions, heatmap can be controlled from the Bunny dashboard.
+You can customize the BunnyStreamPlayer by passing custom icons. Other costumizations like primary color, font, handling control visibilty, captions, heatmap can be controlled from the Bunny dashboard.
 
 1. Override icons you want to change from `PlayerIconSet` class:
 
@@ -105,7 +105,7 @@ data class PlayerIconSet(
 ```
 2. Set new icon set:
 ```
-bunnyVideoPlayer.iconSet = newIconSet
+bunnyStreamPlayer.iconSet = newIconSet
 ```
 
 Full player usage example and permissions handling can be found in demo app.
