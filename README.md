@@ -24,11 +24,11 @@ Bunny Stream is an Android library designed to seamlessly integrate Bunny's powe
 
 The Bunny Stream is organized into several specialized modules, each focusing on specific functionality:
 
-| Module                               | Description                                                                                                                                                                                                                                                                                                                               |
-|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **[api](api/README.md)**             | The core module that provides interface to Bunny's REST Stream API. It handles all API communication, request authentication, and response parsing, allowing you to easily manage your video content, retrieve analytics, and control CDN settings. Features include video management, collection organization, and thumbnail generation. |
-| **[recording](recording/README.md)** | Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
-| **[player](player/README.md)**       | A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.      |
+| Module                                                                 | Description                                                                                                                                                                                                                                                                                                                               |
+|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **[bunny-stream-api](bunny-stream-api/README.md)**                     | The core module that provides interface to Bunny's REST Stream API. It handles all API communication, request authentication, and response parsing, allowing you to easily manage your video content, retrieve analytics, and control CDN settings. Features include video management, collection organization, and thumbnail generation. |
+| **[bunny-stream-camera-upload](bunny-stream-camera-upload/README.md)** | Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
+| **[bunny-stream-player](bunny-stream-player/README.md)**                            | A feature-rich video player specifically optimized for Bunny's CDN. It provides smooth playback with adaptive bitrate streaming, customizable controls, support for multiple video formats, and integration with Bunny's analytics. The player includes features like Google Cast support, DRM support and customizable UI elements.      |
 
 ## Minimum supported Android version
 
@@ -42,17 +42,17 @@ If you plan to use `BunnyVideoPlayer` declare dependency on `api` and `player` m
 
 Declare desired dependencies in your project's `build.gradle.kts`:
 
-- You can use only `api`:
+- You can use only `bunny-stream-api`:
    ```
-   implementation("net.bunnystream.api:1.0.0")
+   implementation("net.bunnystream.bunny-stream-api:1.0.0")
    ```
-- If you also need `player`:
+- If you also need `bunny-stream-player`:
    ```
-   implementation("net.bunnystream.player:1.0.0")
+   implementation("net.bunnystream.bunny-stream-player:1.0.0")
    ```
 - If you need camera recording and live stream upload:
    ```
-   implementation("net.bunnystream.recording:1.0.0")
+   implementation("net.bunnystream.bunny-stream-camera-upload:1.0.0")
    ```
 
 ## Initialization

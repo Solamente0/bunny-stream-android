@@ -60,9 +60,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":api"))
-    implementation(project(":player"))
-    implementation(project(":recording"))
+    implementation(project(":bunny-stream-api"))
+    implementation(project(":bunny-stream-player"))
+    implementation(project(":bunny-stream-camera-upload"))
 
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
