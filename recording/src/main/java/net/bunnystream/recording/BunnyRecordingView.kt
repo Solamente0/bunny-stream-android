@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.core.view.isVisible
 import kotlinx.coroutines.Dispatchers
-import net.bunnystream.androidsdk.BunnyStreamSdk
+import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.recording.data.DefaultRecordingRepository
 import net.bunnystream.recording.databinding.RecordingViewBinding
 import net.bunnystream.recording.domain.DefaultStreamHandler
@@ -38,7 +38,7 @@ class BunnyRecordingView @JvmOverloads constructor(
         coroutineDispatcher = Dispatchers.IO
     )
 
-    private val libraryId = BunnyStreamSdk.libraryId
+    private val libraryId = BunnyStreamApi.libraryId
 
     override var hideDefaultControls: Boolean = false
         set(value) {

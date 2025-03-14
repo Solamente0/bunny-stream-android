@@ -15,7 +15,7 @@ subprojects {
         apply(plugin = "org.jetbrains.dokka")
 
         tasks.dokkaGfm {
-            outputDirectory.set(buildDir.resolve("docs/partial"))
+            outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
             moduleName.set("player")
             dokkaSourceSets {
                 configureEach {
@@ -40,6 +40,6 @@ subprojects {
 }
 
 tasks.dokkaGfmMultiModule {
-    moduleName.set("Bunny Stream Android SDK")
+    moduleName.set("Bunny Stream Android API")
     outputDirectory.set(file("docs"))
 }

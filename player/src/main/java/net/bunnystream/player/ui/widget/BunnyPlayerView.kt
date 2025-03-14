@@ -30,8 +30,8 @@ import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.MediaRouteButton
 import com.bumptech.glide.Glide
 import com.google.android.gms.cast.framework.CastButtonFactory
-import net.bunnystream.androidsdk.settings.capitalizeWords
-import net.bunnystream.androidsdk.settings.domain.model.PlayerSettings
+import net.bunnystream.api.settings.capitalizeWords
+import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.player.PlayerStateListener
 import net.bunnystream.player.PlayerType
 import net.bunnystream.player.R

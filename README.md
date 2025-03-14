@@ -25,7 +25,7 @@ You can find `accessKey`, and `libraryId` on the [bunny.net dashboard](dash.bunn
 
 To use player in Jetpack Compose, instantiate `BunnyVideoPlayer` in `AndroidView` and call `playVideo(libraryId, videoId)`.
 
-You can find an example in [PlayerScreen.kt](app/src/main/java/net/bunnystream/android/player/PlayerScreen.kt).
+You can find an example in [PlayerScreen.kt](app/src/main/java/net/bunnystream/demo/player/PlayerScreen.kt).
 
 To use player in XML views, add `BunnyVideoPlayer` widget in layout and call `playVideo(videoId)` after layout is inflated.
 
@@ -39,7 +39,7 @@ You can use default UI or use your own by instantiating `BunnyStreamView` in `Bo
 
 If you opt for your own UI, set `recordingStateListener` see [RecordingStateListener](recording/src/main/java/net/bunnystream/recording/RecordingStateListener.kt) and `recordingDurationListener`, see [RecordingDurationListener](recording/src/main/java/net/bunnystream/recording/RecordingDurationListener.kt) to get events and update UI accordingly.
 
-See [RecordingActivity](app/src/main/java/net/bunnystream/android/ui/recording/RecordingActivity.kt) as an example of usage.
+See [RecordingActivity](app/src/main/java/net/bunnystream/demo/ui/recording/RecordingActivity.kt) as an example of usage.
 
 ## Other examples
 
