@@ -44,6 +44,7 @@ android {
 }
 
 tasks.dokkaGfm {
+    suppressObviousFunctions.set(true)
     outputDirectory.set(file("docs"))
     dependsOn("compileDebugKotlin", "compileDebugSources")
 

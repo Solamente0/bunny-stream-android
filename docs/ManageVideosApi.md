@@ -2,27 +2,27 @@
 
 All URIs are relative to *https://video.bunnycdn.com*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**videoAddCaption**](ManageVideosApi.md#videoAddCaption) | **POST** /library/{libraryId}/videos/{videoId}/captions/{srclang} | Add Caption |
-| [**videoCreateVideo**](ManageVideosApi.md#videoCreateVideo) | **POST** /library/{libraryId}/videos | Create Video |
-| [**videoDeleteCaption**](ManageVideosApi.md#videoDeleteCaption) | **DELETE** /library/{libraryId}/videos/{videoId}/captions/{srclang} | Delete Caption |
-| [**videoDeleteResolutions**](ManageVideosApi.md#videoDeleteResolutions) | **POST** /library/{libraryId}/videos/{videoId}/resolutions/cleanup | Cleanup Unconfigured Resolutions |
-| [**videoDeleteVideo**](ManageVideosApi.md#videoDeleteVideo) | **DELETE** /library/{libraryId}/videos/{videoId} | Delete Video |
-| [**videoFetchNewVideo**](ManageVideosApi.md#videoFetchNewVideo) | **POST** /library/{libraryId}/videos/fetch | Fetch Video |
-| [**videoGetVideo**](ManageVideosApi.md#videoGetVideo) | **GET** /library/{libraryId}/videos/{videoId} | Get Video |
-| [**videoGetVideoHeatmap**](ManageVideosApi.md#videoGetVideoHeatmap) | **GET** /library/{libraryId}/videos/{videoId}/heatmap | Get Video Heatmap |
-| [**videoGetVideoPlayData**](ManageVideosApi.md#videoGetVideoPlayData) | **GET** /library/{libraryId}/videos/{videoId}/play | Get Video Play Data |
-| [**videoGetVideoResolutions**](ManageVideosApi.md#videoGetVideoResolutions) | **GET** /library/{libraryId}/videos/{videoId}/resolutions | Video Resolutions Info |
-| [**videoGetVideoStatistics**](ManageVideosApi.md#videoGetVideoStatistics) | **GET** /library/{libraryId}/statistics | Get Video Statistics |
-| [**videoList**](ManageVideosApi.md#videoList) | **GET** /library/{libraryId}/videos | List Videos |
-| [**videoReencodeUsingCodec**](ManageVideosApi.md#videoReencodeUsingCodec) | **PUT** /library/{libraryId}/videos/{videoId}/outputs/{outputCodecId} | Add output codec to video |
-| [**videoReencodeVideo**](ManageVideosApi.md#videoReencodeVideo) | **POST** /library/{libraryId}/videos/{videoId}/reencode | Reencode Video |
-| [**videoRepackage**](ManageVideosApi.md#videoRepackage) | **POST** /library/{libraryId}/videos/{videoId}/repackage | Repackage Video |
-| [**videoSetThumbnail**](ManageVideosApi.md#videoSetThumbnail) | **POST** /library/{libraryId}/videos/{videoId}/thumbnail | Set Thumbnail |
-| [**videoTranscribeVideo**](ManageVideosApi.md#videoTranscribeVideo) | **POST** /library/{libraryId}/videos/{videoId}/transcribe | Transcribe Video |
-| [**videoUpdateVideo**](ManageVideosApi.md#videoUpdateVideo) | **POST** /library/{libraryId}/videos/{videoId} | Update Video |
-| [**videoUploadVideo**](ManageVideosApi.md#videoUploadVideo) | **PUT** /library/{libraryId}/videos/{videoId} | Upload Video |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**videoAddCaption**](ManageVideosApi.md#videoAddCaption) | **POST** /library/{libraryId}/videos/{videoId}/captions/{srclang} | Add Caption
+[**videoCreateVideo**](ManageVideosApi.md#videoCreateVideo) | **POST** /library/{libraryId}/videos | Create Video
+[**videoDeleteCaption**](ManageVideosApi.md#videoDeleteCaption) | **DELETE** /library/{libraryId}/videos/{videoId}/captions/{srclang} | Delete Caption
+[**videoDeleteResolutions**](ManageVideosApi.md#videoDeleteResolutions) | **POST** /library/{libraryId}/videos/{videoId}/resolutions/cleanup | Cleanup Unconfigured Resolutions
+[**videoDeleteVideo**](ManageVideosApi.md#videoDeleteVideo) | **DELETE** /library/{libraryId}/videos/{videoId} | Delete Video
+[**videoFetchNewVideo**](ManageVideosApi.md#videoFetchNewVideo) | **POST** /library/{libraryId}/videos/fetch | Fetch Video
+[**videoGetVideo**](ManageVideosApi.md#videoGetVideo) | **GET** /library/{libraryId}/videos/{videoId} | Get Video
+[**videoGetVideoHeatmap**](ManageVideosApi.md#videoGetVideoHeatmap) | **GET** /library/{libraryId}/videos/{videoId}/heatmap | Get Video Heatmap
+[**videoGetVideoPlayData**](ManageVideosApi.md#videoGetVideoPlayData) | **GET** /library/{libraryId}/videos/{videoId}/play | Get Video Play Data
+[**videoGetVideoResolutions**](ManageVideosApi.md#videoGetVideoResolutions) | **GET** /library/{libraryId}/videos/{videoId}/resolutions | Video Resolutions Info
+[**videoGetVideoStatistics**](ManageVideosApi.md#videoGetVideoStatistics) | **GET** /library/{libraryId}/statistics | Get Video Statistics
+[**videoList**](ManageVideosApi.md#videoList) | **GET** /library/{libraryId}/videos | List Videos
+[**videoReencodeUsingCodec**](ManageVideosApi.md#videoReencodeUsingCodec) | **PUT** /library/{libraryId}/videos/{videoId}/outputs/{outputCodecId} | Add output codec to video
+[**videoReencodeVideo**](ManageVideosApi.md#videoReencodeVideo) | **POST** /library/{libraryId}/videos/{videoId}/reencode | Reencode Video
+[**videoRepackage**](ManageVideosApi.md#videoRepackage) | **POST** /library/{libraryId}/videos/{videoId}/repackage | Repackage Video
+[**videoSetThumbnail**](ManageVideosApi.md#videoSetThumbnail) | **POST** /library/{libraryId}/videos/{videoId}/thumbnail | Set Thumbnail
+[**videoTranscribeVideo**](ManageVideosApi.md#videoTranscribeVideo) | **POST** /library/{libraryId}/videos/{videoId}/transcribe | Transcribe Video
+[**videoUpdateVideo**](ManageVideosApi.md#videoUpdateVideo) | **POST** /library/{libraryId}/videos/{videoId} | Update Video
+[**videoUploadVideo**](ManageVideosApi.md#videoUploadVideo) | **PUT** /library/{libraryId}/videos/{videoId} | Upload Video
 
 
 <a id="videoAddCaption"></a>
@@ -57,12 +57,13 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| **srclang** | **kotlin.String**| The ISO 639-1 language code for the caption (e.g., &#39;en&#39;, &#39;fr&#39;). | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoAddCaptionRequest** | [**VideoAddCaptionRequest**](VideoAddCaptionRequest.md)| Caption model including language, label, and base64 encoded captions file. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **srclang** | **kotlin.String**| The ISO 639-1 language code for the caption (e.g., &#39;en&#39;, &#39;fr&#39;). |
+ **videoAddCaptionRequest** | [**VideoAddCaptionRequest**](VideoAddCaptionRequest.md)| Caption model including language, label, and base64 encoded captions file. |
 
 ### Return type
 
@@ -110,10 +111,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library where the video will be created. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoCreateVideoRequest** | [**VideoCreateVideoRequest**](VideoCreateVideoRequest.md)| Video model containing details for the new video. Title is required. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library where the video will be created. |
+ **videoCreateVideoRequest** | [**VideoCreateVideoRequest**](VideoCreateVideoRequest.md)| Video model containing details for the new video. Title is required. |
 
 ### Return type
 
@@ -162,11 +164,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **srclang** | **kotlin.String**| The ISO 639-1 language code of the caption to be deleted. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **srclang** | **kotlin.String**| The ISO 639-1 language code of the caption to be deleted. |
 
 ### Return type
 
@@ -219,15 +222,16 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| **resolutionsToDelete** | **kotlin.String**| Comma separated list of resolutions to delete. | [optional] |
-| **deleteNonConfiguredResolutions** | **kotlin.Boolean**| If true, deletes resolutions that are not configured. | [optional] [default to false] |
-| **deleteOriginal** | **kotlin.Boolean**| If true, deletes the original video file. | [optional] [default to false] |
-| **deleteMp4Files** | **kotlin.Boolean**| If true, deletes MP4 fallback files. | [optional] [default to false] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **dryRun** | **kotlin.Boolean**| If set to true, no files will be actually deleted; only informational data is returned. | [optional] [default to false] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **resolutionsToDelete** | **kotlin.String**| Comma separated list of resolutions to delete. | [optional]
+ **deleteNonConfiguredResolutions** | **kotlin.Boolean**| If true, deletes resolutions that are not configured. | [optional] [default to false]
+ **deleteOriginal** | **kotlin.Boolean**| If true, deletes the original video file. | [optional] [default to false]
+ **deleteMp4Files** | **kotlin.Boolean**| If true, deletes MP4 fallback files. | [optional] [default to false]
+ **dryRun** | **kotlin.Boolean**| If set to true, no files will be actually deleted; only informational data is returned. | [optional] [default to false]
 
 ### Return type
 
@@ -275,10 +279,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoId** | **kotlin.String**| The unique identifier of the video to be deleted. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video to be deleted. |
 
 ### Return type
 
@@ -328,12 +333,13 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoFetchNewVideoRequest** | [**VideoFetchNewVideoRequest**](VideoFetchNewVideoRequest.md)| Fetch video request model containing the URL and optional headers for the fetch operation. | |
-| **collectionId** | **kotlin.String**| Optional collection ID to assign the fetched video to. | [optional] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **thumbnailTime** | **kotlin.Int**| Optional video time in milliseconds to extract the main video thumbnail. | [optional] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoFetchNewVideoRequest** | [**VideoFetchNewVideoRequest**](VideoFetchNewVideoRequest.md)| Fetch video request model containing the URL and optional headers for the fetch operation. |
+ **collectionId** | **kotlin.String**| Optional collection ID to assign the fetched video to. | [optional]
+ **thumbnailTime** | **kotlin.Int**| Optional video time in milliseconds to extract the main video thumbnail. | [optional]
 
 ### Return type
 
@@ -381,10 +387,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
 
 ### Return type
 
@@ -432,10 +439,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
 
 ### Return type
 
@@ -485,12 +493,13 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| **token** | **kotlin.String**| Authentication token for accessing the video playback data. | [optional] [default to &quot;&quot;] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **expires** | **kotlin.Long**| Expiration timestamp for the provided token. | [optional] [default to 0L] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **token** | **kotlin.String**| Authentication token for accessing the video playback data. | [optional] [default to &quot;&quot;]
+ **expires** | **kotlin.Long**| Expiration timestamp for the provided token. | [optional] [default to 0L]
 
 ### Return type
 
@@ -535,10 +544,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
 
 ### Return type
 
@@ -589,13 +599,14 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **dateFrom** | **kotlin.String**| Optional start date (ISO 8601 format) for the statistics. Defaults to the last 30 days if not provided. | [optional] |
-| **dateTo** | **kotlin.String**| Optional end date (ISO 8601 format) for the statistics. Defaults to the last 30 days if not provided. | [optional] |
-| **hourly** | **kotlin.Boolean**| If true, returns statistics data grouped by hour. | [optional] [default to false] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoGuid** | **kotlin.String**| Optional GUID of a specific video to retrieve statistics for. | [optional] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **dateFrom** | **kotlin.String**| Optional start date (ISO 8601 format) for the statistics. Defaults to the last 30 days if not provided. | [optional]
+ **dateTo** | **kotlin.String**| Optional end date (ISO 8601 format) for the statistics. Defaults to the last 30 days if not provided. | [optional]
+ **hourly** | **kotlin.Boolean**| If true, returns statistics data grouped by hour. | [optional] [default to false]
+ **videoGuid** | **kotlin.String**| Optional GUID of a specific video to retrieve statistics for. | [optional]
 
 ### Return type
 
@@ -647,14 +658,15 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **page** | **kotlin.Int**| The page number to retrieve. | [optional] [default to 1] |
-| **itemsPerPage** | **kotlin.Int**| The number of videos per page. | [optional] [default to 100] |
-| **search** | **kotlin.String**| A search term to filter videos by title or metadata. | [optional] [default to &quot;&quot;] |
-| **collection** | **kotlin.String**| The ID of the collection to filter videos by. | [optional] [default to &quot;&quot;] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **orderBy** | **kotlin.String**| Specifies the field by which to order the video list. | [optional] [default to &quot;date&quot;] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **page** | **kotlin.Int**| The page number to retrieve. | [optional] [default to 1]
+ **itemsPerPage** | **kotlin.Int**| The number of videos per page. | [optional] [default to 100]
+ **search** | **kotlin.String**| A search term to filter videos by title or metadata. | [optional] [default to &quot;&quot;]
+ **collection** | **kotlin.String**| The ID of the collection to filter videos by. | [optional] [default to &quot;&quot;]
+ **orderBy** | **kotlin.String**| Specifies the field by which to order the video list. | [optional] [default to &quot;date&quot;]
 
 ### Return type
 
@@ -703,11 +715,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **outputCodecId** | [**EncoderOutputCodec**](.md)| The output codec to add (e.g., x264, vp9, hevc, av1). | [enum: 0, 1, 2, 3] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **outputCodecId** | [**EncoderOutputCodec**](.md)| The output codec to add (e.g., x264, vp9, hevc, av1). | [enum: 0, 1, 2, 3]
 
 ### Return type
 
@@ -755,10 +768,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoId** | **kotlin.String**| The unique identifier of the video to reencode. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video to reencode. |
 
 ### Return type
 
@@ -807,11 +821,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video to repackage. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **keepOriginalFiles** | **kotlin.Boolean**| If true, previous file versions are kept in storage, allowing for faster future repackaging. Default is true. | [optional] [default to true] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video to repackage. |
+ **keepOriginalFiles** | **kotlin.Boolean**| If true, previous file versions are kept in storage, allowing for faster future repackaging. Default is true. | [optional] [default to true]
 
 ### Return type
 
@@ -860,11 +875,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **thumbnailUrl** | **kotlin.String**| The URL of the thumbnail image to set for the video. | [optional] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video. |
+ **thumbnailUrl** | **kotlin.String**| The URL of the thumbnail image to set for the video. | [optional]
 
 ### Return type
 
@@ -915,13 +931,14 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video to transcribe. | |
-| **language** | **kotlin.String**| The ISO 639-1 language code of the video source. This parameter is used only if not overridden by the request body. | [optional] |
-| **force** | **kotlin.Boolean**| If true, forces the transcription process even if the video has been transcribed before. | [optional] [default to false] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoTranscribeVideoRequest** | [**VideoTranscribeVideoRequest**](VideoTranscribeVideoRequest.md)| Optional transcription settings that override the default video library settings. | [optional] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video to transcribe. |
+ **language** | **kotlin.String**| The ISO 639-1 language code of the video source. This parameter is used only if not overridden by the request body. | [optional]
+ **force** | **kotlin.Boolean**| If true, forces the transcription process even if the video has been transcribed before. | [optional] [default to false]
+ **videoTranscribeVideoRequest** | [**VideoTranscribeVideoRequest**](VideoTranscribeVideoRequest.md)| Optional transcription settings that override the default video library settings. | [optional]
 
 ### Return type
 
@@ -970,11 +987,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier of the video to update. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **videoUpdateVideoRequest** | [**VideoUpdateVideoRequest**](VideoUpdateVideoRequest.md)| Video model containing the fields to update. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier of the video to update. |
+ **videoUpdateVideoRequest** | [**VideoUpdateVideoRequest**](VideoUpdateVideoRequest.md)| Video model containing the fields to update. |
 
 ### Return type
 
@@ -1025,13 +1043,14 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **videoId** | **kotlin.String**| The unique identifier to assign to the new video. | |
-| **jitEnabled** | **kotlin.Boolean**| Determines whether JIT encoding should be enabled for this video. Works only when Premium Encoding is enabled; overrides library settings. | [optional] |
-| **enabledResolutions** | **kotlin.String**| A comma-separated list of resolutions to enable for encoding. Options include: 240p, 360p, 480p, 720p, 1080p, 1440p, 2160p. | [optional] [default to &quot;&quot;] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **enabledOutputCodecs** | **kotlin.String**| Specifies the codecs that will be used to encode the video. Overrides library settings. Available values: x264, vp9. | [optional] [default to &quot;&quot;] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **videoId** | **kotlin.String**| The unique identifier to assign to the new video. |
+ **jitEnabled** | **kotlin.Boolean**| Determines whether JIT encoding should be enabled for this video. Works only when Premium Encoding is enabled; overrides library settings. | [optional]
+ **enabledResolutions** | **kotlin.String**| A comma-separated list of resolutions to enable for encoding. Options include: 240p, 360p, 480p, 720p, 1080p, 1440p, 2160p. | [optional] [default to &quot;&quot;]
+ **enabledOutputCodecs** | **kotlin.String**| Specifies the codecs that will be used to encode the video. Overrides library settings. Available values: x264, vp9. | [optional] [default to &quot;&quot;]
 
 ### Return type
 

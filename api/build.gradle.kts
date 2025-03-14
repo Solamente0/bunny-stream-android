@@ -6,10 +6,10 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
     id("org.openapi.generator")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.dokka")
 }
 
 android {
-
     buildFeatures {
         buildConfig = true
     }
@@ -59,7 +59,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
@@ -125,6 +124,7 @@ specs.forEach {
 
 tasks.register("openApiGenerateAll") {
     dependsOn(specs.map { "openApiGenerate-${it.key}" })
+    finalizedBy("fixGeneratedFiles")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -154,5 +154,35 @@ tasks.register<Copy>("copyGeneratedDocs") {
     into(file("../docs"))
     doLast {
         logger.lifecycle("Successfully copied generated API docs to ../docs")
+    }
+}
+
+// Needed to remove VideoModelStatus class which gets generated incorrectly.
+// Correct implementation is supplied from net.bunnystream.api.model.VideoModelStatus.
+tasks.register("fixGeneratedFiles") {
+    doLast {
+        val fileToFix = file("${layout.buildDirectory.dir("generated/api/").get().asFile.absolutePath}/src/main/kotlin/org/openapitools/client/models/VideoModelStatus.kt")
+        if (fileToFix.exists()) {
+            try {
+                // Empty placeholder class that matches the package of the original file
+                val content = """
+                    /**
+                     * This is a placehodler class. The actual implementation is provided by typeMappings in GenerateTask config.
+                     */
+                    package org.openapitools.client.models
+                    
+                    // This class replaces the (wrong) auto-generated implementation
+                    class VideoModelStatus {
+                        // Intentionally left empty
+                    }
+                """.trimIndent()
+                fileToFix.writeText(content)
+            } catch (e: Exception) {
+                logger.error("Failed to modify file: ${fileToFix.absolutePath}", e)
+                throw GradleException("Failed to modify generated file: ${fileToFix.absolutePath}", e)
+            }
+        } else {
+            logger.lifecycle("fixGeneratedFiles: file not found: ${fileToFix.absolutePath}")
+        }
     }
 }

@@ -2,9 +2,9 @@
 
 All URIs are relative to *https://video.bunnycdn.com*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**oEmbedGetOEmbed**](OEmbedApi.md#oEmbedGetOEmbed) | **GET** /OEmbed | Get OEmbed Data |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**oEmbedGetOEmbed**](OEmbedApi.md#oEmbedGetOEmbed) | **GET** /OEmbed | Get OEmbed Data
 
 
 <a id="oEmbedGetOEmbed"></a>
@@ -40,13 +40,14 @@ try {
 ```
 
 ### Parameters
-| **url** | **kotlin.String**| The URL for which to retrieve OEmbed information. | [optional] |
-| **maxWidth** | **kotlin.Int**| Optional maximum width of the embed. | [optional] |
-| **maxHeight** | **kotlin.Int**| Optional maximum height of the embed. | [optional] |
-| **token** | **kotlin.String**| Authentication token if required. | [optional] [default to &quot;&quot;] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **expires** | **kotlin.Long**| Expiration timestamp for the provided token. | [optional] [default to 0L] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **url** | **kotlin.String**| The URL for which to retrieve OEmbed information. | [optional]
+ **maxWidth** | **kotlin.Int**| Optional maximum width of the embed. | [optional]
+ **maxHeight** | **kotlin.Int**| Optional maximum height of the embed. | [optional]
+ **token** | **kotlin.String**| Authentication token if required. | [optional] [default to &quot;&quot;]
+ **expires** | **kotlin.Long**| Expiration timestamp for the provided token. | [optional] [default to 0L]
 
 ### Return type
 

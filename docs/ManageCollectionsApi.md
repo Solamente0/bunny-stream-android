@@ -2,13 +2,13 @@
 
 All URIs are relative to *https://video.bunnycdn.com*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**collectionCreateCollection**](ManageCollectionsApi.md#collectionCreateCollection) | **POST** /library/{libraryId}/collections | Create Collection |
-| [**collectionDeleteCollection**](ManageCollectionsApi.md#collectionDeleteCollection) | **DELETE** /library/{libraryId}/collections/{collectionId} | Delete Collection |
-| [**collectionGetCollection**](ManageCollectionsApi.md#collectionGetCollection) | **GET** /library/{libraryId}/collections/{collectionId} | Get Collection |
-| [**collectionList**](ManageCollectionsApi.md#collectionList) | **GET** /library/{libraryId}/collections | Get Collection List |
-| [**collectionUpdateCollection**](ManageCollectionsApi.md#collectionUpdateCollection) | **POST** /library/{libraryId}/collections/{collectionId} | Update Collection |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**collectionCreateCollection**](ManageCollectionsApi.md#collectionCreateCollection) | **POST** /library/{libraryId}/collections | Create Collection
+[**collectionDeleteCollection**](ManageCollectionsApi.md#collectionDeleteCollection) | **DELETE** /library/{libraryId}/collections/{collectionId} | Delete Collection
+[**collectionGetCollection**](ManageCollectionsApi.md#collectionGetCollection) | **GET** /library/{libraryId}/collections/{collectionId} | Get Collection
+[**collectionList**](ManageCollectionsApi.md#collectionList) | **GET** /library/{libraryId}/collections | Get Collection List
+[**collectionUpdateCollection**](ManageCollectionsApi.md#collectionUpdateCollection) | **POST** /library/{libraryId}/collections/{collectionId} | Update Collection
 
 
 <a id="collectionCreateCollection"></a>
@@ -41,10 +41,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library where the new collection will be created. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the details for the new collection. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library where the new collection will be created. |
+ **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the details for the new collection. |
 
 ### Return type
 
@@ -92,10 +93,11 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **collectionId** | **kotlin.String**| The unique identifier of the collection to be deleted. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. |
+ **collectionId** | **kotlin.String**| The unique identifier of the collection to be deleted. |
 
 ### Return type
 
@@ -144,11 +146,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
-| **collectionId** | **kotlin.String**| The unique identifier of the collection. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **includeThumbnails** | **kotlin.Boolean**| If true, the response will include preview image URLs for the collection. | [optional] [default to false] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. |
+ **collectionId** | **kotlin.String**| The unique identifier of the collection. |
+ **includeThumbnails** | **kotlin.Boolean**| If true, the response will include preview image URLs for the collection. | [optional] [default to false]
 
 ### Return type
 
@@ -200,14 +203,15 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library. | |
-| **page** | **kotlin.Int**| The page number to retrieve. | [optional] [default to 1] |
-| **itemsPerPage** | **kotlin.Int**| The number of items per page. | [optional] [default to 100] |
-| **search** | **kotlin.String**| A search term to filter collections by name or other metadata. | [optional] [default to &quot;&quot;] |
-| **orderBy** | **kotlin.String**| Specifies the field by which to order the results. | [optional] [default to &quot;date&quot;] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **includeThumbnails** | **kotlin.Boolean**| If true, includes thumbnail image URLs in the response. | [optional] [default to false] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library. |
+ **page** | **kotlin.Int**| The page number to retrieve. | [optional] [default to 1]
+ **itemsPerPage** | **kotlin.Int**| The number of items per page. | [optional] [default to 100]
+ **search** | **kotlin.String**| A search term to filter collections by name or other metadata. | [optional] [default to &quot;&quot;]
+ **orderBy** | **kotlin.String**| Specifies the field by which to order the results. | [optional] [default to &quot;date&quot;]
+ **includeThumbnails** | **kotlin.Boolean**| If true, includes thumbnail image URLs in the response. | [optional] [default to false]
 
 ### Return type
 
@@ -256,11 +260,12 @@ try {
 ```
 
 ### Parameters
-| **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. | |
-| **collectionId** | **kotlin.String**| The unique identifier of the collection to be updated. | |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the fields to be updated. | |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **libraryId** | **kotlin.Long**| The ID of the video library containing the collection. |
+ **collectionId** | **kotlin.String**| The unique identifier of the collection to be updated. |
+ **collectionUpdateCollectionRequest** | [**CollectionUpdateCollectionRequest**](CollectionUpdateCollectionRequest.md)| Collection model containing the fields to be updated. |
 
 ### Return type
 
