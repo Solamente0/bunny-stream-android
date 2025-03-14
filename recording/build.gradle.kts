@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -43,8 +44,18 @@ android {
     }
 }
 
-dependencies {
+tasks.dokkaGfm {
+    outputDirectory.set(file("docs"))
+    dependsOn("compileDebugKotlin", "compileDebugSources")
 
+    dokkaSourceSets {
+        named("main") {
+            moduleName.set("BunnyRecordingView")
+        }
+    }
+}
+
+dependencies {
     implementation(project(":api"))
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
