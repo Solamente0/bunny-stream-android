@@ -263,19 +263,19 @@ data class PlayerIconSet(
 bunnyVideoPlayer.iconSet = newIconSet
 ```
 
-## 3. Camera recording and upload iusing BunnyRecordingView
+## 3. Camera recording and upload using BunnyStreamCameraUpload
 
-#### `BunnyRecordingView` requires `CAMERA` and `RECORD_AUDIO` permissions:
+#### `BunnyStreamCameraUpload` requires `CAMERA` and `RECORD_AUDIO` permissions:
 
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 ```
 
-1. Add `BunnyRecordingView` to your layout
+1. Add `BunnyStreamCameraUpload` to your layout
 
 ```xml
-<net.bunnystream.recording.BunnyRecordingView
+<net.bunnystream.recording.BunnyStreamCameraUpload
       android:id="@+id/recordingView"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
@@ -285,7 +285,7 @@ bunnyVideoPlayer.iconSet = newIconSet
 
 2. Set close listener:
 ```
-recordingView.closeStreamClickListener = OnClickListener {
+bunnyStreamCameraUpload.closeStreamClickListener = OnClickListener {
     // Hanlde stream close event, e.g. finish currenty activity
     finish()
 }
