@@ -16,6 +16,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Bunny Stream"
 include(":app")
-include(":sdk")
-include(":player")
-include(":recording")
+include(":bunny-stream-api")
+include(":bunny-stream-player")
+include(":bunny-stream-camera-upload")
