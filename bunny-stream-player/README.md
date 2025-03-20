@@ -11,7 +11,7 @@ This library simplifies video playback in Android applications by providing:
 - Customizable UI components
 - Cast support for Chromecast devices
 - Built-in fullscreen handling
-- 
+
 ## Installation
 
 Declare dependency in your project's `build.gradle.kts`:
@@ -110,7 +110,7 @@ bunnyStreamPlayer.iconSet = newIconSet
 
 Full player usage example and permissions handling can be found in demo app.
 
-Checkout [class level documentation](docs/index.md)
+For more information, see [class level documentation](docs/index.md).
 
 ## License
 
