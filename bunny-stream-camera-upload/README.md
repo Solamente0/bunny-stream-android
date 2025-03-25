@@ -1,6 +1,6 @@
 # Camera recording and upload using BunnyStreamCameraUpload
 
-Integrated camera solution that enables recording and direct upload of videos from the device camera.                                                                                                                                                                                                                                     |
+Integrated camera solution that enables recording and direct upload of videos from the device camera.
 
 ## Installation
 
