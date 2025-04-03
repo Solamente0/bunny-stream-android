@@ -2,6 +2,7 @@ package net.bunnystream.api.model
 
 import com.google.gson.annotations.SerializedName
 
+@Suppress("MagicNumber")
 enum class VideoModelStatus(val value: Int) {
     @SerializedName("0")
     CREATED(0),

@@ -1,7 +1,7 @@
 package net.bunnystream.android.library
 
 import android.net.Uri
-import net.bunnystream.androidsdk.upload.service.UploadListener
+import net.bunnystream.api.upload.service.UploadListener
 
 interface VideoUploadService {
 

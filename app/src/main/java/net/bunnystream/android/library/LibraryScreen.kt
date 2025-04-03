@@ -53,7 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import net.bunnystream.android.R
+import net.bunnystream.android.demo.R
 import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
 import net.bunnystream.android.library.model.VideoStatus
@@ -207,7 +207,7 @@ private fun LibraryScreen(
         topBar = {
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),

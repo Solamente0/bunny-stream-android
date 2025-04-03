@@ -15,7 +15,7 @@ import org.openapitools.client.infrastructure.ApiClient
 
 class BunnyStreamApi private constructor(
     context: Context,
-    accessKey: String,
+    accessKey: String?,
 ) : StreamApi {
 
     companion object {
@@ -32,14 +32,16 @@ class BunnyStreamApi private constructor(
         @Volatile
         private var instance: StreamApi? = null
 
-        fun initialize(context: Context, accessKey: String, libraryId: Long) {
+        fun initialize(context: Context, accessKey: String?, libraryId: Long) {
             instance = BunnyStreamApi(
                 context.applicationContext,
                 accessKey,
             )
 
             this.libraryId = libraryId
-            ApiClient.apiKey["AccessKey"] = accessKey
+            accessKey?.let {
+                ApiClient.apiKey["AccessKey"] = it
+            }
         }
 
         fun getInstance(): StreamApi {
@@ -71,7 +73,13 @@ class BunnyStreamApi private constructor(
     private val tusVideoUploaderService = TusUploaderService(
         preferences = prefs,
         chunkSize = 1024,
-        accessKey = accessKey,
+        accessKey = accessKey ?: run {
+            /**
+             * AccessKey is required for TusUploaderService, if not provided fallback to
+             * BasicUploaderService which will be used instead.
+             */
+            throw IllegalStateException("AccessKey must be provided for TusUploaderService")
+        },
         dispatcher = Dispatchers.IO
     )
 

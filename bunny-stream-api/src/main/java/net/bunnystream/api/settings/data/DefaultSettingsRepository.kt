@@ -16,7 +16,8 @@ class DefaultSettingsRepository(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : SettingsRepository {
 
-    override suspend fun fetchSettings(libraryId: Long, videoId: String): Either<String, PlayerSettings> = withContext(coroutineDispatcher) {
+    override suspend fun fetchSettings(libraryId: Long, videoId: String):
+            Either<String, PlayerSettings> = withContext(coroutineDispatcher) {
         val endpoint = "${BunnyStreamApi.baseApi}/library/$libraryId/videos/$videoId/play"
 
         return@withContext try {

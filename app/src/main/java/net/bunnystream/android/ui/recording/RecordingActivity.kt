@@ -13,8 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import net.bunnystream.android.R
-import net.bunnystream.android.databinding.ActivityRecordingBinding
+import net.bunnystream.android.demo.R
+import net.bunnystream.android.demo.databinding.ActivityRecordingBinding
 
 class RecordingActivity : AppCompatActivity() {
 

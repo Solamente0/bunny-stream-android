@@ -18,7 +18,7 @@ implementation("net.bunnystream.bunny-stream-api:1.0.0")
 After installation, you'll need to configure the package with your Bunny credentials.
 
 ```kotlin
-// Initialize with your access key and library ID
+// Initialize with your access key (optional) and library ID
 BunnyStreamApi.initialize(context, accessKey, libraryId)
 ```
 
