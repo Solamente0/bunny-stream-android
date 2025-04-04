@@ -54,7 +54,7 @@ class BasicUploaderService(
                     requestTimeoutMillis = Duration.INFINITE.inWholeMilliseconds
                 }
                 onUpload { bytesSentTotal, contentLength ->
-                    val percentage = ((bytesSentTotal / contentLength.toFloat()) * 100).toInt()
+                    val percentage = ((bytesSentTotal / (contentLength?.toFloat() ?: 0f)) * 100).toInt()
                     if(percentage != uploadProcess) {
                         uploadProcess = percentage
                         listener.onProgressUpdated(percentage, videoId)

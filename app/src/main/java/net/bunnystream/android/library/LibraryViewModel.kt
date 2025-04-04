@@ -20,9 +20,9 @@ import net.bunnystream.android.library.model.LibraryUiState
 import net.bunnystream.android.library.model.Video
 import net.bunnystream.android.library.model.VideoStatus
 import net.bunnystream.android.library.model.VideoUploadUiState
-import net.bunnystream.androidsdk.BunnyStreamSdk
-import net.bunnystream.androidsdk.upload.model.UploadError
-import net.bunnystream.androidsdk.upload.service.UploadListener
+import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.UploadListener
 import org.openapitools.client.models.VideoModel
 import java.util.UUID
 import kotlin.time.DurationUnit
@@ -82,7 +82,7 @@ class LibraryViewModel : ViewModel() {
     }
 
     private val libraryId: Long
-        get() = BunnyStreamSdk.libraryId
+        get() = BunnyStreamApi.libraryId
 
     var useTusUpload by mutableStateOf(false)
         private set
@@ -95,7 +95,7 @@ class LibraryViewModel : ViewModel() {
     fun loadLibrary() {
         Log.d(TAG, "loadLibrary")
 
-        if(libraryId == -1L || !BunnyStreamSdk.isInitialized()) {
+        if(libraryId == -1L || !BunnyStreamApi.isInitialized()) {
             return
         }
 
@@ -103,7 +103,7 @@ class LibraryViewModel : ViewModel() {
 
         scope.launch {
             try {
-                val response = App.di.streamSdk.streamApi.videosApi.videoList(
+                val response = App.di.streamSdk.videosApi.videoList(
                     libraryId = libraryId,
                     page = null,
                     itemsPerPage = null,
@@ -163,9 +163,9 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "onDeleteVideo video=$video")
         scope.launch {
             try {
-                val result = App.di.streamSdk.streamApi.videosApi.videoDeleteVideo(libraryId, video.id)
+                val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
 
-                if(result.success) {
+                if(result.success == true) {
                     Log.d(TAG, "Video deleted")
 
                     loadedVideos -= video
@@ -194,7 +194,7 @@ class LibraryViewModel : ViewModel() {
         return Video(
             id = guid ?: UUID.randomUUID().toString(),
             name = title ?: "N/A",
-            duration = length.toDuration(DurationUnit.SECONDS).toString(),
+            duration = length?.toDuration(DurationUnit.SECONDS).toString(),
             status =  when(status?.value){
                 null -> VideoStatus.ERROR
                 0  -> VideoStatus.CREATED

@@ -60,7 +60,7 @@ Declare desired dependencies in your project's `build.gradle.kts`:
 After installation, you'll need to configure the package with your Bunny credentials. Initialization is common for all modules.
 
 ```kotlin
-// Initialize with your access key and library ID
+// Initialize with your access key (optional) and library ID
 BunnyStreamApi.initialize(context, accessKey, libraryId)
 ```
 
@@ -178,7 +178,7 @@ Checkout full [API reference](api/README.md#full-api-reference)
 
 ## 2. BunnyStreamPlayer - Video Playback
 
-Before attempting video playback, make sure `BunnyStreamApi` is initialized:
+Before attempting video playback, make sure `BunnyStreamApi` is initialized  with your access key (optional) and library ID:
 ```
 BunnyStreamApi.initialize(context, accessKey, libraryId)
 ```

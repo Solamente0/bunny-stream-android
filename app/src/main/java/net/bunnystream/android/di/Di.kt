@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import net.bunnystream.android.library.DefaultVideoUploadService
 import net.bunnystream.android.settings.LocalPrefs
-import net.bunnystream.androidsdk.BunnyStreamSdk
-import net.bunnystream.androidsdk.StreamSdk
+import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.StreamApi
 
 @SuppressLint("StaticFieldLeak")
 class Di(private val context: Context) {
@@ -14,10 +14,10 @@ class Di(private val context: Context) {
     val localPrefs = LocalPrefs(prefs)
 
     init {
-        BunnyStreamSdk.initialize(context, localPrefs.accessKey, localPrefs.libraryId)
+        BunnyStreamApi.initialize(context, localPrefs.accessKey, localPrefs.libraryId)
     }
 
-    var streamSdk: StreamSdk = BunnyStreamSdk.getInstance()
+    var streamSdk: StreamApi = BunnyStreamApi.getInstance()
         private set
 
     var videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
@@ -27,8 +27,8 @@ class Di(private val context: Context) {
     fun updateKeys(accessKey: String, libraryId: Long) {
         localPrefs.accessKey = accessKey
         localPrefs.libraryId = libraryId
-        BunnyStreamSdk.initialize(context, accessKey, libraryId)
-        streamSdk = BunnyStreamSdk.getInstance()
+        BunnyStreamApi.initialize(context, accessKey, libraryId)
+        streamSdk = BunnyStreamApi.getInstance()
         videoUploadService = DefaultVideoUploadService(streamSdk.videoUploader)
         tusVideoUploadService = DefaultVideoUploadService(streamSdk.tusVideoUploader)
     }

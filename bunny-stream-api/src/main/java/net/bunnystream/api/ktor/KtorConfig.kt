@@ -23,7 +23,7 @@ val defaultJson = Json {
     useAlternativeNames = true
 }
 
-fun initHttpClient(accessKey: String): HttpClient {
+fun initHttpClient(accessKey: String?): HttpClient {
 
     val client = HttpClient(OkHttp) {
 
@@ -56,7 +56,8 @@ fun initHttpClient(accessKey: String): HttpClient {
     }
 
     client.plugin(HttpSend).intercept { request ->
-        request.header("AccessKey", accessKey)
+        accessKey?.let { request.header("AccessKey", it) }
+
         execute(request)
     }
 

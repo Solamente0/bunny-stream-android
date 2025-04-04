@@ -7,6 +7,7 @@ plugins {
     id("org.openapi.generator")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
 }
 
 android {
@@ -50,42 +51,69 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14" // Replace with the correct version
     }
 }
 
 dependencies {
+    // AndroidX and Material
+    // https://developer.android.com/jetpack/androidx/releases/core
     implementation("androidx.core:core-ktx:1.15.0")
+    // https://developer.android.com/jetpack/androidx/releases/appcompat
     implementation("androidx.appcompat:appcompat:1.7.0")
+    // https://github.com/material-components/material-components-android
     implementation("com.google.android.material:material:1.12.0")
+
+    // Testing dependencies
+    // https://junit.org/junit4/
     testImplementation("junit:junit:4.13.2")
+    // https://developer.android.com/jetpack/androidx/releases/test
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // https://developer.android.com/jetpack/androidx/releases/test#espresso
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
+    // OkHttp (BOM and related libraries)
+    // https://square.github.io/okhttp/
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
 
-    implementation("com.squareup.moshi:moshi:1.15.1")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+    // Moshi
+    // https://github.com/square/moshi
+    implementation("com.squareup.moshi:moshi:1.15.2")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 
+    // Android Lifecycle
+    // https://developer.android.com/jetpack/androidx/releases/lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
-    implementation("com.google.code.gson:gson:2.11.0")
+    // Gson
+    // https://github.com/google/gson
+    implementation("com.google.code.gson:gson:2.12.1")
 
-    implementation("io.ktor:ktor-client-okhttp:2.3.2")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
-    implementation("io.ktor:ktor-client-logging-jvm:2.3.12")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    // Ktor
+    // https://ktor.io
+    implementation("io.ktor:ktor-client-okhttp:3.1.2")
+    implementation("io.ktor:ktor-client-content-negotiation:3.1.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.2")
+    implementation("io.ktor:ktor-client-logging-jvm:3.1.2")
 
-    implementation("io.arrow-kt:arrow-core:1.2.0")
+    // Arrow
+    // https://arrow-kt.io
+    implementation("io.arrow-kt:arrow-core:2.0.1")
 
+    // Tus client libraries (update to newer patch versions if available)
+    // https://github.com/tus/tus-java-client
     implementation("io.tus.java.client:tus-java-client:0.5.0")
+    // https://github.com/tus/tus-android-client
     implementation("io.tus.android.client:tus-android-client:0.1.11")
 }
 
@@ -129,7 +157,6 @@ tasks.register("openApiGenerateAll") {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn(
-        // "downloadLatestOpenApiSpecs",
         "openApiGenerateAll",
         "copyGeneratedDocs"
     )
@@ -140,12 +167,6 @@ tasks.withType<DokkaTaskPartial> {
         "openApiGenerateAll",
         "copyGeneratedDocs"
     )
-}
-
-tasks.register("downloadLatestOpenApiSpecs") {
-    val openApiSpecsUrl = "https://docs.bunny.net/openapi/6054a6cc63d1a0001e3d22fc"
-    val destinationFile = project.file("openapi/").resolve("StreamApi.json")
-    ant.invokeMethod("get", mapOf("src" to openApiSpecsUrl, "dest" to destinationFile))
 }
 
 tasks.register<Copy>("copyGeneratedDocs") {

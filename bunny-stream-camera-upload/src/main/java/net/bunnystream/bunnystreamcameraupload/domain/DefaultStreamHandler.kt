@@ -1,5 +1,6 @@
 package net.bunnystream.bunnystreamcameraupload.domain
 
+import android.content.Context
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import net.bunnystream.bunnystreamcameraupload.DeviceCamera
 import net.bunnystream.bunnystreamcameraupload.RecordingDurationListener
 import net.bunnystream.bunnystreamcameraupload.RecordingStateListener
+import net.bunnystream.bunnystreamcameraupload.util.ScreenUtil
 
 class DefaultStreamHandler(
     private val streamRepository: RecordingRepository,
@@ -36,6 +38,8 @@ class DefaultStreamHandler(
 
     private lateinit var camera: GenericCamera1
 
+    private lateinit var openGlView: OpenGlView
+
     private val scope = CoroutineScope(coroutineDispatcher)
 
     private var timerJob: Job? = null
@@ -43,6 +47,14 @@ class DefaultStreamHandler(
     private var recordingStartTime: Long? = null
 
     private var cameraFacing = Facing.BACK
+
+    val width = 1280
+    val height = 720
+    val vBitrate = 2500 * 1024
+    val fps = 30
+    private val sampleRate = 32000
+    private val isStereo = true
+    private val aBitrate = 128 * 1000
 
     private val connectChecker: ConnectChecker = object : ConnectChecker {
         override fun onAuthError() {
@@ -99,11 +111,15 @@ class DefaultStreamHandler(
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            if (!camera.isStreaming) {
+                prepare()
+            }
             camera.startPreview(cameraFacing)
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             if (camera.isStreaming) {
+                ScreenUtil.unlockScreenOrientation(openGlView)
                 camera.stopStream()
             }
             camera.stopPreview()
@@ -111,7 +127,7 @@ class DefaultStreamHandler(
     }
 
     override fun initialize(container: ViewGroup, deviceCamera: DeviceCamera) {
-        val openGlView = OpenGlView(container.context)
+        openGlView = OpenGlView(container.context)
         val lp = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -124,35 +140,40 @@ class DefaultStreamHandler(
         Log.d(TAG, "initialize, surface.isValid: ${openGlView.holder.surface.isValid}")
         openGlView.holder.addCallback(surfaceCallback)
 
-        cameraFacing = when(deviceCamera) {
+        cameraFacing = when (deviceCamera) {
             DeviceCamera.FRONT -> Facing.FRONT
             DeviceCamera.BACK -> Facing.BACK
         }
 
-        if(openGlView.holder.surface.isValid) {
+        if (openGlView.holder.surface.isValid) {
             camera.startPreview(cameraFacing)
         }
+
+        camera.streamClient
     }
 
-    override fun startStreaming(libraryId: Long, videoId: String?){
+    override fun startStreaming(libraryId: Long, videoId: String?) {
         recordingStateListener?.onStreamInitializing()
         scope.launch {
 
-            if(videoId != null) {
-                if (camera.isRecording || camera.prepareAudio() && camera.prepareVideo()) {
+            if (videoId != null) {
+                if (camera.isRecording || prepare()) {
+                    ScreenUtil.lockCurrentOrientation(openGlView)
                     camera.startStream(videoId)
                 }
             } else {
                 val result = streamRepository.prepareRecording(libraryId)
 
-                when(result) {
+                when (result) {
                     is Either.Left -> {
                         MainScope().launch {
                             recordingStateListener?.onStreamConnectionFailed(result.value)
                         }
                     }
+
                     is Either.Right -> {
-                        if (camera.isRecording || camera.prepareAudio() && camera.prepareVideo()) {
+                        if (camera.isRecording || prepare()) {
+                            ScreenUtil.lockCurrentOrientation(openGlView)
                             camera.startStream(result.value)
                         }
                     }
@@ -161,7 +182,8 @@ class DefaultStreamHandler(
         }
     }
 
-    override fun stopStreaming(){
+    override fun stopStreaming() {
+        ScreenUtil.unlockScreenOrientation(openGlView)
         camera.stopStream()
         recordingStateListener?.onStreamStopped()
     }
@@ -172,11 +194,12 @@ class DefaultStreamHandler(
 
     override fun selectCamera(deviceCamera: DeviceCamera) {
         Log.d(TAG, "selectCamera: $deviceCamera")
-        when(deviceCamera) {
+        when (deviceCamera) {
             DeviceCamera.BACK -> {
                 camera.switchCamera(Facing.BACK.ordinal)
                 recordingStateListener?.onCameraChanged(DeviceCamera.BACK)
             }
+
             DeviceCamera.FRONT -> {
                 camera.switchCamera(Facing.FRONT.ordinal)
                 recordingStateListener?.onCameraChanged(DeviceCamera.FRONT)
@@ -186,11 +209,26 @@ class DefaultStreamHandler(
 
     override fun switchCamera() {
         camera.switchCamera()
-        when(camera.cameraFacing){
+        when (camera.cameraFacing) {
             Facing.FRONT -> recordingStateListener?.onCameraChanged(DeviceCamera.FRONT)
             Facing.BACK -> recordingStateListener?.onCameraChanged(DeviceCamera.BACK)
-            else -> { /* no-op */ }
+            else -> { /* no-op */
+            }
         }
+    }
+
+    private fun prepare(): Boolean {
+        val rotation = getRotation()
+        val prepared = try {
+            camera.prepareVideo(width, height, fps, vBitrate, rotation)
+                    && camera.prepareAudio(sampleRate, aBitrate, isStereo)
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+        if (!prepared) {
+            Log.e(TAG, "Audio or Video configuration failed")
+        }
+        return prepared
     }
 
     override fun isMuted(): Boolean {
@@ -198,7 +236,7 @@ class DefaultStreamHandler(
     }
 
     override fun setMuted(muted: Boolean) {
-        if(muted) {
+        if (muted) {
             camera.disableAudio()
             recordingStateListener?.onAudioMuted(true)
         } else {
@@ -207,15 +245,37 @@ class DefaultStreamHandler(
         }
     }
 
-    private fun startTimer(){
+    private fun startTimer() {
         timerJob = MainScope().launch {
             while (isActive) {
                 recordingStartTime?.let {
                     val duration = System.currentTimeMillis() - it
-                    recordingDurationListener?.onDurationUpdated(duration, duration.toFormattedDuration())
+                    recordingDurationListener?.onDurationUpdated(
+                        duration,
+                        duration.toFormattedDuration()
+                    )
                     delay(1000)
                 }
             }
+        }
+    }
+
+    private fun getRotation(): Int {
+        val context = openGlView.context
+        val windowManager =
+            context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager
+        val displayRotation = windowManager.defaultDisplay.rotation
+        val orientation = context.resources.configuration.orientation
+
+        Log.d(TAG, "updatePreviewOrientation: rotation=$displayRotation, orientation=$orientation")
+
+        // Set the preview orientation based on the device rotation
+        return when (displayRotation) {
+            android.view.Surface.ROTATION_0 -> 90
+            android.view.Surface.ROTATION_90 -> 0
+            android.view.Surface.ROTATION_180 -> 90
+            android.view.Surface.ROTATION_270 -> 0
+            else -> 90
         }
     }
 }

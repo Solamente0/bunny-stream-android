@@ -420,7 +420,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         val audioTrackOptions = bunnyPlayer?.getAudioTrackOptions()
         val audioTracksMenuId = View.generateViewId()
 
-        if(audioTrackOptions != null) {
+        if(audioTrackOptions != null && audioTrackOptions.options.size > 1) {
             val qualityOptionsMenu = popupMenu.menu.addSubMenu(
                 Menu.NONE,
                 audioTracksMenuId,

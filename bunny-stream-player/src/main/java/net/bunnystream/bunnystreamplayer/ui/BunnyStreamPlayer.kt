@@ -22,6 +22,7 @@ import net.bunnystream.bunnystreamplayer.model.PlayerIconSet
 import net.bunnystream.bunnystreamplayer.model.getSanitizedRetentionData
 import net.bunnystream.bunnystreamplayer.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.bunnystreamplayer.ui.widget.BunnyPlayerView
+import net.bunnystream.player.R
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import org.openapitools.client.models.VideoModel
 
@@ -168,6 +169,12 @@ class BunnyStreamPlayer @JvmOverloads constructor(
     }
 
     private suspend fun initializeVideo(video: VideoModel, playerSettings: PlayerSettings){
+        if(playerSettings.drmEnabled){
+            Log.e(TAG, "DRM is enabled for this video, " +
+                    "BunnyStreamPlayer does not support DRM protected content.")
+            playerView.showError(context.getString(R.string.label_drm_not_supported_exception))
+            return
+        }
         playerView.showPreviewThumbnail(playerSettings.thumbnailUrl)
 
         var retentionData: Map<Int, Int> = mutableMapOf()

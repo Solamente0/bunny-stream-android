@@ -2,9 +2,9 @@ package net.bunnystream.android.library
 
 import android.net.Uri
 import android.util.Log
-import net.bunnystream.androidsdk.upload.VideoUploader
-import net.bunnystream.androidsdk.upload.model.UploadError
-import net.bunnystream.androidsdk.upload.service.UploadListener
+import net.bunnystream.api.upload.VideoUploader
+import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.UploadListener
 
 class DefaultVideoUploadService(
     private val videoUploader: VideoUploader

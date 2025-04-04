@@ -21,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import net.bunnystream.android.R
+import net.bunnystream.android.demo.R
 import net.bunnystream.android.ui.AppState
 import net.bunnystream.android.ui.theme.BunnyStreamTheme
-import net.bunnystream.player.ui.BunnyVideoPlayer
+import net.bunnystream.bunnystreamplayer.ui.BunnyStreamPlayer
 
 @Composable
 fun PlayerRoute(
@@ -50,7 +50,7 @@ private fun PlayerScreen(
         topBar = {
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
@@ -92,7 +92,7 @@ fun BunnyPlayerComposable(
 ) {
     AndroidView(
         factory = { context ->
-            BunnyVideoPlayer(context)
+            BunnyStreamPlayer(context)
         },
         update = {
             it.playVideo(videoId)

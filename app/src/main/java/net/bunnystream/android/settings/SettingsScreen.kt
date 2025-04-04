@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import net.bunnystream.android.R
+import net.bunnystream.android.demo.R
 import net.bunnystream.android.ui.AppState
 import net.bunnystream.android.ui.theme.BunnyStreamTheme
 
@@ -72,7 +72,7 @@ private fun SettingsScreen(
         topBar = {
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
@@ -84,7 +84,7 @@ private fun SettingsScreen(
                             onClick = onBackClicked
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null
                             )
                         }
