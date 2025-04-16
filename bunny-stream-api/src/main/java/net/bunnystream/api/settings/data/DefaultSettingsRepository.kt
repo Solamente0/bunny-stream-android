@@ -21,11 +21,20 @@ class DefaultSettingsRepository(
         val endpoint = "${BunnyStreamApi.baseApi}/library/$libraryId/videos/$videoId/play"
 
         return@withContext try {
-            val result: PlayerSettingsResponse = httpClient.get(endpoint).body()
-            Either.Right(result.toModel())
+            val response = httpClient.get(endpoint)
+            when (response.status.value) {
+                200 -> {
+                    val result: PlayerSettingsResponse = response.body()
+                    Either.Right(result.toModel())
+                }
+                401 -> Either.Left("Authorization required Unauthorized")
+                403 -> Either.Left("Forbidden")
+                404 -> Either.Left("Not Found")
+                else -> Either.Left("Error: ${response.status.value}")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            Either.Left("")
+            Either.Left("Unknown exception: ${e.message}")
         }
     }
 }
