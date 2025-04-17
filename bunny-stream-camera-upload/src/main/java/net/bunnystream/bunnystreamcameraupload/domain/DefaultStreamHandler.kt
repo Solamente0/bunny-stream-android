@@ -48,13 +48,16 @@ class DefaultStreamHandler(
 
     private var cameraFacing = Facing.BACK
 
-    val width = 1280
-    val height = 720
-    val vBitrate = 2500 * 1024
-    val fps = 30
-    private val sampleRate = 32000
+    private val width = 1920
+    private val height = 1080
+    private val fps = 30
+    private val motionFactor = 0.15
+    private val vBitrate = (width * height * fps * motionFactor).toInt()
+    private val sampleRate = 44100
     private val isStereo = true
-    private val aBitrate = 128 * 1000
+    private val channels = if (isStereo) 2 else 1
+    val bitratePerSample = 2.9
+    private val aBitrate = (sampleRate * channels * bitratePerSample).toInt()
 
     private val connectChecker: ConnectChecker = object : ConnectChecker {
         override fun onAuthError() {

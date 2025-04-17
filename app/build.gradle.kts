@@ -23,6 +23,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("develop") {
+            storeFile = file("keystore/develop.keystore")
+            storePassword = "android"
+            keyAlias = "android"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,11 +42,11 @@ android {
         }
 
         getByName("debug") {
-
+            signingConfig = signingConfigs.getByName("develop")
         }
 
         create("staging") {
-            initWith(getByName("debug"))
+            signingConfig = signingConfigs.getByName("develop")
         }
     }
     compileOptions {

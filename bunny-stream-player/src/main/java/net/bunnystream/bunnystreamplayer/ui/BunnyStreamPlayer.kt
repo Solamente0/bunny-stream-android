@@ -145,7 +145,26 @@ class BunnyStreamPlayer @JvmOverloads constructor(
                 val settings = BunnyStreamApi.getInstance().fetchPlayerSettings(BunnyStreamApi.libraryId, videoId)
 
                 settings.fold(
-                    ifLeft = { playerView.showError(it) },
+                    ifLeft = {
+                        initializeVideo(video, PlayerSettings(
+                            thumbnailUrl = "",
+                            controls = "",
+                            keyColor = 0,
+                            captionsFontSize = 0,
+                            captionsFontColor = null,
+                            captionsBackgroundColor = null,
+                            uiLanguage = "",
+                            showHeatmap = false,
+                            fontFamily = "",
+                            playbackSpeeds = emptyList(),
+                            drmEnabled = false,
+                            vastTagUrl = null,
+                            videoUrl = "",
+                            seekPath = "",
+                            captionsPath = ""
+                        ))
+                        playerView.showError(it)
+                             },
                     ifRight = { initializeVideo(video, it) }
                 )
             }
