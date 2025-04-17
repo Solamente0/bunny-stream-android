@@ -1,4 +1,4 @@
-package net.bunnystream.android.demo.ui.recording
+package net.bunnystream.android.demo.recording
 
 import android.Manifest
 import android.content.Intent

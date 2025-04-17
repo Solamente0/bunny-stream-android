@@ -6,15 +6,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import net.bunnystream.android.demo.library.model.Video
 import net.bunnystream.android.demo.ui.AppState
 import java.net.URLEncoder
 
 const val PLAYER_ROUTE = "player"
 const val VIDEO_ID = "videoId"
 
-fun NavController.navigateToPlayer(video: Video, navOptions: NavOptions? = null) {
-    val encodedVideoId = URLEncoder.encode(video.id, "UTF-8")
+fun NavController.navigateToPlayer(videoId: String, navOptions: NavOptions? = null) {
+    val encodedVideoId = URLEncoder.encode(videoId, "UTF-8")
     this.navigate("$PLAYER_ROUTE/$encodedVideoId", navOptions)
 }
 

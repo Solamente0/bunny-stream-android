@@ -55,9 +55,7 @@ class DefaultStreamHandler(
     private val vBitrate = (width * height * fps * motionFactor).toInt()
     private val sampleRate = 44100
     private val isStereo = true
-    private val channels = if (isStereo) 2 else 1
-    val bitratePerSample = 2.9
-    private val aBitrate = (sampleRate * channels * bitratePerSample).toInt()
+    private val aBitrate = 64 * 1024
 
     private val connectChecker: ConnectChecker = object : ConnectChecker {
         override fun onAuthError() {

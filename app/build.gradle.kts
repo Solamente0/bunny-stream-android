@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
+    id("kotlin-parcelize")
 }
 
 android {
@@ -14,8 +15,8 @@ android {
         applicationId = "net.bunnystream.android.demo"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -138,8 +139,13 @@ dependencies {
     // Coil for Compose Image Loading
     // https://coil-kt.github.io/coil/compose/
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 
     // Accompanist Swipe Refresh
     // https://central.sonatype.com/artifact/com.google.accompanist/accompanist-swiperefresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.36.0")
+
+    // Functional Programming (Arrow)
+    // https://arrow-kt.io
+    implementation("io.arrow-kt:arrow-core:2.0.1")
 }
