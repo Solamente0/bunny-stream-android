@@ -28,6 +28,7 @@ import net.bunnystream.bunnystreamplayer.model.RetentionGraphEntry
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
+import androidx.core.graphics.createBitmap
 
 @UnstableApi
 class BunnyTimeBar @JvmOverloads constructor(
@@ -795,7 +796,7 @@ class BunnyTimeBar @JvmOverloads constructor(
     }
 
     private fun createGradientBitmap(height: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(1, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(1, height)
         val canvas = Canvas(bitmap)
 
         val gradient = LinearGradient(
