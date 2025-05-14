@@ -22,9 +22,9 @@ import net.bunnystream.bunnystreamplayer.model.PlayerIconSet
 import net.bunnystream.bunnystreamplayer.model.getSanitizedRetentionData
 import net.bunnystream.bunnystreamplayer.ui.fullscreen.FullScreenPlayerActivity
 import net.bunnystream.bunnystreamplayer.ui.widget.BunnyPlayerView
-import net.bunnystream.player.R
 import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import org.openapitools.client.models.VideoModel
+import org.openapitools.client.models.VideoPlayDataModelVideo
 
 class BunnyStreamPlayer @JvmOverloads constructor(
     context: Context,
@@ -57,7 +57,7 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
     private val lifecycleObserver = object : DefaultLifecycleObserver {
         override fun onResume(owner: LifecycleOwner) {
-            if(bunnyPlayer.autoPaused) {
+            if (bunnyPlayer.autoPaused) {
                 bunnyPlayer.play()
             }
         }
@@ -114,11 +114,16 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         bunnyPlayer.stop()
     }
 
-    override fun playVideo(videoId: String) {
+    override fun playVideo(videoId: String, libraryId: Long?) {
         Log.d(TAG, "playVideo videoId=$videoId")
 
-        if(!BunnyStreamApi.isInitialized()) {
-            Log.e(TAG, "Unable to play video, initialize the player first using BunnyStreamSdk.initialize")
+        val providedLibraryId = libraryId ?: BunnyStreamApi.libraryId
+
+        if (!BunnyStreamApi.isInitialized()) {
+            Log.e(
+                TAG,
+                "Unable to play video, initialize the player first using BunnyStreamSdk.initialize"
+            )
             return
         }
 
@@ -131,10 +136,10 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
                 try {
                     video = withContext(Dispatchers.IO) {
-                        BunnyStreamApi.getInstance().videosApi.videoGetVideo(
-                            BunnyStreamApi.libraryId,
+                       BunnyStreamApi.getInstance().videosApi.videoGetVideoPlayData(
+                            providedLibraryId,
                             videoId
-                        )
+                        ).video?.toVideoModel()!!
                     }
                     Log.d(TAG, "video=$video")
                 } catch (e: Exception) {
@@ -142,35 +147,38 @@ class BunnyStreamPlayer @JvmOverloads constructor(
                     return@launch
                 }
 
-                val settings = BunnyStreamApi.getInstance().fetchPlayerSettings(BunnyStreamApi.libraryId, videoId)
+                val settings = BunnyStreamApi.getInstance()
+                    .fetchPlayerSettings(providedLibraryId, videoId)
 
                 settings.fold(
                     ifLeft = {
-                        initializeVideo(video, PlayerSettings(
-                            thumbnailUrl = "",
-                            controls = "",
-                            keyColor = 0,
-                            captionsFontSize = 0,
-                            captionsFontColor = null,
-                            captionsBackgroundColor = null,
-                            uiLanguage = "",
-                            showHeatmap = false,
-                            fontFamily = "",
-                            playbackSpeeds = emptyList(),
-                            drmEnabled = false,
-                            vastTagUrl = null,
-                            videoUrl = "",
-                            seekPath = "",
-                            captionsPath = ""
-                        ))
+                        initializeVideo(
+                            video, PlayerSettings(
+                                thumbnailUrl = "",
+                                controls = "",
+                                keyColor = 0,
+                                captionsFontSize = 0,
+                                captionsFontColor = null,
+                                captionsBackgroundColor = null,
+                                uiLanguage = "",
+                                showHeatmap = false,
+                                fontFamily = "",
+                                playbackSpeeds = emptyList(),
+                                drmEnabled = false,
+                                vastTagUrl = null,
+                                videoUrl = "",
+                                seekPath = "",
+                                captionsPath = ""
+                            )
+                        )
                         playerView.showError(it)
-                             },
+                    },
                     ifRight = { initializeVideo(video, it) }
                 )
             }
         }
 
-        if(scope == null) {
+        if (scope == null) {
             Log.d(TAG, "scope not created yet")
             return
         }
@@ -187,22 +195,16 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         bunnyPlayer.play()
     }
 
-    private suspend fun initializeVideo(video: VideoModel, playerSettings: PlayerSettings){
-        if(playerSettings.drmEnabled){
-            Log.e(TAG, "DRM is enabled for this video, " +
-                    "BunnyStreamPlayer does not support DRM protected content.")
-            playerView.showError(context.getString(R.string.label_drm_not_supported_exception))
-            return
-        }
+    private suspend fun initializeVideo(video: VideoModel, playerSettings: PlayerSettings) {
         playerView.showPreviewThumbnail(playerSettings.thumbnailUrl)
 
         var retentionData: Map<Int, Int> = mutableMapOf()
 
-        if(playerSettings.showHeatmap) {
+        if (playerSettings.showHeatmap) {
             try {
                 val retentionDataResponse = withContext(Dispatchers.IO) {
                     BunnyStreamApi.getInstance().videosApi.videoGetVideoHeatmap(
-                        BunnyStreamApi.libraryId,
+                        video.videoLibraryId!!,
                         video.guid!!
                     )
                 }
@@ -215,4 +217,35 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         bunnyPlayer.playVideo(binding.playerView, video, retentionData, playerSettings)
         playerView.bunnyPlayer = bunnyPlayer
     }
+
+    fun VideoPlayDataModelVideo.toVideoModel(): VideoModel = VideoModel(
+        videoLibraryId        = this.videoLibraryId,
+        guid                  = this.guid,
+        title                 = this.title,
+        dateUploaded          = this.dateUploaded,
+        views                 = this.views,
+        isPublic              = this.isPublic,
+        length                = this.length,
+        status                = this.status,
+        framerate             = this.framerate,
+        rotation              = this.rotation,
+        width                 = this.width,
+        height                = this.height,
+        availableResolutions  = this.availableResolutions,
+        outputCodecs          = this.outputCodecs,
+        thumbnailCount        = this.thumbnailCount,
+        encodeProgress        = this.encodeProgress,
+        storageSize           = this.storageSize,
+        captions               = this.captions,
+        hasMP4Fallback        = this.hasMP4Fallback,
+        collectionId          = this.collectionId,
+        thumbnailFileName     = this.thumbnailFileName,
+        averageWatchTime      = this.averageWatchTime,
+        totalWatchTime        = this.totalWatchTime,
+        category              = this.category,
+        chapters              = this.chapters,
+        moments               = this.moments,
+        metaTags              = this.metaTags,
+        transcodingMessages   = this.transcodingMessages
+    )
 }

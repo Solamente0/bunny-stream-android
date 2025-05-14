@@ -75,7 +75,7 @@ fun HomeScreenRoute(
     navigateToVideoList: () -> Unit,
     navigateToUpload: () -> Unit,
     navigateToStreaming: () -> Unit,
-    navigateToPlayer: (String) -> Unit,
+    navigateToPlayer: (String, Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -106,9 +106,9 @@ fun HomeScreenRoute(
                 }
             }
         },
-        onPlayDirect = { videoId ->
+        onPlayDirect = { videoId, libraryId ->
             showDialog = false
-            navigateToPlayer(videoId) // fire the navigation
+            navigateToPlayer(videoId, libraryId.toLong()) // fire the navigation
         },
         onDismiss = {
             showDialog = false
@@ -122,7 +122,7 @@ fun HomeScreenContent(
     modifier: Modifier,
     showDialog: Boolean = false,
     onOptionClick: (HomeOption) -> Unit,
-    onPlayDirect: (String) -> Unit,
+    onPlayDirect: (String, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     Scaffold(
@@ -148,8 +148,8 @@ fun HomeScreenContent(
         if (showDialog) {
             EnterVideoIdDialog(
                 initialValue = "",
-                onPlay = { videoId ->
-                    onPlayDirect(videoId)     // fire the navigation/callback
+                onPlay = { videoId, libraryId ->
+                    onPlayDirect(videoId, libraryId)     // fire the navigation/callback
                 },
                 onDismiss = {
                     onDismiss()
@@ -255,10 +255,11 @@ fun OptionsCategory(title: String) {
 @Composable
 private fun EnterVideoIdDialog(
     initialValue: String = "",
-    onPlay: (String) -> Unit,
+    onPlay: (String, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var videoId by remember { mutableStateOf(initialValue) }
+    var libraryId by remember { mutableStateOf(initialValue) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -284,11 +285,25 @@ private fun EnterVideoIdDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Please enter the Library ID of the video you want to play",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = libraryId,
+                    onValueChange = { libraryId = it },
+                    placeholder = { Text("Video Library ID") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onPlay(videoId) }
+                onClick = { onPlay(videoId, libraryId) }
             ) {
                 Text("Play", color = MaterialTheme.colorScheme.primary)
             }
@@ -311,7 +326,8 @@ fun OptionsScreenPreview() {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
             onOptionClick = {},
-            onPlayDirect = {},
+            onPlayDirect = { videoId, libraryId ->
+            },
             onDismiss = { },
         )
     }

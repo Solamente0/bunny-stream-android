@@ -15,6 +15,7 @@ import net.bunnystream.android.demo.library.model.Video
 import net.bunnystream.android.demo.library.model.VideoStatus
 import net.bunnystream.api.BunnyStreamApi
 import org.openapitools.client.models.VideoModel
+import org.openapitools.client.models.VideoPlayDataModelVideo
 import java.util.UUID
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -41,8 +42,10 @@ class PlayerViewModel : ViewModel() {
         Log.d(TAG, "<init> $this")
     }
 
-    fun loadVideo(videoId: String) {
+    fun loadVideo(videoId: String, libraryId: Long?) {
         Log.d(TAG, "loadVideo videoId=$videoId")
+
+        val providedLibraryId = libraryId ?: BunnyStreamApi.libraryId
 
         if (libraryId == -1L || !BunnyStreamApi.isInitialized()) {
             return
@@ -53,11 +56,14 @@ class PlayerViewModel : ViewModel() {
         scope.launch {
             try {
                 val response =
-                    BunnyStreamApi.getInstance().videosApi.videoGetVideo(libraryId, videoId)
+                    BunnyStreamApi.getInstance().videosApi.videoGetVideoPlayData(
+                        providedLibraryId,
+                        videoId
+                    ).video?.toVideoModel()!!
                 val video = response.toVideo()
                 mutableUiState.value = VideoUiState.VideoUiLoaded(video)
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading video: ${e.message}")
+                 Log.e(TAG, "Error loading video: ${e.message}")
                 e.printStackTrace()
                 mutableErrorState.emit(Error("Error loading video: ${e.message}"))
                 mutableUiState.value = VideoUiState.VideoUiEmpty
@@ -90,6 +96,37 @@ class PlayerViewModel : ViewModel() {
             viewCount = views?.toString() ?: "N/A",
         )
     }
+
+    fun VideoPlayDataModelVideo.toVideoModel(): VideoModel = VideoModel(
+        videoLibraryId        = this.videoLibraryId,
+        guid                  = this.guid,
+        title                 = this.title,
+        dateUploaded          = this.dateUploaded,
+        views                 = this.views,
+        isPublic              = this.isPublic,
+        length                = this.length,
+        status                = this.status,
+        framerate             = this.framerate,
+        rotation              = this.rotation,
+        width                 = this.width,
+        height                = this.height,
+        availableResolutions  = this.availableResolutions,
+        outputCodecs          = this.outputCodecs,
+        thumbnailCount        = this.thumbnailCount,
+        encodeProgress        = this.encodeProgress,
+        storageSize           = this.storageSize,
+        captions               = this.captions,
+        hasMP4Fallback        = this.hasMP4Fallback,
+        collectionId          = this.collectionId,
+        thumbnailFileName     = this.thumbnailFileName,
+        averageWatchTime      = this.averageWatchTime,
+        totalWatchTime        = this.totalWatchTime,
+        category              = this.category,
+        chapters              = this.chapters,
+        moments               = this.moments,
+        metaTags              = this.metaTags,
+        transcodingMessages   = this.transcodingMessages
+    )
 
     private val Long?.inMb: Double?
         get() = this?.div(1024.0 * 1024.0)

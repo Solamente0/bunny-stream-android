@@ -22,7 +22,7 @@ fun NavGraphBuilder.homeScreen(
     navigateToVideoList: () -> Unit,
     navigateToUpload: () -> Unit,
     navigateToStreaming: () -> Unit,
-    navigateToPlayer: (String) -> Unit,
+    navigateToPlayer: (String, Long) -> Unit,
 ) {
     composable(
         route = HOME_ROUTE,

@@ -265,8 +265,6 @@ paths:
           description: The requested video was not found.
         '500':
           description: Internal Server Error.
-      security:
-        - AccessKey: []
     post:
       tags:
         - Manage Videos

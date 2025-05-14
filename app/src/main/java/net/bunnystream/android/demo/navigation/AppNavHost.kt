@@ -43,7 +43,7 @@ fun AppNavHost(
         libraryScreen(
             appState = appState,
             navigateToSettings = navController::navigateToSettings,
-            navigateToPlayer = navController::navigateToPlayer,
+            navigateToPlayer = { navController.navigateToPlayer(it, null) },
         )
         settingsScreen(appState = appState)
         playerScreen(appState = appState)

@@ -14,7 +14,7 @@ interface BunnyPlayer {
      *
      * @param videoId Video ID
      */
-    fun playVideo(videoId: String)
+    fun playVideo(videoId: String, libraryId: Long?)
 
     /**
      * Pauses video

@@ -111,21 +111,21 @@ private fun SettingsScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                value = accessKey,
-                onValueChange = onAccessKeyUpdated,
+                value = libraryId,
+                onValueChange = onLibraryIdUpdated,
+                label = { Text(stringResource(id = R.string.hint_library_id)) },
                 singleLine = true,
-                label = { Text(stringResource(id = R.string.hint_access_key)) }
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
             OutlinedTextField(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                value = libraryId,
-                onValueChange = onLibraryIdUpdated,
-                label = { Text(stringResource(id = R.string.hint_library_id)) },
+                value = accessKey,
+                onValueChange = onAccessKeyUpdated,
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text(stringResource(id = R.string.hint_access_key)) }
             )
 
             Button(

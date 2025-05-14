@@ -51,6 +51,7 @@ import java.util.Locale
 fun PlayerRoute(
     appState: AppState,
     videoId: String,
+    libraryId: Long?,
     modifier: Modifier = Modifier,
     viewModel: PlayerViewModel = viewModel(),
 ) {
@@ -59,11 +60,12 @@ fun PlayerRoute(
     PlayerScreen(
         modifier = modifier,
         videoId = videoId,
+        libraryId = libraryId,
         uiState,
         onBackClicked = { appState.navController.popBackStack() },
     )
 
-    LaunchedEffect(key1 = "load", block = { viewModel.loadVideo(videoId) })
+    LaunchedEffect(key1 = "load", block = { viewModel.loadVideo(videoId, libraryId) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +73,7 @@ fun PlayerRoute(
 fun PlayerScreen(
     modifier: Modifier = Modifier,
     videoId: String,
+    libraryId: Long?,
     uiState: VideoUiState,
     onBackClicked: () -> Unit,
 ) {
@@ -103,6 +106,7 @@ fun PlayerScreen(
         ) {
             BunnyPlayerComposable(
                 videoId = videoId,
+                libraryId = libraryId,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
@@ -179,6 +183,7 @@ fun VideoPropertyItem(prop: VideoProperty) {
 @Composable
 fun BunnyPlayerComposable(
     videoId: String,
+    libraryId: Long?,
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
@@ -200,7 +205,7 @@ fun BunnyPlayerComposable(
                 BunnyStreamPlayer(context)
             },
             update = {
-                it.playVideo(videoId)
+                it.playVideo(videoId, libraryId)
             },
             modifier = modifier.background(Color.Gray)
         )
@@ -213,6 +218,7 @@ private fun PlayerScreenPreview() {
     BunnyStreamTheme {
         PlayerScreen(
             videoId = "12345",
+            libraryId = null,
             uiState = VideoUiState.VideoUiLoaded(
                 Video(
                     id = "12345",
