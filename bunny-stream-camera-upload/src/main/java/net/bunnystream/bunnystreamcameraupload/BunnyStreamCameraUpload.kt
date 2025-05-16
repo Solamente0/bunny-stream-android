@@ -117,7 +117,7 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
 
         binding.startStop.setOnClickListener {
             if(!streamHandler.isStreaming()) {
-                streamHandler.startStreaming(libraryId, null)
+                streamHandler.startStreaming(libraryId)
             } else {
                 streamHandler.stopStreaming()
             }
@@ -153,10 +153,6 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
                     "android.permission.RECORD_AUDIO permissions"
             )
         }
-    }
-
-    override fun startRecording(videoId: String?){
-        streamHandler.startStreaming(libraryId, videoId)
     }
 
     override fun stopRecording(){
