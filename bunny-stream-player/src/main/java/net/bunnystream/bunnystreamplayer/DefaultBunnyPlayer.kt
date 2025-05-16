@@ -14,7 +14,10 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
+import androidx.media3.common.util.Util
 import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DataSpec
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -181,89 +184,138 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     override fun playVideo(
         playerView: PlayerView,
         video: VideoModel,
         retentionData: Map<Int, Int>,
         playerSettings: PlayerSettings
     ) {
-        Log.d(TAG, "loadVideo video=$video retentionData=$retentionData playerSettings=$playerSettings")
+        Log.d(TAG, "playVideo(video=$video, retentionData=$retentionData, playerSettings=$playerSettings)")
 
+        // Save for callbacks
         this.playerSettings = playerSettings
         currentVideo = video
 
+        // 1️⃣ IMA ads loader
         val imaLoader = ImaAdsLoader.Builder(context).build()
 
+        // 2️⃣ Build an HTTP factory that always sends your Referer
+        val httpFactory = DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+            .setDefaultRequestProperties(
+                mapOf(
+                    "Referer" to "https://iframe.mediadelivery.net"
+                    // If you need auth, add:
+                    // "Authorization" to "Bearer ${playerSettings.authToken}"
+                )
+            )
+            .setUserAgent(Util.getUserAgent(context, "BunnyStreamPlayer"))
+
+        // 3️⃣ Wrap it so we can also log every single request URI
+        val loggingDataSourceFactory = DataSource.Factory {
+            // Create the real HTTP DataSource with your headers already set
+            val real = httpFactory.createDataSource()
+            // Proxy / delegate every call except open()
+            object : DataSource by real {
+                override fun open(dataSpec: DataSpec): Long {
+                    // Log the outgoing request URI and headers
+                    Log.d(TAG, "HTTP ▶️ ${dataSpec.uri} headers=${dataSpec.httpRequestHeaders}")
+                    // Perform the real open()
+                    val length = real.open(dataSpec)
+                    // Now you can get the HTTP status code & response headers
+                    val httpDs = real as HttpDataSource
+                    Log.d(
+                        TAG,
+                        "HTTP ✅ ${dataSpec.uri} code=${httpDs.responseCode} headers=${httpDs.responseHeaders}"
+                    )  // HttpDataSource.responseCode / .responseHeaders  [oai_citation_attribution:0‡androidx.de](https://androidx.de/androidx/media3/datasource/HttpDataSource.html?utm_source=chatgpt.com)
+                    return length
+                }
+            }
+        }
+
+        // 4️⃣ MediaSourceFactory with ad insertion
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(dataSourceFactory)
+            .setDataSourceFactory(loggingDataSourceFactory)
             .setLocalAdInsertionComponents({ imaLoader }, playerView)
 
+        // 5️⃣ Build ExoPlayer
         trackSelector = DefaultTrackSelector(context, AdaptiveTrackSelection.Factory())
-
         localPlayer = ExoPlayer.Builder(context)
             .setTrackSelector(trackSelector!!)
             .setMediaSourceFactory(mediaSourceFactory)
-            .build().also {
-                it.addListener(playerListener)
-            }
-
+            .build().also { it.addListener(playerListener) }
         currentPlayer = localPlayer
         imaLoader.setPlayer(currentPlayer)
         serverSideAdLoader?.setPlayer(currentPlayer!!)
 
-        val drmLicenseUri = "${BunnyStreamApi.baseApi}/WidevineLicense/${BunnyStreamApi.libraryId}/${video.guid}?contentId=${video.guid}"
+        // 6️⃣ Build DRM license URI
+        val drmLicenseUri = "${BunnyStreamApi.baseApi}/WidevineLicense/" +
+                "${video.videoLibraryId}/${video.guid}?contentId=${video.guid}"
 
-        mediaItemBuilder = MediaItem.Builder()
+        // 7️⃣ Start building the MediaItem
+        val itemBuilder = MediaItem.Builder()
             .setUri(playerSettings.videoUrl)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
 
-        if(playerSettings.drmEnabled) {
-            mediaItemBuilder!!.setDrmConfiguration(drmConfig.setLicenseUri(drmLicenseUri).build())
+        // 8️⃣ Per-item DRM config if needed
+        if (playerSettings.drmEnabled) {
+            val licenseRequestHeaders = mapOf(
+                "Referer" to "https://iframe.mediadelivery.net"
+                // "Authorization" to "Bearer ${playerSettings.authToken}"
+            )
+            val drmConfig = MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                .setLicenseUri(drmLicenseUri)
+                .setMultiSession(true)
+                .setLicenseRequestHeaders(licenseRequestHeaders)
+                .build()
+            itemBuilder.setDrmConfiguration(drmConfig)
         }
 
-        val vastTagUri = playerSettings.vastTagUrl.toUri()
-
-        if(vastTagUri != null) {
-            mediaItemBuilder!!.setAdsConfiguration(MediaItem.AdsConfiguration.Builder(vastTagUri).build())
+        // 9️⃣ VAST ads
+        playerSettings.vastTagUrl.toUri()?.let { vastUri ->
+            itemBuilder.setAdsConfiguration(
+                MediaItem.AdsConfiguration.Builder(vastUri).build()
+            )
         }
 
-        val subtitles = video.captions?.map {
-            val subUri = Uri.parse("${playerSettings.captionsPath}${it.srclang}.vtt?ver=1")
-
+        // 🔟 Subtitles
+        val subtitleConfigs = video.captions?.map { cap ->
+            val subUri = Uri.parse("${playerSettings.captionsPath}${cap.srclang}.vtt?ver=1")
             MediaItem.SubtitleConfiguration.Builder(subUri)
                 .setMimeType(MimeTypes.TEXT_VTT)
-                .setLanguage(it.srclang)
+                .setLanguage(cap.srclang)
                 .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                 .build()
-        } ?: listOf()
+        } ?: emptyList()
+        itemBuilder.setSubtitleConfigurations(subtitleConfigs)
 
-        mediaItemBuilder!!.setSubtitleConfigurations(subtitles)
-
-        mediaItem = mediaItemBuilder!!.build()
-        currentPlayer?.setMediaItem(mediaItem!!)
-
+        // 1️⃣1️⃣ Finalize & prepare
+        mediaItem = itemBuilder.build()
+        currentPlayer!!.setMediaItem(mediaItem!!)
         selectSubtitleTrack(null)
+        currentPlayer!!.playWhenReady = true
+        currentPlayer!!.prepare()
 
-        currentPlayer?.playWhenReady = true
-        currentPlayer?.prepare()
-
+        // 1️⃣2️⃣ Seek thumbnails
         initSeekThumbnailPreview(video, playerSettings.seekPath)
 
+        // 1️⃣3️⃣ Moments & chapters
         moments = video.moments?.map {
             Moment(it.label, it.timestamp?.seconds?.inWholeMilliseconds ?: 0)
-        } ?: listOf()
-
+        } ?: emptyList()
         chapters = video.chapters?.map {
             Chapter(
                 it.start?.seconds?.inWholeMilliseconds ?: 0,
                 it.end?.seconds?.inWholeMilliseconds ?: 0,
                 it.title
             )
-        } ?: listOf()
+        } ?: emptyList()
 
-        if(playerSettings.showHeatmap) {
-            this.retentionData = retentionData.map {
-                RetentionGraphEntry(it.key, it.value)
+        // 1️⃣4️⃣ Retention data
+        if (playerSettings.showHeatmap) {
+            this.retentionData = retentionData.map { (ms, pct) ->
+                RetentionGraphEntry(ms, pct)
             }
         }
     }

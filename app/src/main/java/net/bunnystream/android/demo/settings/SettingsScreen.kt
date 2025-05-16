@@ -1,5 +1,6 @@
 package net.bunnystream.android.demo.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +42,12 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = viewModel(),
 ) {
     var accessKey by remember { mutableStateOf(viewModel.accessKey) }
-    var libraryId by remember { mutableStateOf(viewModel.libraryId.toString()) }
+    var libraryId by remember {
+        mutableStateOf(
+            if (viewModel.libraryId == -1L) ""
+            else viewModel.libraryId.toString()
+        )
+    }
 
     SettingsScreen(
         modifier = modifier,
@@ -73,8 +80,8 @@ private fun SettingsScreen(
             Surface(shadowElevation = 3.dp) {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     title = {
                         Text(stringResource(id = R.string.screen_settings))
@@ -85,6 +92,7 @@ private fun SettingsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 contentDescription = null
                             )
                         }
@@ -97,17 +105,8 @@ private fun SettingsScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
         ) {
-            OutlinedTextField(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                value = accessKey,
-                onValueChange = onAccessKeyUpdated,
-                label = { Text(stringResource(id = R.string.hint_access_key)) }
-            )
-
             OutlinedTextField(
                 modifier = modifier
                     .fillMaxWidth()
@@ -115,7 +114,18 @@ private fun SettingsScreen(
                 value = libraryId,
                 onValueChange = onLibraryIdUpdated,
                 label = { Text(stringResource(id = R.string.hint_library_id)) },
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                value = accessKey,
+                onValueChange = onAccessKeyUpdated,
+                singleLine = true,
+                label = { Text(stringResource(id = R.string.hint_access_key)) }
             )
 
             Button(
@@ -123,8 +133,12 @@ private fun SettingsScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 onClick = onSaveClicked,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor   = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
-                Text(text = stringResource(id = R.string.button_save_settings))
+                Text(text = stringResource(id = R.string.button_save_settings), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

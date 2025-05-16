@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.Dimension
 import androidx.appcompat.widget.PopupMenu
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
@@ -217,6 +218,10 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val overlay by lazy {
         findViewById<FrameLayout>(androidx.media3.ui.R.id.exo_overlay)
+    }
+
+    private val bottomBar by lazy {
+        findViewById<ConstraintLayout>(androidx.media3.ui.R.id.exo_bottom_bar)
     }
 
     private val i18n = I18n(context)
@@ -571,6 +576,9 @@ class BunnyPlayerView @JvmOverloads constructor(
         })
 
         setControllerVisibilityListener(ControllerVisibilityListener {
+            bottomBar.visibility = it
+            replyButton.visibility = it
+            forwardButton.visibility = it
             if (it == View.VISIBLE) {
                 timeBar.showScrubber()
             } else {

@@ -4,6 +4,7 @@ import arrow.core.Either
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.bunnystream.api.BunnyStreamApi
@@ -23,13 +24,13 @@ class DefaultSettingsRepository(
         return@withContext try {
             val response = httpClient.get(endpoint)
             when (response.status.value) {
-                200 -> {
+                HttpStatusCode.OK.value -> {
                     val result: PlayerSettingsResponse = response.body()
                     Either.Right(result.toModel())
                 }
-                401 -> Either.Left("Authorization required Unauthorized")
-                403 -> Either.Left("Forbidden")
-                404 -> Either.Left("Not Found")
+                HttpStatusCode.Unauthorized.value -> Either.Left("Authorization required Unauthorized")
+                HttpStatusCode.Forbidden.value -> Either.Left("Forbidden")
+                HttpStatusCode.NotFound.value -> Either.Left("Not Found")
                 else -> Either.Left("Error: ${response.status.value}")
             }
         } catch (e: Exception) {

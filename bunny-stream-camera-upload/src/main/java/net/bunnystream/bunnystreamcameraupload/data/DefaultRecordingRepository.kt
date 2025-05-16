@@ -31,7 +31,7 @@ class DefaultRecordingRepository(
                 videoCreateVideoRequest = createVideoRequest
             )
 
-            val endpoint = "${BuildConfig.RTMP_ENDPOINT}?vid=${result.guid}&accessKey=${ApiClient.apiKey["AccessKey"]}&lib=$libraryId"
+            val endpoint = "${BuildConfig.RTMP_ENDPOINT}??vid=${result.guid}&accessKey=${ApiClient.apiKey["AccessKey"]}&lib=$libraryId"
 
             Log.d(TAG, "endpoint=$endpoint")
 

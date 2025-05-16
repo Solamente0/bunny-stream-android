@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.BunnyStream" parent="Theme.AppCompat.NoActionBar" />
+    <style name="Theme.BunnyStream" parent="Theme.AppCompat.NoActionBar" >
+    </style>
+
 </resources>

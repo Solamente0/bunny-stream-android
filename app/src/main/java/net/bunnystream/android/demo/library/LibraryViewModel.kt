@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.bunnystream.android.demo.App
 import net.bunnystream.android.demo.library.model.Error
-import net.bunnystream.android.demo.library.model.LibraryUiState
 import net.bunnystream.android.demo.library.model.Video
+import net.bunnystream.android.demo.library.model.VideoListUiState
 import net.bunnystream.android.demo.library.model.VideoStatus
 import net.bunnystream.android.demo.library.model.VideoUploadUiState
 import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 import org.openapitools.client.models.VideoModel
 import java.util.UUID
@@ -36,19 +37,19 @@ class LibraryViewModel : ViewModel() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val prefs = App.di.localPrefs
-
-    private val mutableUiState: MutableStateFlow<LibraryUiState> = MutableStateFlow(LibraryUiState.LibraryUiEmpty)
+    private val mutableUiState: MutableStateFlow<VideoListUiState> = MutableStateFlow(
+        VideoListUiState.VideoListUiEmpty
+    )
     val uiState = mutableUiState.asStateFlow()
 
     private val mutableUploadUiState: MutableStateFlow<VideoUploadUiState> = MutableStateFlow(
-        VideoUploadUiState.NotUploading)
+        VideoUploadUiState.NotUploading
+    )
     val uploadUiState = mutableUploadUiState.asStateFlow()
 
     private val mutableErrorState: MutableSharedFlow<Error?> = MutableSharedFlow()
     val errorState = mutableErrorState.asSharedFlow()
 
-    private var loadedVideos: List<Video> = listOf()
     private var uploadInProgressId: String? = null
 
     private val uploadListener = object : UploadListener {
@@ -70,9 +71,9 @@ class LibraryViewModel : ViewModel() {
             uploadInProgressId = uploadId
         }
 
-        override fun onProgressUpdated(percentage: Int, videoId: String) {
+        override fun onProgressUpdated(percentage: Int, videoId: String, pauseState: PauseState) {
             Log.d(TAG, "onUploadProgress: percentage=$percentage")
-            mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage)
+            mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage, pauseState)
         }
 
         override fun onUploadCancelled(videoId: String) {
@@ -94,13 +95,13 @@ class LibraryViewModel : ViewModel() {
     }
 
     fun loadLibrary() {
-        Log.d(TAG, "loadLibrary")
+        Log.d(TAG, "loadVideoList")
 
-        if(libraryId == -1L || !BunnyStreamApi.isInitialized()) {
+        if (libraryId == -1L || !BunnyStreamApi.isInitialized()) {
             return
         }
 
-        mutableUiState.value = LibraryUiState.LibraryUiLoading
+        mutableUiState.value = VideoListUiState.VideoListUiLoading
 
         scope.launch {
             try {
@@ -112,14 +113,35 @@ class LibraryViewModel : ViewModel() {
                     collection = null,
                     orderBy = null
                 )
-                loadedVideos = response.items?.map { it.toVideo() } ?: listOf()
-                notifyVideosUpdated()
+                val loadedVideos = response.items?.map { it.toVideo() } ?: listOf()
+                notifyVideosUpdated(loadedVideos)
+                enrichVideo(loadedVideos)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to fetch videos")
                 e.printStackTrace()
-                mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
                 mutableErrorState.emit(Error(e.message ?: e.toString()))
             }
+        }
+    }
+
+    private fun enrichVideo(videos: List<Video>) {
+        Log.d(TAG, "enrichVideo videos=$videos")
+
+        scope.launch {
+            val enrichedList = videos.map { video ->
+                BunnyStreamApi.getInstance()
+                    .fetchPlayerSettings(libraryId, video.id)
+                    .fold(
+                        ifLeft = {
+                            Log.w(TAG, "Failed to fetch details for ${video.id}")
+                            video
+                        },
+                        ifRight = {
+                            video.copy(thumbnailUrl = it.thumbnailUrl)
+                        }
+                    )
+            }
+            notifyVideosUpdated(enrichedList)
         }
     }
 
@@ -131,7 +153,7 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "uploadVideo uri=$videoUri useTusUpload=$useTusUpload")
         mutableUploadUiState.value = VideoUploadUiState.Preparing
 
-        if(useTusUpload) {
+        if (useTusUpload) {
             App.di.tusVideoUploadService.uploadListener = uploadListener
             App.di.tusVideoUploadService.uploadVideo(libraryId, videoUri)
         } else {
@@ -144,13 +166,28 @@ class LibraryViewModel : ViewModel() {
         mutableUploadUiState.value = VideoUploadUiState.NotUploading
     }
 
-    fun cancelUpload(){
+    fun cancelUpload() {
         Log.d(TAG, "cancelUpload: uploadInProgressId=$uploadInProgressId")
         uploadInProgressId?.let {
-            if(useTusUpload) {
+            if (useTusUpload) {
                 App.di.tusVideoUploadService.cancelUpload(it)
             } else {
                 App.di.videoUploadService.cancelUpload(it)
+            }
+        }
+    }
+
+    fun pauseResumeUpload() {
+        Log.d(TAG, "pauseResumeUpload: uploadInProgressId=$uploadInProgressId")
+        uploadInProgressId?.let {
+            if (useTusUpload) {
+                val uploadState = mutableUploadUiState.value as? VideoUploadUiState.Uploading
+                when (uploadState?.pauseState) {
+                    PauseState.Paused -> App.di.tusVideoUploadService.resumeUpload(it)
+                    PauseState.Uploading -> App.di.tusVideoUploadService.pauseUpload(it)
+                    else -> { /* no-op */
+                    }
+                }
             }
         }
     }
@@ -166,11 +203,12 @@ class LibraryViewModel : ViewModel() {
             try {
                 val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
 
-                if(result.success == true) {
+                if (result.success == true) {
                     Log.d(TAG, "Video deleted")
-
-                    loadedVideos -= video
-                    notifyVideosUpdated()
+                    val loadedVideos =
+                        (mutableUiState.value as? VideoListUiState.VideoListUiLoaded)?.videos
+                            ?: emptyList()
+                    notifyVideosUpdated(loadedVideos - video)
                 } else {
                     Log.e(TAG, "Couldn't delete video: $result")
                     mutableErrorState.emit(Error("${result.statusCode} ${result.message}"))
@@ -183,11 +221,11 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
-    private fun notifyVideosUpdated(){
-        if(loadedVideos.isEmpty()) {
-            mutableUiState.value = LibraryUiState.LibraryUiEmpty
+    private fun notifyVideosUpdated(loadedVideos: List<Video>) {
+        if (loadedVideos.isEmpty()) {
+            mutableUiState.value = VideoListUiState.VideoListUiEmpty
         } else {
-            mutableUiState.value = LibraryUiState.LibraryUiLoaded(loadedVideos)
+            mutableUiState.value = VideoListUiState.VideoListUiLoaded(loadedVideos)
         }
     }
 
@@ -196,21 +234,22 @@ class LibraryViewModel : ViewModel() {
             id = guid ?: UUID.randomUUID().toString(),
             name = title ?: "N/A",
             duration = length?.toDuration(DurationUnit.SECONDS).toString(),
-            status =  when(status?.value){
+            status = when (status?.value) {
                 null -> VideoStatus.ERROR
-                0  -> VideoStatus.CREATED
-                1  -> VideoStatus.UPLOADED
-                2  -> VideoStatus.PROCESSING
-                3  -> VideoStatus.TRANSCODING
-                4  -> VideoStatus.FINISHED
-                5  -> VideoStatus.ERROR
-                6  -> VideoStatus.UPLOAD_FAILED
-                else  -> VideoStatus.ERROR
+                0 -> VideoStatus.CREATED
+                1 -> VideoStatus.UPLOADED
+                2 -> VideoStatus.PROCESSING
+                3 -> VideoStatus.TRANSCODING
+                4 -> VideoStatus.FINISHED
+                5 -> VideoStatus.ERROR
+                6 -> VideoStatus.UPLOAD_FAILED
+                else -> VideoStatus.ERROR
             },
+            size = storageSize?.inMb ?: 0.0,
+            viewCount = views?.toString() ?: "N/A",
         )
     }
 
-    override fun onCleared() {
-        super.onCleared()
-    }
+    private val Long?.inMb: Double?
+        get() = this?.div(1024.0 * 1024.0)
 }

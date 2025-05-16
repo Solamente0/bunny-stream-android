@@ -399,10 +399,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-
-Configure AccessKey:
-    ApiClient.apiKey["AccessKey"] = ""
-    ApiClient.apiKeyPrefix["AccessKey"] = ""
+No authorization required
 
 ### HTTP request headers
 

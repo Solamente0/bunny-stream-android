@@ -10,4 +10,8 @@ interface VideoUploadService {
     fun uploadVideo(libraryId: Long, videoUri: Uri)
 
     fun cancelUpload(uploadId: String)
+
+    fun pauseUpload(uploadId: String)
+
+    fun resumeUpload(uploadId: String)
 }
