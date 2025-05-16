@@ -22,4 +22,16 @@ interface VideoUploader {
      * @param uploadId ID of the upload received from [UploadListener.onUploadStarted]
      */
     fun cancelUpload(uploadId: String)
+
+    /**
+     * Pauses video upload
+     * @param uploadId ID of the upload received from [UploadListener.onUploadStarted]
+     */
+    fun pauseUpload(uploadId: String)
+
+    /**
+     * Resumes video upload
+     * @param uploadId ID of the upload received from [UploadListener.onUploadStarted]
+     */
+    fun resumeUpload(uploadId: String)
 }

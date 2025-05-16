@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import net.bunnystream.api.upload.VideoUploader
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 
 class DefaultVideoUploadService(
@@ -34,9 +35,13 @@ class DefaultVideoUploadService(
                 uploadListener?.onUploadStarted(uploadId, videoId)
             }
 
-            override fun onProgressUpdated(percentage: Int, videoId: String) {
+            override fun onProgressUpdated(
+                percentage: Int,
+                videoId: String,
+                pauseState: PauseState
+            ) {
                 Log.d(TAG, "onUploadProgress: percentage=$percentage")
-                uploadListener?.onProgressUpdated(percentage, videoId)
+                uploadListener?.onProgressUpdated(percentage, videoId, pauseState)
             }
 
             override fun onUploadCancelled(videoId: String) {
@@ -49,5 +54,15 @@ class DefaultVideoUploadService(
     override fun cancelUpload(uploadId: String) {
         Log.d(TAG, "cancelUpload videoUploader=$videoUploader")
         videoUploader.cancelUpload(uploadId)
+    }
+
+    override fun pauseUpload(uploadId: String) {
+        Log.d(TAG, "pauseUpload videoUploader=$videoUploader")
+        videoUploader.pauseUpload(uploadId)
+    }
+
+    override fun resumeUpload(uploadId: String) {
+        Log.d(TAG, "resumeUpload videoUploader=$videoUploader")
+        videoUploader.resumeUpload(uploadId)
     }
 }

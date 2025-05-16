@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -80,6 +81,7 @@ import net.bunnystream.android.demo.library.model.VideoUploadUiState
 import net.bunnystream.android.demo.settings.LocalPrefs
 import net.bunnystream.android.demo.ui.AppState
 import net.bunnystream.android.demo.ui.theme.BunnyStreamTheme
+import net.bunnystream.api.upload.service.PauseState
 import java.util.Locale
 
 @Composable
@@ -150,6 +152,7 @@ fun LibraryRoute(
         uploadingUiState = uploadingUiState,
         onDismissUploadErrorClicked = viewModel::clearUploadError,
         onCancelUploadClicked = viewModel::cancelUpload,
+        onPauseResumeUploadClicked = viewModel::pauseResumeUpload,
         onTusUploadOptionChanged = {
             viewModel.onTusUploadOptionChanged(it)
         },
@@ -179,6 +182,7 @@ private fun LibraryScreen(
     uploadingUiState: VideoUploadUiState,
     onDismissUploadErrorClicked: () -> Unit,
     onCancelUploadClicked: () -> Unit,
+    onPauseResumeUploadClicked: () -> Unit,
     onTusUploadOptionChanged: (Boolean) -> Unit,
     useTusUpload: Boolean,
     onDeleteVideoClicked: (Video) -> Unit,
@@ -281,6 +285,7 @@ private fun LibraryScreen(
                                     onUploadVideoClicked = onUploadVideoClicked,
                                     onDismissUploadErrorClicked = onDismissUploadErrorClicked,
                                     onCancelUploadClicked = onCancelUploadClicked,
+                                    onPauseResumeUploadClicked = onPauseResumeUploadClicked,
                                     onTusUploadOptionChanged = onTusUploadOptionChanged,
                                     useTusUpload = useTusUpload,
                                 )
@@ -529,6 +534,7 @@ private fun VideoUploadControls(
     onUploadVideoClicked: () -> Unit,
     onDismissUploadErrorClicked: () -> Unit,
     onCancelUploadClicked: () -> Unit,
+    onPauseResumeUploadClicked: () -> Unit,
     onTusUploadOptionChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     useTusUpload: Boolean
@@ -617,13 +623,32 @@ private fun VideoUploadControls(
                         )
                     }
 
+                    if (uploadingUiState.pauseState != PauseState.Unsupported) {
+                        val icon = if (uploadingUiState.pauseState == PauseState.Uploading) {
+                            R.drawable.pause_circle_icon
+                        } else {
+                            R.drawable.play_circle_icon
+                        }
+                        IconButton(
+                            modifier = modifier.align(CenterVertically),
+                            onClick = onPauseResumeUploadClicked
+                        ) {
+                            Icon(
+                                painter = painterResource(id = icon),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                contentDescription = "Pause upload"
+                            )
+                        }
+                    }
+
                     IconButton(
                         modifier = modifier.align(CenterVertically),
                         onClick = onCancelUploadClicked
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Clear,
-                            contentDescription = null
+                            painter = painterResource(id = R.drawable.stop_circle_icon),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "Cancel upload",
                         )
                     }
                 }
@@ -659,13 +684,14 @@ private fun LibraryScreenPreview() {
             onLoadLibrary = {},
             uiState = VideoListUiState.VideoListUiEmpty,
             onUploadVideoClicked = {},
-            uploadingUiState = VideoUploadUiState.Uploading(50),
+            uploadingUiState = VideoUploadUiState.Uploading(50, PauseState.Paused),
             onDismissUploadErrorClicked = {},
             onCancelUploadClicked = {},
             onTusUploadOptionChanged = {},
             useTusUpload = true,
             onDeleteVideoClicked = {},
             onVideoClicked = {},
+            onPauseResumeUploadClicked = {}
         )
     }
 }

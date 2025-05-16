@@ -13,4 +13,14 @@ abstract class UploadRequest(
      * Cancels upload
      */
     abstract suspend fun cancel()
+
+    /**
+     * Pauses upload
+     */
+    abstract suspend fun pause()
+
+    /**
+     * Resumes upload
+     */
+    abstract suspend fun resume()
 }

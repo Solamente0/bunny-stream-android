@@ -17,10 +17,18 @@ class BasicUploadRequest(
         Log.d("BasicUploadRequest", "cancel")
         try {
             uploadJob.cancel()
-        } catch (e: Exception){
-            Log.e("BasicUploadRequest","cancel exception: ${e.message}")
+        } catch (e: Exception) {
+            Log.e("BasicUploadRequest", "cancel exception: ${e.message}")
             e.printStackTrace()
         }
         listener.onUploadCancelled(videoId)
+    }
+
+    override suspend fun pause() {
+        throw UnsupportedOperationException("Pause not supported in BasicUploadRequest")
+    }
+
+    override suspend fun resume() {
+        throw UnsupportedOperationException("Resume not supported in BasicUploadRequest")
     }
 }

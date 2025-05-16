@@ -31,7 +31,7 @@ interface UploadListener {
      * Called when upload progress changes
      * @param videoId ID of video that is being uploaded
      */
-    fun onProgressUpdated(percentage: Int, videoId: String)
+    fun onProgressUpdated(percentage: Int, videoId: String, pauseState: PauseState)
 
     /**
      * Called when upload gets cancelled

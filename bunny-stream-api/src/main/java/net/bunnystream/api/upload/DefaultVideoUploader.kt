@@ -13,6 +13,7 @@ import net.bunnystream.api.api.ManageVideosApi
 import net.bunnystream.api.upload.model.FileInfo
 import net.bunnystream.api.upload.model.HttpStatusCodes
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 import net.bunnystream.api.upload.service.UploadRequest
 import net.bunnystream.api.upload.service.UploadService
@@ -47,7 +48,7 @@ class DefaultVideoUploader(
 
         val fileInfo = getFileInfo(videoUri)
 
-        if(fileInfo == null) {
+        if (fileInfo == null) {
             listener.onUploadError(UploadError.ErrorReadingFile, null)
             return
         }
@@ -62,22 +63,23 @@ class DefaultVideoUploader(
                 Log.e(TAG, "could not create video: ${e.message}")
                 e.printStackTrace()
 
-                val error = when(e) {
+                val error = when (e) {
                     is ClientException -> {
-                        when(e.statusCode) {
+                        when (e.statusCode) {
                             HttpStatusCodes.UNAUTHORIZED -> UploadError.Unauthorized
                             HttpStatusCodes.NOT_FOUND -> UploadError.VideoNotFound
                             else -> UploadError.UnknownError("${e.statusCode} ${e.message}")
                         }
                     }
+
                     is ServerException -> UploadError.ServerError
-                    else ->  UploadError.UnknownError(e.message ?: e.toString())
+                    else -> UploadError.UnknownError(e.message ?: e.toString())
                 }
                 listener.onUploadError(error, null)
                 return@launch
             }
 
-            if(videoId.isNullOrEmpty()) {
+            if (videoId.isNullOrEmpty()) {
                 listener.onUploadError(UploadError.ErrorCreating, videoId)
                 return@launch
             }
@@ -86,9 +88,13 @@ class DefaultVideoUploader(
 
             val request = videoUploadService.upload(
                 libraryId, videoId, fileInfo, object : UploadListener {
-                    override fun onProgressUpdated(percentage: Int, videoId: String) {
+                    override fun onProgressUpdated(
+                        percentage: Int,
+                        videoId: String,
+                        pauseState: PauseState
+                    ) {
                         Log.d(TAG, "onProgressUpdated: $percentage")
-                        listener.onProgressUpdated(percentage, videoId)
+                        listener.onProgressUpdated(percentage, videoId, pauseState)
                     }
 
                     override fun onUploadDone(videoId: String) {
@@ -130,7 +136,7 @@ class DefaultVideoUploader(
             request = uploadsInProgress.remove(uploadId)
         }
 
-        if(request == null){
+        if (request == null) {
             Log.w(TAG, "Cannot cancel, upload ID $uploadId not found")
             return
         }
@@ -138,6 +144,40 @@ class DefaultVideoUploader(
         scope.launch { request.cancel() }
 
         scope.launch { deleteVideo(request.libraryId, request.videoId) }
+    }
+
+    override fun pauseUpload(uploadId: String) {
+        Log.d(TAG, "pauseUpload: $uploadId")
+
+        val request: UploadRequest?
+
+        synchronized(lock) {
+            request = uploadsInProgress.get(uploadId)
+        }
+
+        if (request == null) {
+            Log.w(TAG, "Cannot pause, upload ID $uploadId not found")
+            return
+        }
+
+        scope.launch { request.pause() }
+    }
+
+    override fun resumeUpload(uploadId: String) {
+        Log.d(TAG, "resumeUpload: $uploadId")
+
+        val request: UploadRequest?
+
+        synchronized(lock) {
+            request = uploadsInProgress.get(uploadId)
+        }
+
+        if (request == null) {
+            Log.w(TAG, "Cannot resume, upload ID $uploadId not found")
+            return
+        }
+
+        scope.launch { request.resume() }
     }
 
     private fun createVideo(
@@ -164,7 +204,7 @@ class DefaultVideoUploader(
         Log.d(TAG, "deleteVideo libraryId=$libraryId videoId=$videoId")
         try {
             val result = videosApi.videoDeleteVideo(libraryId, videoId)
-            if(result.success == true) {
+            if (result.success == true) {
                 Log.d(TAG, "Video deleted")
             } else {
                 Log.e(TAG, "Error deleting video: $result")

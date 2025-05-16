@@ -9,17 +9,23 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.bunnystream.api.BuildConfig
 import net.bunnystream.api.upload.model.FileInfo
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 import net.bunnystream.api.upload.service.UploadRequest
 import net.bunnystream.api.upload.service.UploadService
 import java.net.URL
 import java.security.MessageDigest
 import java.util.UUID
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.coroutines.cancellation.CancellationException
 
+@OptIn(ExperimentalAtomicApi::class)
 class TusUploaderService(
     private val preferences: SharedPreferences,
     private val chunkSize: Int,
@@ -69,31 +75,54 @@ class TusUploaderService(
 
         val uploader = tusClient.resumeOrCreateUpload(upload)
         uploader.chunkSize = chunkSize
+        val isPaused = AtomicBoolean(false)
+        val isCanceled = AtomicBoolean(false)
 
         scope.launch {
-            var uploadProgress = 0
+            var chunkNumber = 0
             try {
                 do {
                     val bytesUploaded = uploader.offset
                     val progress = ((bytesUploaded.toDouble() / upload.size) * 100).toInt()
+                    val pauseState =
+                        if (isPaused.load()) PauseState.Paused else PauseState.Uploading
 
-                    if(progress != uploadProgress) {
-                        uploadProgress = progress
-                        listener.onProgressUpdated(progress, videoId)
+                    listener.onProgressUpdated(progress, videoId, pauseState)
+
+                    if (!isPaused.load()) {
+                        chunkNumber = uploader.uploadChunk()
+                    } else {
+                        delay(250)
                     }
-                } while (uploader.uploadChunk() > -1)
+                    if (isCanceled.load()) {
+                        Log.d(TAG, "upload cancelled")
+                        listener.onUploadCancelled(videoId)
+                        break
+                    }
+                } while (chunkNumber > -1)
 
                 uploader.finish()
                 Log.d(TAG, "upload done")
                 listener.onUploadDone(videoId)
             } catch (e: Exception) {
-                Log.e(TAG, "error uploading: ${e.message}")
-                e.printStackTrace()
-                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
+                if(e is CancellationException){
+                    Log.d(TAG, "upload cancelled")
+                    isCanceled.store(true)
+                    listener.onUploadCancelled(videoId)
+                } else {
+                    Log.w(TAG, "error uploading: ${e.message}")
+                    e.printStackTrace()
+                    listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
+                }
             }
         }
 
-        return TusUploadRequest(libraryId, videoId, uploader, listener)
+        return TusUploadRequest(
+            libraryId,
+            videoId,
+            uploader,
+            listener
+        ) { isPaused.store(it) }
     }
 
     private fun sha256(input: String): String {

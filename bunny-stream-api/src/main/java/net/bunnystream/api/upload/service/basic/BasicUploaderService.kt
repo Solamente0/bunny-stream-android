@@ -20,9 +20,11 @@ import net.bunnystream.api.upload.model.FileInfo
 import net.bunnystream.api.upload.model.HttpStatusCodes
 import net.bunnystream.api.upload.model.StreamContent
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 import net.bunnystream.api.upload.service.UploadRequest
 import net.bunnystream.api.upload.service.UploadService
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 
 class BasicUploaderService(
@@ -57,7 +59,7 @@ class BasicUploaderService(
                     val percentage = ((bytesSentTotal / (contentLength?.toFloat() ?: 0f)) * 100).toInt()
                     if(percentage != uploadProcess) {
                         uploadProcess = percentage
-                        listener.onProgressUpdated(percentage, videoId)
+                        listener.onProgressUpdated(percentage, videoId, PauseState.Unsupported)
                     }
                 }
             }
@@ -77,9 +79,14 @@ class BasicUploaderService(
                 }
 
             } catch (e: Exception) {
-                Log.w(TAG, "error uploading: ${e.message}")
-                e.printStackTrace()
-                listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
+                if(e is CancellationException){
+                    Log.d(TAG, "upload cancelled")
+                    listener.onUploadCancelled(videoId)
+                } else {
+                    Log.w(TAG, "error uploading: ${e.message}")
+                    e.printStackTrace()
+                    listener.onUploadError(UploadError.UnknownError(e.message ?: e.toString()), videoId)
+                }
             }
         }
 

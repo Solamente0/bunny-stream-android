@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.bunnystream.android.demo.App
 import net.bunnystream.android.demo.library.model.Error
-import net.bunnystream.android.demo.library.model.VideoListUiState
 import net.bunnystream.android.demo.library.model.Video
+import net.bunnystream.android.demo.library.model.VideoListUiState
 import net.bunnystream.android.demo.library.model.VideoStatus
 import net.bunnystream.android.demo.library.model.VideoUploadUiState
 import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.api.upload.model.UploadError
+import net.bunnystream.api.upload.service.PauseState
 import net.bunnystream.api.upload.service.UploadListener
 import org.openapitools.client.models.VideoModel
 import java.util.UUID
@@ -37,11 +38,13 @@ class LibraryViewModel : ViewModel() {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private val mutableUiState: MutableStateFlow<VideoListUiState> = MutableStateFlow(
-        VideoListUiState.VideoListUiEmpty)
+        VideoListUiState.VideoListUiEmpty
+    )
     val uiState = mutableUiState.asStateFlow()
 
     private val mutableUploadUiState: MutableStateFlow<VideoUploadUiState> = MutableStateFlow(
-        VideoUploadUiState.NotUploading)
+        VideoUploadUiState.NotUploading
+    )
     val uploadUiState = mutableUploadUiState.asStateFlow()
 
     private val mutableErrorState: MutableSharedFlow<Error?> = MutableSharedFlow()
@@ -68,9 +71,9 @@ class LibraryViewModel : ViewModel() {
             uploadInProgressId = uploadId
         }
 
-        override fun onProgressUpdated(percentage: Int, videoId: String) {
+        override fun onProgressUpdated(percentage: Int, videoId: String, pauseState: PauseState) {
             Log.d(TAG, "onUploadProgress: percentage=$percentage")
-            mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage)
+            mutableUploadUiState.value = VideoUploadUiState.Uploading(percentage, pauseState)
         }
 
         override fun onUploadCancelled(videoId: String) {
@@ -150,7 +153,7 @@ class LibraryViewModel : ViewModel() {
         Log.d(TAG, "uploadVideo uri=$videoUri useTusUpload=$useTusUpload")
         mutableUploadUiState.value = VideoUploadUiState.Preparing
 
-        if(useTusUpload) {
+        if (useTusUpload) {
             App.di.tusVideoUploadService.uploadListener = uploadListener
             App.di.tusVideoUploadService.uploadVideo(libraryId, videoUri)
         } else {
@@ -163,13 +166,28 @@ class LibraryViewModel : ViewModel() {
         mutableUploadUiState.value = VideoUploadUiState.NotUploading
     }
 
-    fun cancelUpload(){
+    fun cancelUpload() {
         Log.d(TAG, "cancelUpload: uploadInProgressId=$uploadInProgressId")
         uploadInProgressId?.let {
-            if(useTusUpload) {
+            if (useTusUpload) {
                 App.di.tusVideoUploadService.cancelUpload(it)
             } else {
                 App.di.videoUploadService.cancelUpload(it)
+            }
+        }
+    }
+
+    fun pauseResumeUpload() {
+        Log.d(TAG, "pauseResumeUpload: uploadInProgressId=$uploadInProgressId")
+        uploadInProgressId?.let {
+            if (useTusUpload) {
+                val uploadState = mutableUploadUiState.value as? VideoUploadUiState.Uploading
+                when (uploadState?.pauseState) {
+                    PauseState.Paused -> App.di.tusVideoUploadService.resumeUpload(it)
+                    PauseState.Uploading -> App.di.tusVideoUploadService.pauseUpload(it)
+                    else -> { /* no-op */
+                    }
+                }
             }
         }
     }
@@ -185,7 +203,7 @@ class LibraryViewModel : ViewModel() {
             try {
                 val result = App.di.streamSdk.videosApi.videoDeleteVideo(libraryId, video.id)
 
-                if(result.success == true) {
+                if (result.success == true) {
                     Log.d(TAG, "Video deleted")
                     val loadedVideos =
                         (mutableUiState.value as? VideoListUiState.VideoListUiLoaded)?.videos
@@ -210,6 +228,7 @@ class LibraryViewModel : ViewModel() {
             mutableUiState.value = VideoListUiState.VideoListUiLoaded(loadedVideos)
         }
     }
+
     private fun VideoModel.toVideo(): Video {
         return Video(
             id = guid ?: UUID.randomUUID().toString(),
