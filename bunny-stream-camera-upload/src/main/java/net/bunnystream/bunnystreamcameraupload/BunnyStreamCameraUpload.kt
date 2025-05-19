@@ -85,7 +85,7 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
 
             override fun onStreamAuthError() {
                 setNotRecording()
-                if(streamStateListener != null) {
+                if (streamStateListener != null) {
                     streamStateListener?.onStreamAuthError()
                 } else {
                     showStreamAuthErrorDialog()
@@ -94,7 +94,7 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
 
             override fun onStreamConnectionFailed(message: String) {
                 setNotRecording()
-                if(streamStateListener != null) {
+                if (streamStateListener != null) {
                     streamStateListener?.onStreamConnectionFailed(message)
                 } else {
                     showStreamConnectionErrorDialog(message)
@@ -116,10 +116,17 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
         }
 
         binding.startStop.setOnClickListener {
-            if(!streamHandler.isStreaming()) {
+            if (!streamHandler.isStreaming()) {
                 streamHandler.startStreaming(libraryId)
             } else {
-                streamHandler.stopStreaming()
+                AlertDialog.Builder(binding.root.context)
+                    .setTitle(context.getString(R.string.dialog_end_stream_title))
+                    .setMessage(context.getString(R.string.dialog_end_stream_text))
+                    .setNegativeButton(context.getString(R.string.dialog_end_stream_negative), null)
+                    .setPositiveButton(context.getString(R.string.dialog_end_stream_positive)) { _, _ ->
+                        streamHandler.stopStreaming()
+                    }
+                    .show()
             }
         }
 
@@ -138,32 +145,35 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
         }
     }
 
-    override fun startPreview(){
-        val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-        val micPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+    override fun startPreview() {
+        val cameraPermission =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+        val micPermission =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
 
         val camGranted = cameraPermission == PackageManager.PERMISSION_GRANTED
         val micGranted = micPermission == PackageManager.PERMISSION_GRANTED
 
-        if(camGranted && micGranted){
+        if (camGranted && micGranted) {
             streamHandler.initialize(binding.surfaceViewContainer, defaultCamera)
         } else {
-            Log.w(TAG, "Couldn't initialize preview, " +
-                    "missing android.permission.CAMERA and " +
-                    "android.permission.RECORD_AUDIO permissions"
+            Log.w(
+                TAG, "Couldn't initialize preview, " +
+                        "missing android.permission.CAMERA and " +
+                        "android.permission.RECORD_AUDIO permissions"
             )
         }
     }
 
-    override fun stopRecording(){
+    override fun stopRecording() {
         streamHandler.stopStreaming()
     }
 
-    override fun switchCamera(){
+    override fun switchCamera() {
         streamHandler.switchCamera()
     }
 
-    override fun setAudioMuted(muted: Boolean){
+    override fun setAudioMuted(muted: Boolean) {
         streamHandler.setMuted(muted)
     }
 
@@ -171,7 +181,7 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
         return streamHandler.isStreaming()
     }
 
-    private fun setRecording(){
+    private fun setRecording() {
         binding.startStop.isActivated = true
         binding.startStop.visibility = View.VISIBLE
         binding.progress.isVisible = false
@@ -182,12 +192,12 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
         binding.close.visibility = View.INVISIBLE
     }
 
-    private fun setPreparing(){
+    private fun setPreparing() {
         binding.startStop.visibility = View.INVISIBLE
         binding.progress.isVisible = true
     }
 
-    private fun setNotRecording(){
+    private fun setNotRecording() {
         binding.startStop.isActivated = false
         binding.startStop.visibility = View.VISIBLE
         binding.progress.isVisible = false
@@ -216,9 +226,10 @@ class BunnyStreamCameraUpload @JvmOverloads constructor(
     private fun extractAttrs(attrs: AttributeSet?) {
         if (attrs != null) {
             context.obtainStyledAttributes(attrs, R.styleable.BunnyRecordingView).use {
-                hideDefaultControls = it.getBoolean(R.styleable.BunnyRecordingView_brvHideDefaultControls, false)
+                hideDefaultControls =
+                    it.getBoolean(R.styleable.BunnyRecordingView_brvHideDefaultControls, false)
                 val cam = it.getInt(R.styleable.BunnyRecordingView_brvDefaultCamera, 0)
-                defaultCamera = if(cam == 0) {
+                defaultCamera = if (cam == 0) {
                     DeviceCamera.BACK
                 } else {
                     DeviceCamera.FRONT

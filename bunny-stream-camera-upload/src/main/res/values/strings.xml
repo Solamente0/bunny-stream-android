@@ -7,4 +7,8 @@
     <string name="stream_connection_error">Connection error</string>
     <string name="stream_unknown_error">Unknown error</string>
     <string name="dialog_stream_error_message">Couldn\'t start recording: %1$s</string>
+    <string name="dialog_end_stream_title">End Stream</string>
+    <string name="dialog_end_stream_positive">End Stream</string>
+    <string name="dialog_end_stream_negative">Cancel</string>
+    <string name="dialog_end_stream_text">Are you sure you want to end the stream?</string>
 </resources>
