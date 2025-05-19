@@ -576,9 +576,13 @@ class BunnyPlayerView @JvmOverloads constructor(
         })
 
         setControllerVisibilityListener(ControllerVisibilityListener {
+            if(playerSettings?.rewindEnabled == true) {
+                replyButton.visibility = it
+            }
+            if(playerSettings?.fastForwardEnabled == true){
+                forwardButton.visibility = it
+            }
             bottomBar.visibility = it
-            replyButton.visibility = it
-            forwardButton.visibility = it
             if (it == View.VISIBLE) {
                 timeBar.showScrubber()
             } else {
@@ -648,6 +652,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         subtitle.isVisible = playerSettings?.subtitlesEnabled == true
         timeBar.isVisible = playerSettings?.progressEnabled == true
         playPauseButton.isVisible = playerSettings?.playButtonEnabled == true
+        castButton.isVisible = playerSettings?.castButtonEnabled == true
 
         progressDurationDivider.isVisible = progressTextView.isVisible && durationTextView.isVisible
     }

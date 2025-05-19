@@ -28,4 +28,5 @@ data class PlayerSettings(
     val progressEnabled = controls.contains("progress")
     val durationEnabled = controls.contains("duration")
     val playButtonEnabled = controls.contains("play-large") || controls.contains("play")
+    val castButtonEnabled = controls.contains("chromecast")
 }
