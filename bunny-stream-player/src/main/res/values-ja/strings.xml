@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">キャプション</string>
+    <string name="label_video_settings_speed">速度</string>
+    <string name="label_video_settings_quality">クオリティー</string>
+    <string name="label_video_quality_auto">自動</string>
+    <string name="error_playing_video">ビデオを再生できませんでした</string>
+    <string name="label_video_settings_captions_disabled">無効</string>
+    <string name="label_video_settings_audio_track">オーディオトラック</string>
+    <string name="label_drm_not_supported_exception">このビデオではDRMが有効になっています。このデバイスでは再生がサポートされていません。</string>
+</resources>

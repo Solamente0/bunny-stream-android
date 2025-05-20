@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Надписи</string>
+    <string name="label_video_settings_speed">Скорост</string>
+    <string name="label_video_settings_quality">Качество</string>
+    <string name="label_video_quality_auto">Автоматично</string>
+    <string name="error_playing_video">Не можа да се възпроизведе видео</string>
+    <string name="label_video_settings_captions_disabled">Дезактивиран</string>
+    <string name="label_video_settings_audio_track">Аудио запис</string>
+    <string name="label_drm_not_supported_exception">DRM е активиран за това видео, възпроизвеждането не се поддържа на това устройство.</string>
+</resources>

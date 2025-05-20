@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Napisy</string>
+    <string name="label_video_settings_speed">Szybkość</string>
+    <string name="label_video_settings_quality">Jakość</string>
+    <string name="label_video_quality_auto">Automatycznie</string>
+    <string name="error_playing_video">Nie można odtworzyć wideo</string>
+    <string name="label_video_settings_captions_disabled">Wyłączone</string>
+    <string name="label_video_settings_audio_track">Ścieżka dźwiękowa</string>
+    <string name="label_drm_not_supported_exception">DRM jest włączone dla tego wideo, odtwarzanie nie jest obsługiwane na tym urządzeniu.</string>
+</resources>

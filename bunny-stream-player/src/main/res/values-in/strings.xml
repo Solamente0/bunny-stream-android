@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Takarir</string>
+    <string name="label_video_settings_speed">Kecepatan</string>
+    <string name="label_video_settings_quality">Kualitas</string>
+    <string name="label_video_quality_auto">Otomatis</string>
+    <string name="error_playing_video">Tidak dapat memutar video</string>
+    <string name="label_video_settings_captions_disabled">Nonaktif</string>
+    <string name="label_video_settings_audio_track">Trek audio</string>
+    <string name="label_drm_not_supported_exception">DRM diaktifkan untuk video ini, pemutaran tidak didukung pada perangkat ini.</string>
+</resources>

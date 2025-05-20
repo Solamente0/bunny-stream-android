@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Υπότιτλοι</string>
+    <string name="label_video_settings_speed">Ταχύτητα</string>
+    <string name="label_video_settings_quality">Ποιότητα</string>
+    <string name="label_video_quality_auto">Αυτόματο</string>
+    <string name="error_playing_video">Δεν ήταν δυνατή η αναπαραγωγή του βίντεο</string>
+    <string name="label_video_settings_captions_disabled">Απενεργοποιημένο</string>
+    <string name="label_video_settings_audio_track">Κομμάτι ήχου</string>
+    <string name="label_drm_not_supported_exception">Το DRM είναι ενεργοποιημένο για αυτό το βίντεο, η αναπαραγωγή δεν υποστηρίζεται σε αυτήν τη συσκευή.</string>
+</resources>

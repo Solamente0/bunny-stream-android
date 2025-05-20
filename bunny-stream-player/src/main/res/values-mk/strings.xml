@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Поднаписи</string>
+    <string name="label_video_settings_speed">Брзина</string>
+    <string name="label_video_settings_quality">Квалитет</string>
+    <string name="label_video_quality_auto">Автоматски</string>
+    <string name="error_playing_video">Не можеше да се репродуцира видеото</string>
+    <string name="label_video_settings_captions_disabled">Оневозможено</string>
+    <string name="label_video_settings_audio_track">Аудио песна</string>
+    <string name="label_drm_not_supported_exception">DRM е овозможен за ова видео, репродукцијата не е поддржана на овој уред.</string>
+</resources>

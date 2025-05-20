@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Podnapisi</string>
+    <string name="label_video_settings_speed">Hitrost</string>
+    <string name="label_video_settings_quality">Kvaliteta</string>
+    <string name="label_video_quality_auto">Samodejno</string>
+    <string name="error_playing_video">Videoposnetka ni bilo mogoče predvajati</string>
+    <string name="label_video_settings_captions_disabled">Onemogočeno</string>
+    <string name="label_video_settings_audio_track">Zvočni posnetek</string>
+    <string name="label_drm_not_supported_exception">DRM je omogočen za ta videoposnetek, predvajanje ni podprto na tej napravi.</string>
+</resources>

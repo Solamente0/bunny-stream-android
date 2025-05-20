@@ -2,6 +2,7 @@ package net.bunnystream.bunnystreamplayer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import androidx.media3.cast.CastPlayer
@@ -20,7 +21,13 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
+import androidx.media3.datasource.TransferListener
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
+import androidx.media3.exoplayer.drm.FrameworkMediaDrm
+import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 import androidx.media3.exoplayer.ima.ImaAdsLoader
 import androidx.media3.exoplayer.ima.ImaServerSideAdInsertionMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -148,7 +155,41 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            Log.d(TAG, "onPlayerError error=$error")
+            Log.e(TAG, "❌ Player error (${error.errorCodeName}): ${error.message}", error)
+
+            error.errorCode.let {
+                when (error.errorCode) {
+                    PlaybackException.ERROR_CODE_DRM_UNSPECIFIED ->
+                        Log.e(TAG, "DRM unspecified error – possibly malformed license or unknown cause")
+
+                    PlaybackException.ERROR_CODE_DRM_SCHEME_UNSUPPORTED ->
+                        Log.e(TAG, "DRM scheme unsupported – device or ExoPlayer doesn't support Widevine")
+
+                    PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED ->
+                        Log.e(TAG, "DRM provisioning failed – check internet connection or device provisioning")
+
+                    PlaybackException.ERROR_CODE_DRM_CONTENT_ERROR ->
+                        Log.e(TAG, "DRM content error – possibly corrupted or tampered content keys")
+
+                    PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED ->
+                        Log.e(TAG, "DRM license acquisition failed – invalid license URL or headers")
+
+                    PlaybackException.ERROR_CODE_DRM_DISALLOWED_OPERATION ->
+                        Log.e(TAG, "DRM disallowed operation – action not permitted by DRM policy (e.g. seeking)")
+
+                    PlaybackException.ERROR_CODE_DRM_SYSTEM_ERROR ->
+                        Log.e(TAG, "DRM system error – device DRM stack failure (e.g. MediaDrm crash)")
+
+                    PlaybackException.ERROR_CODE_DRM_DEVICE_REVOKED ->
+                        Log.e(TAG, "DRM device revoked – device has been blacklisted for content protection")
+
+                    PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED ->
+                        Log.e(TAG, "DRM license expired – request a new license or check expiration settings")
+
+                    else -> Log.w(TAG, "Unhandled DRM error code: ${error.errorCodeName}")
+                }
+            }
+
             playerStateListener?.onPlayerError("${error.errorCodeName}: ${error.message}")
         }
     }
@@ -193,93 +234,49 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     ) {
         Log.d(TAG, "playVideo(video=$video, retentionData=$retentionData, playerSettings=$playerSettings)")
 
-        // Save for callbacks
         this.playerSettings = playerSettings
         currentVideo = video
 
-        // 1️⃣ IMA ads loader
-        val imaLoader = ImaAdsLoader.Builder(context).build()
+        // Set up TransferListener for debugging
+        val transferListener = object : TransferListener {
+            override fun onTransferInitializing(
+                source: DataSource,
+                dataSpec: DataSpec,
+                isNetwork: Boolean
+            ) {
 
-        // 2️⃣ Build an HTTP factory that always sends your Referer
-        val httpFactory = DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
-            .setDefaultRequestProperties(
-                mapOf(
-                    "Referer" to "https://iframe.mediadelivery.net"
-                    // If you need auth, add:
-                    // "Authorization" to "Bearer ${playerSettings.authToken}"
-                )
-            )
-            .setUserAgent(Util.getUserAgent(context, "BunnyStreamPlayer"))
+            }
 
-        // 3️⃣ Wrap it so we can also log every single request URI
-        val loggingDataSourceFactory = DataSource.Factory {
-            // Create the real HTTP DataSource with your headers already set
-            val real = httpFactory.createDataSource()
-            // Proxy / delegate every call except open()
-            object : DataSource by real {
-                override fun open(dataSpec: DataSpec): Long {
-                    // Log the outgoing request URI and headers
-                    Log.d(TAG, "HTTP ▶️ ${dataSpec.uri} headers=${dataSpec.httpRequestHeaders}")
-                    // Perform the real open()
-                    val length = real.open(dataSpec)
-                    // Now you can get the HTTP status code & response headers
-                    val httpDs = real as HttpDataSource
-                    Log.d(
-                        TAG,
-                        "HTTP ✅ ${dataSpec.uri} code=${httpDs.responseCode} headers=${httpDs.responseHeaders}"
-                    )  // HttpDataSource.responseCode / .responseHeaders  [oai_citation_attribution:0‡androidx.de](https://androidx.de/androidx/media3/datasource/HttpDataSource.html?utm_source=chatgpt.com)
-                    return length
-                }
+            override fun onTransferStart(source: DataSource, dataSpec: DataSpec, isNetwork: Boolean) {
+                Log.d(TAG, "HTTP ▶️ ${dataSpec.uri}")
+            }
+
+            override fun onBytesTransferred(
+                source: DataSource,
+                dataSpec: DataSpec,
+                isNetwork: Boolean,
+                bytesTransferred: Int
+            ) {
+
+            }
+
+            override fun onTransferEnd(source: DataSource, dataSpec: DataSpec, isNetwork: Boolean) {
+                Log.d(TAG, "HTTP ✅ ${dataSpec.uri}")
             }
         }
 
-        // 4️⃣ MediaSourceFactory with ad insertion
+        // Create HTTP data source factory with headers
+        val httpFactory = DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+            .setDefaultRequestProperties(mapOf("Referer" to "https://iframe.mediadelivery.net"))
+            .setUserAgent(Util.getUserAgent(context, "BunnyStreamPlayer"))
+            .setTransferListener(transferListener)
+
+        // Create media source factory without setDrmSessionManagerProvider
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(loggingDataSourceFactory)
-            .setLocalAdInsertionComponents({ imaLoader }, playerView)
+            .setDataSourceFactory(httpFactory)
 
-        // 5️⃣ Build ExoPlayer
-        trackSelector = DefaultTrackSelector(context, AdaptiveTrackSelection.Factory())
-        localPlayer = ExoPlayer.Builder(context)
-            .setTrackSelector(trackSelector!!)
-            .setMediaSourceFactory(mediaSourceFactory)
-            .build().also { it.addListener(playerListener) }
-        currentPlayer = localPlayer
-        imaLoader.setPlayer(currentPlayer)
-        serverSideAdLoader?.setPlayer(currentPlayer!!)
-
-        // 6️⃣ Build DRM license URI
-        val drmLicenseUri = "${BunnyStreamApi.baseApi}/WidevineLicense/" +
-                "${video.videoLibraryId}/${video.guid}?contentId=${video.guid}"
-
-        // 7️⃣ Start building the MediaItem
-        val itemBuilder = MediaItem.Builder()
-            .setUri(playerSettings.videoUrl)
-            .setMimeType(MimeTypes.APPLICATION_M3U8)
-
-        // 8️⃣ Per-item DRM config if needed
-        if (playerSettings.drmEnabled) {
-            val licenseRequestHeaders = mapOf(
-                "Referer" to "https://iframe.mediadelivery.net"
-                // "Authorization" to "Bearer ${playerSettings.authToken}"
-            )
-            val drmConfig = MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                .setLicenseUri(drmLicenseUri)
-                .setMultiSession(true)
-                .setLicenseRequestHeaders(licenseRequestHeaders)
-                .build()
-            itemBuilder.setDrmConfiguration(drmConfig)
-        }
-
-        // 9️⃣ VAST ads
-        playerSettings.vastTagUrl.toUri()?.let { vastUri ->
-            itemBuilder.setAdsConfiguration(
-                MediaItem.AdsConfiguration.Builder(vastUri).build()
-            )
-        }
-
-        // 🔟 Subtitles
+        // Set up subtitle tracks if available
         val subtitleConfigs = video.captions?.map { cap ->
             val subUri = Uri.parse("${playerSettings.captionsPath}${cap.srclang}.vtt?ver=1")
             MediaItem.SubtitleConfiguration.Builder(subUri)
@@ -288,22 +285,101 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
                 .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                 .build()
         } ?: emptyList()
-        itemBuilder.setSubtitleConfigurations(subtitleConfigs)
 
-        // 1️⃣1️⃣ Finalize & prepare
-        mediaItem = itemBuilder.build()
-        currentPlayer!!.setMediaItem(mediaItem!!)
-        selectSubtitleTrack(null)
-        currentPlayer!!.playWhenReady = true
+        // Build MediaItem with DRM config (CENC)
+        val drmLicenseUri = "${BunnyStreamApi.baseApi}/WidevineLicense/" +
+                "${video.videoLibraryId}/${video.guid}?contentId=${video.guid}"
+
+        val mediaItemBuilder = MediaItem.Builder()
+            .setUri(playerSettings.videoUrl)
+            .setMimeType(MimeTypes.APPLICATION_M3U8)
+            .setSubtitleConfigurations(subtitleConfigs)
+
+        if (playerSettings.drmEnabled) {
+            mediaItemBuilder.setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri(drmLicenseUri)
+                    .setLicenseRequestHeaders(mapOf("Referer" to "https://iframe.mediadelivery.net"))
+                    .setMultiSession(true)
+                    .setForceDefaultLicenseUri(true)
+                    .build()
+            )
+        }
+
+        playerSettings.vastTagUrl.toUri()?.let { vastUri ->
+            mediaItemBuilder.setAdsConfiguration(
+                MediaItem.AdsConfiguration.Builder(vastUri).build()
+            )
+        }
+
+        // Create new ExoPlayer and assign to PlayerView
+        trackSelector = DefaultTrackSelector(context)
+        trackSelector?.parameters = trackSelector!!.buildUponParameters()
+            .setPreferredVideoMimeType(MimeTypes.VIDEO_H264)
+            .clearVideoSizeConstraints()
+            .build()
+
+        playerView.setShutterBackgroundColor(Color.TRANSPARENT)
+        playerView.useController = true
+        playerView.keepScreenOn = true
+        Log.d(TAG, "PlayerView attached: ${playerView.isAttachedToWindow}, size: ${playerView.width}x${playerView.height}")
+
+        localPlayer = ExoPlayer.Builder(context)
+            .setTrackSelector(trackSelector!!)
+            .setMediaSourceFactory(mediaSourceFactory)
+            .build().also {
+                it.addListener(playerListener)
+                it.addAnalyticsListener(object : AnalyticsListener {
+                    override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
+                        Log.d(TAG, "✅ First frame rendered after ${renderTimeMs}ms")
+                    }
+
+                    override fun onVideoDecoderInitialized(eventTime: AnalyticsListener.EventTime, decoderName: String, initializedTimestampMs: Long, initializationDurationMs: Long) {
+                        Log.d(TAG, "🎥 Video decoder initialized: $decoderName, took ${initializationDurationMs}ms")
+                    }
+
+                    override fun onDrmSessionAcquired(eventTime: AnalyticsListener.EventTime) {
+                        Log.d(TAG, "🔐 DRM session acquired")
+                    }
+
+                    override fun onDrmKeysLoaded(eventTime: AnalyticsListener.EventTime) {
+                        Log.d(TAG, "✅ DRM keys loaded successfully")
+                    }
+
+                    override fun onDrmSessionManagerError(eventTime: AnalyticsListener.EventTime, error: Exception) {
+                        Log.e(TAG, "❌ DRM session manager error", error)
+                    }
+
+                    override fun onTracksChanged(eventTime: AnalyticsListener.EventTime, tracks: Tracks) {
+                        Log.d(TAG, "🎚 Tracks changed:")
+                        for (group in tracks.groups) {
+                            for (i in 0 until group.length) {
+                                val format = group.getTrackFormat(i)
+                                Log.d(TAG, "  - Track: ${format.sampleMimeType}, id=${format.id}, lang=${format.language}, selected=${group.isTrackSelected(i)}")
+                            }
+                        }
+                    }
+                })
+            }
+
+        currentPlayer = localPlayer
+        playerView.player = currentPlayer
+        playerView.keepScreenOn = true
+
+        // Prepare and play
+        val mediaItem = mediaItemBuilder.build()
+        this.mediaItem = mediaItem
+        currentPlayer!!.setMediaItem(mediaItem)
         currentPlayer!!.prepare()
+        currentPlayer!!.playWhenReady = true
 
-        // 1️⃣2️⃣ Seek thumbnails
+        // Init seek thumbnails and metadata
         initSeekThumbnailPreview(video, playerSettings.seekPath)
 
-        // 1️⃣3️⃣ Moments & chapters
         moments = video.moments?.map {
             Moment(it.label, it.timestamp?.seconds?.inWholeMilliseconds ?: 0)
         } ?: emptyList()
+
         chapters = video.chapters?.map {
             Chapter(
                 it.start?.seconds?.inWholeMilliseconds ?: 0,
@@ -312,7 +388,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             )
         } ?: emptyList()
 
-        // 1️⃣4️⃣ Retention data
         if (playerSettings.showHeatmap) {
             this.retentionData = retentionData.map { (ms, pct) ->
                 RetentionGraphEntry(ms, pct)

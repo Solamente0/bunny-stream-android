@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Undertekster</string>
+    <string name="label_video_settings_speed">Hastighet</string>
+    <string name="label_video_settings_quality">Kvalitet</string>
+    <string name="label_video_quality_auto">Automatisk</string>
+    <string name="error_playing_video">Kunne ikke spille av video</string>
+    <string name="label_video_settings_captions_disabled">Deaktivert</string>
+    <string name="label_video_settings_audio_track">Lydspor</string>
+    <string name="label_drm_not_supported_exception">DRM er aktivert for denne videoen, avspilling støttes ikke på denne enheten.</string>
+</resources>
