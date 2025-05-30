@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">คำบรรยาย</string>
+    <string name="label_video_settings_speed">ความเร็ว</string>
+    <string name="label_video_settings_quality">คุณภาพ</string>
+    <string name="label_video_quality_auto">อัตโนมัติ</string>
+    <string name="error_playing_video">ไม่สามารถเล่นวิดีโอได้</string>
+    <string name="label_video_settings_captions_disabled">ปิดใช้งาน</string>
+    <string name="label_video_settings_audio_track">แทร็กเสียง</string>
+    <string name="label_drm_not_supported_exception">DRM เปิดใช้งานสำหรับวิดีโอนี้ การเล่นไม่รองรับบนอุปกรณ์นี้</string>
+</resources>

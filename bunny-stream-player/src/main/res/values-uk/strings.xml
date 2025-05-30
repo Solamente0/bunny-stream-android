@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Субтитри</string>
+    <string name="label_video_settings_speed">Швидкість</string>
+    <string name="label_video_settings_quality">Якість</string>
+    <string name="label_video_quality_auto">Автоматично</string>
+    <string name="error_playing_video">Не вдалося відтворити відео</string>
+    <string name="label_video_settings_captions_disabled">Вимкнуто</string>
+    <string name="label_video_settings_audio_track">Аудіодоріжка</string>
+    <string name="label_drm_not_supported_exception">DRM увімкнено для цього відео, відтворення не підтримується на цьому пристрої.</string>
+</resources>

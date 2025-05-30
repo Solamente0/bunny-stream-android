@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Titulky</string>
+    <string name="label_video_settings_speed">Rýchlosť</string>
+    <string name="label_video_settings_quality">Kvalita</string>
+    <string name="label_video_quality_auto">Automaticky</string>
+    <string name="error_playing_video">Video sa nedalo prehrať</string>
+    <string name="label_video_settings_captions_disabled">Zakázané</string>
+    <string name="label_video_settings_audio_track">Zvuková stopa</string>
+    <string name="label_drm_not_supported_exception">DRM je povolené pre toto video, prehrávanie nie je podporované na tomto zariadení.</string>
+</resources>

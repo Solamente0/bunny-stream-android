@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">字幕</string>
+    <string name="label_video_settings_speed">速度</string>
+    <string name="label_video_settings_quality">畫質</string>
+    <string name="label_video_quality_auto">自动</string>
+    <string name="error_playing_video">无法播放视频</string>
+    <string name="label_video_settings_captions_disabled">已禁用</string>
+    <string name="label_video_settings_audio_track">音轨</string>
+    <string name="label_drm_not_supported_exception">此视频已启用DRM，此设备不支持播放。</string>
+</resources>

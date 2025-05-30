@@ -1,10 +1,9 @@
 package net.bunnystream.bunnystreamplayer.common
 
 import android.content.Context
+import android.content.res.Configuration
 import android.util.Log
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlMap
-import com.charleskorn.kaml.yamlMap
+import java.util.Locale
 
 class I18n(private val context: Context) {
 
@@ -12,25 +11,29 @@ class I18n(private val context: Context) {
         private const val TAG = "I18n"
     }
 
-    private var translationsMap: YamlMap? = null
+    private var languageCode: String? = null
 
     fun load(lang: String) {
-        try {
-            val id = context.resources.getIdentifier(
-                lang.lowercase(),
-                "raw",
-                context.packageName
-            )
-
-            val i18n = context.resources.openRawResource(id).bufferedReader().use { it.readText() }
-            translationsMap = Yaml.default.parseToYamlNode(i18n).yamlMap["i18n"]
-        } catch (e: Exception){
-            Log.w(TAG, "Couldn't load translations file for $lang language: ${e.message}")
-            e.printStackTrace()
-        }
+        languageCode = lang
     }
 
-    fun getTranslation(key: String, default: String): String {
-        return translationsMap?.getScalar(key)?.content ?: default
+    /**
+     * Gets a localized string for the specified language and string resource ID.
+     *
+     * @param resId ID from R.string.*
+     * @param languageCode ISO 639 language code, e.g., "en", "bg", "fr"
+     */
+    fun getTranslation(resId: Int): String {
+        return try {
+            val lang = languageCode ?: return context.getString(resId)
+            val config = Configuration(context.resources.configuration).apply {
+                setLocale(Locale(lang))
+            }
+            val localizedContext = context.createConfigurationContext(config)
+            localizedContext.getString(resId)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to load string for '$languageCode': ${e.message}")
+            context.getString(resId) // fallback to default
+        }
     }
 }

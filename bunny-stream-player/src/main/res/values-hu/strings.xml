@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Feliratok</string>
+    <string name="label_video_settings_speed">Sebesség</string>
+    <string name="label_video_settings_quality">Minőség</string>
+    <string name="label_video_quality_auto">Automatikus</string>
+    <string name="error_playing_video">A videó lejátszása nem sikerült</string>
+    <string name="label_video_settings_captions_disabled">Kikapcsolva</string>
+    <string name="label_video_settings_audio_track">Hangsáv</string>
+    <string name="label_drm_not_supported_exception">A DRM engedélyezve van ehhez a videóhoz, a lejátszás nem támogatott ezen az eszközön.</string>
+</resources>

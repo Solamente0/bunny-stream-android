@@ -70,19 +70,19 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val playStateListener = object : PlayerStateListener {
         override fun onPlayingChanged(isPlaying: Boolean) {
-            playPauseButton.state = if(isPlaying) {
+            playPauseButton.state = if (isPlaying) {
                 ToggleableImageButton.State.STATE_TOGGLED
             } else {
                 ToggleableImageButton.State.STATE_DEFAULT
             }
             errorWrapper.isVisible = false
-            if(isPlaying) {
+            if (isPlaying) {
                 overlay.removeAllViews()
             }
         }
 
         override fun onMutedChanged(isMuted: Boolean) {
-            muteButton.state = if(isMuted) {
+            muteButton.state = if (isMuted) {
                 ToggleableImageButton.State.STATE_TOGGLED
             } else {
                 ToggleableImageButton.State.STATE_DEFAULT
@@ -226,7 +226,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
     private val i18n = I18n(context)
 
-    private fun setPlayerControls(){
+    private fun setPlayerControls() {
         playPauseButton.setOnClickListener {
             if (bunnyPlayer?.isPlaying() == true) {
                 bunnyPlayer?.pause()
@@ -247,7 +247,7 @@ class BunnyPlayerView @JvmOverloads constructor(
             bunnyPlayer?.let {
                 it.setSubtitlesEnabled(!it.areSubtitlesEnabled())
             }
-            subtitle.state = if(bunnyPlayer?.areSubtitlesEnabled() == true) {
+            subtitle.state = if (bunnyPlayer?.areSubtitlesEnabled() == true) {
                 ToggleableImageButton.State.STATE_TOGGLED
             } else {
                 ToggleableImageButton.State.STATE_DEFAULT
@@ -268,9 +268,9 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 val subtitleOption = subtitleMenuIds[item.itemId]
 
-                if(subtitleOption != null) {
+                if (subtitleOption != null) {
                     bunnyPlayer?.selectSubtitle(subtitleOption)
-                    subtitle.state = if(subtitleOption.language == "") {
+                    subtitle.state = if (subtitleOption.language == "") {
                         ToggleableImageButton.State.STATE_DEFAULT
                     } else {
                         ToggleableImageButton.State.STATE_TOGGLED
@@ -281,7 +281,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 val qualityOption = qualityMenuIds[item.itemId]
 
-                if(qualityOption != null) {
+                if (qualityOption != null) {
                     bunnyPlayer?.selectQuality(qualityOption)
                     controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
@@ -289,7 +289,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 val audioTrackOption = audioTracksMenuIds[item.itemId]
 
-                if(audioTrackOption != null) {
+                if (audioTrackOption != null) {
                     bunnyPlayer?.selectAudioTrack(audioTrackOption)
                     controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
@@ -297,7 +297,7 @@ class BunnyPlayerView @JvmOverloads constructor(
 
                 val speedOption = speedMenuIds[item.itemId]
 
-                if(speedOption != null) {
+                if (speedOption != null) {
                     bunnyPlayer?.setSpeed(speedOption)
                     controllerShowTimeoutMs = 2.seconds.inWholeMilliseconds.toInt()
                     return@setOnMenuItemClickListener true
@@ -336,18 +336,16 @@ class BunnyPlayerView @JvmOverloads constructor(
 
         val subtitleMenuId = View.generateViewId()
 
-        if(subtitlesEnabled && subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
+        if (subtitlesEnabled && subtitlesConfig != null && subtitlesConfig.subtitles.isNotEmpty()) {
+            val translation = i18n.getTranslation(R.string.label_video_settings_captions)
             val subtitlesMenu = popupMenu.menu.addSubMenu(
                 Menu.NONE,
                 subtitleMenuId,
                 Menu.NONE,
-                i18n.getTranslation("captions", context.getString(R.string.label_video_settings_captions))
+                translation
             )
 
-            val disabledTitle = i18n.getTranslation(
-                "disabled",
-                context.getString(R.string.label_video_settings_captions_disabled)
-            )
+            val disabledTitle = i18n.getTranslation(R.string.label_video_settings_captions_disabled)
 
             val disabled = SubtitleInfo(disabledTitle, "")
 
@@ -360,7 +358,8 @@ class BunnyPlayerView @JvmOverloads constructor(
                 disabledTitle
             )
             item.isCheckable = true
-            item.isChecked = subtitlesConfig.selectedSubtitle == null || subtitlesConfig.selectedSubtitle == disabled
+            item.isChecked =
+                subtitlesConfig.selectedSubtitle == null || subtitlesConfig.selectedSubtitle == disabled
 
             subtitlesConfig.subtitles.forEach { info ->
                 val id = View.generateViewId()
@@ -386,19 +385,20 @@ class BunnyPlayerView @JvmOverloads constructor(
         val videoQualityOptions = bunnyPlayer?.getVideoQualityOptions()
         val qualityMenuId = View.generateViewId()
 
-        if(videoQualityOptions != null) {
+        if (videoQualityOptions != null) {
+            val translation = i18n.getTranslation(R.string.label_video_settings_quality)
             val qualityOptionsMenu = popupMenu.menu.addSubMenu(
                 Menu.NONE,
                 qualityMenuId,
                 Menu.NONE,
-                i18n.getTranslation("quality", context.getString(R.string.label_video_settings_quality))
+                translation
             )
 
             videoQualityOptions.options.forEach { option ->
                 val id = generateViewId()
                 qualityMenuIds[id] = option
 
-                val title = if(option.width == Int.MAX_VALUE) {
+                val title = if (option.width == Int.MAX_VALUE) {
                     context.getString(R.string.label_video_quality_auto)
                 } else {
                     "${option.width} x ${option.height}"
@@ -425,12 +425,12 @@ class BunnyPlayerView @JvmOverloads constructor(
         val audioTrackOptions = bunnyPlayer?.getAudioTrackOptions()
         val audioTracksMenuId = View.generateViewId()
 
-        if(audioTrackOptions != null && audioTrackOptions.options.size > 1) {
+        if (audioTrackOptions != null && audioTrackOptions.options.size > 1) {
             val qualityOptionsMenu = popupMenu.menu.addSubMenu(
                 Menu.NONE,
                 audioTracksMenuId,
                 Menu.NONE,
-                i18n.getTranslation("audioTrack", context.getString(R.string.label_video_settings_audio_track))
+                i18n.getTranslation(R.string.label_video_settings_audio_track)
             )
 
             audioTrackOptions.options.forEach { option ->
@@ -460,12 +460,12 @@ class BunnyPlayerView @JvmOverloads constructor(
 
         val speedMenuId = View.generateViewId()
 
-        if(!speeds.isNullOrEmpty()) {
+        if (!speeds.isNullOrEmpty()) {
             val speedOptionsMenu = popupMenu.menu.addSubMenu(
                 Menu.NONE,
                 speedMenuId,
                 Menu.NONE,
-                i18n.getTranslation("speed", context.getString(R.string.label_video_settings_speed))
+                i18n.getTranslation(R.string.label_video_settings_speed)
             )
 
             speeds.forEach { option ->
@@ -487,17 +487,18 @@ class BunnyPlayerView @JvmOverloads constructor(
         return speedMenuIds
     }
 
-    private fun updatePlayer(player: Player, playerType: PlayerType){
+    private fun updatePlayer(player: Player, playerType: PlayerType) {
         Log.d(TAG, "updatePlayer player=$player playerTpe=$playerType")
         this.player = player
 
-        when(playerType) {
+        when (playerType) {
             PlayerType.DEFAULT_PLAYER -> {
                 controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
                 defaultArtwork = null
                 controllerHideOnTouch = true
                 muteButton.isVisible = true
             }
+
             PlayerType.CAST_PLAYER -> {
                 controllerShowTimeoutMs = 0
                 showController()
@@ -519,7 +520,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         settingsButton.setImageResource(iconSet.settingsIcon)
         muteButton.setStateIcons(iconSet.volumeOnIcon, iconSet.volumeOffIcon)
 
-        val fullScreenIcon = if(isFullscreen) {
+        val fullScreenIcon = if (isFullscreen) {
             iconSet.fullscreenOffIcon
         } else {
             iconSet.fullscreenOnIcon
@@ -529,13 +530,18 @@ class BunnyPlayerView @JvmOverloads constructor(
 
         val settings = playerSettings
 
-        if(settings == null) {
+        if (settings == null) {
             timeBar.tintColor = Color.WHITE
             subtitles.setStyle(CaptionStyleCompat.DEFAULT)
         } else {
             timeBar.tintColor = settings.keyColor
 
-            subtitles.setStyle(getSubtitleStyle(settings.captionsFontColor, settings.captionsBackgroundColor))
+            subtitles.setStyle(
+                getSubtitleStyle(
+                    settings.captionsFontColor,
+                    settings.captionsBackgroundColor
+                )
+            )
             subtitles.setFixedTextSize(Dimension.SP, settings.captionsFontSize.toFloat())
 
             // Google fonts are usually capitalized, e.g. "rubik" is not found but "Rubik" is
@@ -576,10 +582,10 @@ class BunnyPlayerView @JvmOverloads constructor(
         })
 
         setControllerVisibilityListener(ControllerVisibilityListener {
-            if(playerSettings?.rewindEnabled == true) {
+            if (playerSettings?.rewindEnabled == true) {
                 replyButton.visibility = it
             }
-            if(playerSettings?.fastForwardEnabled == true){
+            if (playerSettings?.fastForwardEnabled == true) {
                 forwardButton.visibility = it
             }
             bottomBar.visibility = it
@@ -591,7 +597,7 @@ class BunnyPlayerView @JvmOverloads constructor(
         })
     }
 
-    private fun fetchFont(fontFamily: String){
+    private fun fetchFont(fontFamily: String) {
         Log.d(TAG, "fetchFont: $fontFamily")
         val handlerThread = HandlerThread("fonts").apply { start() }
         val handler = Handler(handlerThread.looper)
@@ -616,13 +622,19 @@ class BunnyPlayerView @JvmOverloads constructor(
         FontsContractCompat.requestFont(context, request, callback, handler)
     }
 
-    private fun updateFonts(typeface: Typeface){
+    private fun updateFonts(typeface: Typeface) {
         timeBarPreview.updateTypeface(typeface)
         progressTextView.typeface = typeface
         durationTextView.typeface = typeface
 
         playerSettings?.let {
-            subtitles.setStyle(getSubtitleStyle(it.captionsFontColor, it.captionsBackgroundColor, typeface))
+            subtitles.setStyle(
+                getSubtitleStyle(
+                    it.captionsFontColor,
+                    it.captionsBackgroundColor,
+                    typeface
+                )
+            )
         }
     }
 

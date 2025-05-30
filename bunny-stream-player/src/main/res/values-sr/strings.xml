@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Natpisi</string>
+    <string name="label_video_settings_speed">Brzina</string>
+    <string name="label_video_settings_quality">Kvalitet</string>
+    <string name="label_video_quality_auto">Аутоматски</string>
+    <string name="error_playing_video">Није могуће репродуковати видео</string>
+    <string name="label_video_settings_captions_disabled">Onemogućeno</string>
+    <string name="label_video_settings_audio_track">Аудио трака</string>
+    <string name="label_drm_not_supported_exception">DRM је омогућен за овај видео, репродукција није подржана на овом уређају.</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Subtitrări</string>
+    <string name="label_video_settings_speed">Viteză</string>
+    <string name="label_video_settings_quality">Calitate</string>
+    <string name="label_video_quality_auto">Automat</string>
+    <string name="error_playing_video">Nu s-a putut reda videoclipul</string>
+    <string name="label_video_settings_captions_disabled">Dezactivat</string>
+    <string name="label_video_settings_audio_track">Pistă audio</string>
+    <string name="label_drm_not_supported_exception">DRM este activat pentru acest videoclip, redarea nu este acceptată pe acest dispozitiv.</string>
+</resources>

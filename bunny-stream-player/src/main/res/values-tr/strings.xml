@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_video_settings_captions">Altyazılar</string>
+    <string name="label_video_settings_speed">Hız</string>
+    <string name="label_video_settings_quality">Kalite</string>
+    <string name="label_video_quality_auto">Otomatik</string>
+    <string name="error_playing_video">Video oynatılamadı</string>
+    <string name="label_video_settings_captions_disabled">Devre dışı</string>
+    <string name="label_video_settings_audio_track">Ses parçası</string>
+    <string name="label_drm_not_supported_exception">Bu video için DRM etkinleştirildi, bu cihazda oynatma desteklenmiyor.</string>
+</resources>
