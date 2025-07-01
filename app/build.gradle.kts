@@ -24,15 +24,6 @@ android {
         }
     }
 
-    signingConfigs {
-        create("develop") {
-            storeFile = file("keystore/develop.keystore")
-            storePassword = "android"
-            keyAlias = "android"
-            keyPassword = "android"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -43,11 +34,11 @@ android {
         }
 
         getByName("debug") {
-            signingConfig = signingConfigs.getByName("develop")
+
         }
 
         create("staging") {
-            signingConfig = signingConfigs.getByName("develop")
+
         }
     }
     compileOptions {
@@ -73,9 +64,9 @@ android {
 dependencies {
     // Project Modules
     // Gradle Project Dependencies: https://docs.gradle.org/current/userguide/java_plugin.html#sec:project_dependencies
-    implementation(project(":bunny-stream-api"))
-    implementation(project(":bunny-stream-player"))
-    implementation(project(":bunny-stream-camera-upload"))
+    implementation(project(":api"))
+    implementation(project(":player"))
+    implementation(project(":recording"))
 
     // AndroidX Core and Lifecycle
     // Core: https://developer.android.com/jetpack/androidx/releases/core

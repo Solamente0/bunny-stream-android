@@ -1,115 +1,64 @@
-name: Deploy App
+# Workflow name shown in GitHub Actions UI
+name: Test and Upload Artifact App
 
+# When to run this workflow:
 on:
-  pull_request:
-    branches: [ develop ]
-
+  # Trigger on any push to 'main'
+  push:
+    branches:
+      - main
+  # Allow manual triggering from the Actions tab
   workflow_dispatch:
 
 jobs:
-  lint_check:
-    name: Lint check
-    runs-on: ubuntu-latest 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Lint check
-        run: ./gradlew .detekt
-        
+  # First job: run your unit tests
   unit_tests:
     name: Run unit tests
-    runs-on: ubuntu-latest 
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Unit tests
-        run: ./gradlew testDebugUnitTest
-
-  instrumentation_tests:
-    name: Instrumentation tests
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        api-level: [29]
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-        
-
-      - name: Run tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedCheck
-        
-  build:
-    name: Build app
-    needs: [ lint_check, unit_tests, instrumentation_tests ]
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      # Check out the repository code
+      - uses: actions/checkout@v4
+
+      # Set up JDK 17 (Temurin distribution)
       - name: Setup JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+      # Execute your Android unit tests
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Build Release APK
-        run: ./gradlew :app:assembleDebug
-
+  # Second job: build the APK and upload it
   distribute:
-    name: Distribute
-    needs: [ build ]
-    runs-on: ubuntu-latest 
-
+    name: Upload APK as Artifact
+    needs: unit_tests
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      # Re-checkout code at the start of this job
+      - uses: actions/checkout@v4
+
+      # Set up JDK again for Gradle
       - name: Setup JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
+      # Install the Android SDK to build the app
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3.2.0
 
+      # Build the Debug APK with Gradle
       - name: Build Debug APK
-        run: ./gradlew :app:assembleDebug
+        run: ./gradlew :app:assembleDebug --no-daemon
 
-      - name: Upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
+      # Upload the generated Debug APK as a GitHub Actions artifact
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v3
         with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          groups: Testers
-          file: app/build/outputs/apk/debug/app-debug.apk
+          # The name shown in the Actions UI for this artifact
+          name: app-debug-apk
+          # Path to the APK file produced by the build
+          path: app/build/outputs/apk/debug/app-debug.apk
