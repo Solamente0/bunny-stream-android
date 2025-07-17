@@ -5,6 +5,7 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.bunnystreamplayer.PlayerStateListener
+import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
 import net.bunnystream.bunnystreamplayer.model.AudioTrackInfo
 import net.bunnystream.bunnystreamplayer.model.AudioTrackInfoOptions
 import net.bunnystream.bunnystreamplayer.model.SeekThumbnail
@@ -74,6 +75,8 @@ interface BunnyPlayer {
 
     fun replay()
 
+    fun setPlaybackSpeedConfig(config: PlaybackSpeedConfig)
+    fun loadSavedSpeed()
     fun setSpeed(speed: Float)
 
     fun getSpeed(): Float

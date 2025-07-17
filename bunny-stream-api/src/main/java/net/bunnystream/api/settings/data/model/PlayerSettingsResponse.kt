@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.api.settings.toColorOrDefault
+import net.bunnystream.api.settings.PlaybackSpeedManager
 
 @Serializable
 data class PlayerSettingsResponse(
@@ -35,9 +36,9 @@ data class PlayerSettingsResponse(
     @SerialName("fontFamily")
     val fontFamily: String,
 
-    // "playbackSpeeds": "0.5,0.75,1,1.25,1.5,1.75,2,4"
+    // "playbackSpeeds": "0.5,0.75,1,1.25,1.5,1.75,2,3,4"
     @SerialName("playbackSpeeds")
-    val playbackSpeeds: String?,
+    val playbackSpeeds: String? , // "0.5,0.75,1,1.25,1.5,1.75,2,3,4"
 
     @SerialName("enableDRM")
     val drmEnabled: Boolean,
@@ -73,10 +74,6 @@ data class PlayerSettingsResponse(
     )
 
     private fun parsePlaybackSpeeds(): List<Float> {
-        return try {
-            playbackSpeeds?.split(",")?.map { it.toFloat() } ?: listOf()
-        } catch (e: Exception) {
-            listOf()
-        }
+        return PlaybackSpeedManager().parsePlaybackSpeeds(playbackSpeeds)
     }
 }

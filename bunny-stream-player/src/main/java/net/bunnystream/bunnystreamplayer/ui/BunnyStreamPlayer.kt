@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.bunnystreamplayer.DefaultBunnyPlayer
+import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
 import net.bunnystream.bunnystreamplayer.model.PlayerIconSet
 import net.bunnystream.bunnystreamplayer.model.getSanitizedRetentionData
 import net.bunnystream.bunnystreamplayer.ui.fullscreen.FullScreenPlayerActivity
@@ -113,7 +114,10 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         Log.d(TAG, "onDetachedFromWindow")
         bunnyPlayer.stop()
     }
-
+    fun setPlaybackSpeedConfig(config: PlaybackSpeedConfig) {
+        val defaultPlayer = DefaultBunnyPlayer.getInstance(context)
+        defaultPlayer.setPlaybackSpeedConfig(config)
+    }
     override fun playVideo(videoId: String, libraryId: Long?) {
         Log.d(TAG, "playVideo videoId=$videoId")
 
@@ -163,7 +167,7 @@ class BunnyStreamPlayer @JvmOverloads constructor(
                                 uiLanguage = "",
                                 showHeatmap = false,
                                 fontFamily = "",
-                                playbackSpeeds = emptyList(),
+                                playbackSpeeds = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 3.0f, 4.0f), // Add this line
                                 drmEnabled = false,
                                 vastTagUrl = null,
                                 videoUrl = "",

@@ -36,9 +36,12 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.settings.PlaybackSpeedManager
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.api.settings.toUri
 import net.bunnystream.bunnystreamplayer.common.BunnyPlayer
+import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
+import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedPreferences
 import net.bunnystream.bunnystreamplayer.context.AppCastContext
 import net.bunnystream.bunnystreamplayer.model.AudioTrackInfo
 import net.bunnystream.bunnystreamplayer.model.AudioTrackInfoOptions
@@ -54,7 +57,6 @@ import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
-
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -73,6 +75,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
                 instance ?: DefaultBunnyPlayer(context.applicationContext).also { instance = it }
             }
     }
+
+    private var speedConfig = PlaybackSpeedConfig()
+    private val speedPreferences = PlaybackSpeedPreferences(context)
+    private val speedManager = PlaybackSpeedManager()
 
     private var localPlayer: Player? = null
     private val castContext = AppCastContext.get()
@@ -224,7 +230,21 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
         }
     }
-
+    // Add configuration method
+    override fun setPlaybackSpeedConfig(config: PlaybackSpeedConfig) {
+        this.speedConfig = config
+        if (config.rememberLastSpeed) {
+            loadSavedSpeed()
+        }
+    }
+    override fun loadSavedSpeed() {
+        if (speedConfig.rememberLastSpeed) {
+            val savedSpeed = speedPreferences.getLastSpeed(speedConfig.defaultSpeed)
+            if (savedSpeed != 1.0f) {
+                setSpeed(savedSpeed)
+            }
+        }
+    }
     @SuppressLint("UnsafeOptInUsageError")
     override fun playVideo(
         playerView: PlayerView,
@@ -294,6 +314,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             .setUri(playerSettings.videoUrl)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
             .setSubtitleConfigurations(subtitleConfigs)
+
+        if (speedConfig.rememberLastSpeed) {
+            loadSavedSpeed()
+        }
 
         if (playerSettings.drmEnabled) {
             mediaItemBuilder.setDrmConfiguration(
@@ -432,8 +456,14 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun setSpeed(speed: Float) {
         currentPlayer?.setPlaybackSpeed(speed)
-    }
 
+        if (speedConfig.rememberLastSpeed) {
+            speedPreferences.saveLastSpeed(speed)
+        }
+
+        // Notify listener for UI updates (like speed badge)
+        playerStateListener?.onPlaybackSpeedChanged(speed)
+    }
     override fun getSpeed(): Float {
         return currentPlayer?.playbackParameters?.speed ?: 1F
     }
@@ -515,9 +545,10 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun getPlaybackSpeeds(): List<Float> {
-        return playerSettings?.playbackSpeeds ?: listOf()
+        return speedConfig.allowedSpeeds
+            ?: playerSettings?.playbackSpeeds
+            ?: PlaybackSpeedManager.DEFAULT_SPEEDS
     }
-
     override fun release() {
         currentPlayer?.stop()
 
