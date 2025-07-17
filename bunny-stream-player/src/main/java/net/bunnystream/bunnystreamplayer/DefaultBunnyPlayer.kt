@@ -238,13 +238,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         }
     }
     override fun loadSavedSpeed() {
-        if (speedConfig.rememberLastSpeed) {
+        if (speedConfig.rememberLastSpeed && currentPlayer != null) {
             val savedSpeed = speedPreferences.getLastSpeed(speedConfig.defaultSpeed)
-            if (savedSpeed != 1.0f) {
-                setSpeed(savedSpeed)
+            Log.d(TAG, "Loading saved speed: $savedSpeed")
+            if (savedSpeed != speedConfig.defaultSpeed) {
+                currentPlayer?.setPlaybackSpeed(savedSpeed)
             }
         }
     }
+
     @SuppressLint("UnsafeOptInUsageError")
     override fun playVideo(
         playerView: PlayerView,
@@ -315,10 +317,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             .setMimeType(MimeTypes.APPLICATION_M3U8)
             .setSubtitleConfigurations(subtitleConfigs)
 
-        if (speedConfig.rememberLastSpeed) {
-            loadSavedSpeed()
-        }
-
         if (playerSettings.drmEnabled) {
             mediaItemBuilder.setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
@@ -353,6 +351,13 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             .setMediaSourceFactory(mediaSourceFactory)
             .build().also {
                 it.addListener(playerListener)
+                it.addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        if (playbackState == Player.STATE_READY && speedConfig.rememberLastSpeed) {
+                            loadSavedSpeed()
+                        }
+                    }
+                })
                 it.addAnalyticsListener(object : AnalyticsListener {
                     override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
                         Log.d(TAG, "✅ First frame rendered after ${renderTimeMs}ms")
@@ -396,6 +401,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         currentPlayer!!.setMediaItem(mediaItem)
         currentPlayer!!.prepare()
         currentPlayer!!.playWhenReady = true
+
+
+        if (speedConfig.rememberLastSpeed) {
+            loadSavedSpeed()
+        }
 
         // Init seek thumbnails and metadata
         initSeekThumbnailPreview(video, playerSettings.seekPath)
@@ -455,13 +465,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun setSpeed(speed: Float) {
+        Log.d(TAG, "Setting speed to: $speed")
         currentPlayer?.setPlaybackSpeed(speed)
 
         if (speedConfig.rememberLastSpeed) {
             speedPreferences.saveLastSpeed(speed)
+            Log.d(TAG, "Saved speed: $speed")
         }
 
-        // Notify listener for UI updates (like speed badge)
+        // Notify listener for UI updates
         playerStateListener?.onPlaybackSpeedChanged(speed)
     }
     override fun getSpeed(): Float {

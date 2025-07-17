@@ -2,6 +2,7 @@ package net.bunnystream.bunnystreamplayer.config
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 
 data class PlaybackSpeedConfig(
     val enableSpeedControl: Boolean = true,
@@ -12,16 +13,20 @@ data class PlaybackSpeedConfig(
 )
 
 class PlaybackSpeedPreferences(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("bunny_speed_prefs", Context.MODE_PRIVATE)
-    
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("bunny_speed_prefs", Context.MODE_PRIVATE)
+
     fun saveLastSpeed(speed: Float) {
+        Log.d("PlaybackSpeedPrefs", "Saving speed: $speed")
         prefs.edit().putFloat("last_speed", speed).apply()
     }
-    
+
     fun getLastSpeed(defaultSpeed: Float = 1.0f): Float {
-        return prefs.getFloat("last_speed", defaultSpeed)
+        val saved = prefs.getFloat("last_speed", defaultSpeed)
+        Log.d("PlaybackSpeedPrefs", "Retrieved speed: $saved")
+        return saved
     }
-    
+
     fun clearLastSpeed() {
         prefs.edit().remove("last_speed").apply()
     }
