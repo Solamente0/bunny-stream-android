@@ -3,6 +3,9 @@ package net.bunnystream.bunnystreamplayer.common
 import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
+import net.bunnystream.api.playback.PlaybackPositionManager
+import net.bunnystream.api.playback.ResumeConfig
+import net.bunnystream.api.playback.ResumePositionListener
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.bunnystreamplayer.PlayerStateListener
 import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
@@ -98,4 +101,10 @@ interface BunnyPlayer {
     fun selectAudioTrack(audioTrackInfo: AudioTrackInfo)
 
     fun getPlaybackSpeeds(): List<Float>
+
+    // New resume position methods
+    fun enableResumePosition(config: ResumeConfig = ResumeConfig())
+    fun disableResumePosition()
+    fun clearSavedPosition(videoId: String)
+    fun setResumePositionListener(listener: ResumePositionListener)
 }

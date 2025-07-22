@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,9 +53,12 @@ import net.bunnystream.android.demo.ui.AppState
 import net.bunnystream.android.demo.ui.theme.BunnyStreamTheme
 import net.bunnystream.android.demo.library.model.Video
 import net.bunnystream.android.demo.library.model.VideoStatus
+import net.bunnystream.api.playback.PlaybackPosition
+import net.bunnystream.api.playback.ResumeConfig
 import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
 import net.bunnystream.bunnystreamplayer.ui.BunnyStreamPlayer
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun PlayerRoute(
@@ -87,6 +92,9 @@ fun PlayerScreen(
 ) {
     var playerController by remember { mutableStateOf<PlayerController?>(null) }
     var currentSpeed by remember { mutableStateOf(1.0f) }
+    var showResumeDialog by remember { mutableStateOf(false) }
+    var resumePosition by remember { mutableStateOf<PlaybackPosition?>(null) }
+    var resumeCallback by remember { mutableStateOf<((Boolean) -> Unit)?>(null) }
 
     Scaffold(
         topBar = {
@@ -121,6 +129,11 @@ fun PlayerScreen(
                 onPlayerReady = { player ->
                     playerController = PlayerController(player)
                 },
+                onResumePosition = { position, callback ->
+                    resumePosition = position
+                    resumeCallback = callback
+                    showResumeDialog = true
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
@@ -154,6 +167,69 @@ fun PlayerScreen(
             }
         }
     }
+
+    // Resume Dialog
+    if (showResumeDialog && resumePosition != null) {
+        ResumeDialog(
+            position = resumePosition!!,
+            onResume = {
+                resumeCallback?.invoke(true)
+                showResumeDialog = false
+            },
+            onStartOver = {
+                resumeCallback?.invoke(false)
+                showResumeDialog = false
+            },
+            onDismiss = {
+                resumeCallback?.invoke(false)
+                showResumeDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun ResumeDialog(
+    position: PlaybackPosition,
+    onResume: () -> Unit,
+    onStartOver: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Resume Playback",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Continue watching from ${formatTime(position.position)}?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Progress: ${(position.watchPercentage * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onResume) {
+                Text("Resume", color = MaterialTheme.colorScheme.primary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onStartOver) {
+                Text("Start Over")
+            }
+        }
+    )
 }
 
 @Composable
@@ -290,6 +366,7 @@ fun BunnyPlayerComposable(
     videoId: String,
     libraryId: Long?,
     onPlayerReady: (BunnyStreamPlayer) -> Unit = {},
+    onResumePosition: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
@@ -321,6 +398,19 @@ fun BunnyPlayerComposable(
                 )
 
                 player.setPlaybackSpeedConfig(speedConfig)
+
+                // Enable resume position with custom callback
+                player.enableResumePosition(
+                    config = ResumeConfig(
+                        retentionDays = 7,
+                        minimumWatchTime = 30_000L, // 30 seconds
+                        resumeThreshold = 0.05f, // Don't resume if < 5% watched
+                        nearEndThreshold = 0.95f // Don't resume if > 95% watched
+                    ),
+                    onResumePositionCallback = onResumePosition
+                )
+
+                onPlayerReady(player)
                 player
             },
             update = {
@@ -328,6 +418,18 @@ fun BunnyPlayerComposable(
             },
             modifier = modifier.background(Color.Gray)
         )
+    }
+}
+
+private fun formatTime(positionMs: Long): String {
+    val hours = TimeUnit.MILLISECONDS.toHours(positionMs)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(positionMs) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(positionMs) % 60
+
+    return if (hours > 0) {
+        String.format("%d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format("%d:%02d", minutes, seconds)
     }
 }
 

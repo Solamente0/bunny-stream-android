@@ -16,6 +16,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.bunnystream.api.BunnyStreamApi
+import net.bunnystream.api.playback.PlaybackPosition
+import net.bunnystream.api.playback.ResumeConfig
+import net.bunnystream.api.playback.ResumePositionListener
 import net.bunnystream.api.settings.domain.model.PlayerSettings
 import net.bunnystream.bunnystreamplayer.DefaultBunnyPlayer
 import net.bunnystream.bunnystreamplayer.config.PlaybackSpeedConfig
@@ -56,6 +59,24 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
     private val bunnyPlayer = DefaultBunnyPlayer.getInstance(context)
 
+    // Resume position functionality
+    private var resumePositionCallback: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null
+
+    private val resumePositionListener = object : ResumePositionListener {
+        override fun onResumePositionAvailable(videoId: String, position: PlaybackPosition) {
+            Log.d(TAG, "Resume position available: $position")
+            resumePositionCallback?.invoke(position) { shouldResume ->
+                if (shouldResume) {
+                    bunnyPlayer.seekTo(position.position)
+                }
+            }
+        }
+
+        override fun onResumePositionSaved(videoId: String, position: PlaybackPosition) {
+            Log.d(TAG, "Resume position saved: $position")
+        }
+    }
+
     private val lifecycleObserver = object : DefaultLifecycleObserver {
         override fun onResume(owner: LifecycleOwner) {
             if (bunnyPlayer.autoPaused) {
@@ -80,6 +101,9 @@ class BunnyStreamPlayer @JvmOverloads constructor(
                 }
             }
         }
+
+        // Set up resume position listener
+        bunnyPlayer.setResumePositionListener(resumePositionListener)
 
         addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(view: View) {
@@ -114,10 +138,38 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         Log.d(TAG, "onDetachedFromWindow")
         bunnyPlayer.stop()
     }
+
     fun setPlaybackSpeedConfig(config: PlaybackSpeedConfig) {
         val defaultPlayer = DefaultBunnyPlayer.getInstance(context)
         defaultPlayer.setPlaybackSpeedConfig(config)
     }
+
+    /**
+     * Enable resume position functionality
+     */
+    fun enableResumePosition(
+        config: ResumeConfig = ResumeConfig(),
+        onResumePositionCallback: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null
+    ) {
+        bunnyPlayer.enableResumePosition(config)
+        this.resumePositionCallback = onResumePositionCallback
+    }
+
+    /**
+     * Disable resume position functionality
+     */
+    fun disableResumePosition() {
+        bunnyPlayer.disableResumePosition()
+        this.resumePositionCallback = null
+    }
+
+    /**
+     * Clear saved position for specific video
+     */
+    fun clearSavedPosition(videoId: String) {
+        bunnyPlayer.clearSavedPosition(videoId)
+    }
+
     override fun playVideo(videoId: String, libraryId: Long?) {
         Log.d(TAG, "playVideo videoId=$videoId")
 
@@ -140,7 +192,7 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
                 try {
                     video = withContext(Dispatchers.IO) {
-                       BunnyStreamApi.getInstance().videosApi.videoGetVideoPlayData(
+                        BunnyStreamApi.getInstance().videosApi.videoGetVideoPlayData(
                             providedLibraryId,
                             videoId
                         ).video?.toVideoModel()!!
@@ -167,7 +219,7 @@ class BunnyStreamPlayer @JvmOverloads constructor(
                                 uiLanguage = "",
                                 showHeatmap = false,
                                 fontFamily = "",
-                                playbackSpeeds = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 3.0f, 4.0f), // Add this line
+                                playbackSpeeds = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 3.0f, 4.0f),
                                 drmEnabled = false,
                                 vastTagUrl = null,
                                 videoUrl = "",
