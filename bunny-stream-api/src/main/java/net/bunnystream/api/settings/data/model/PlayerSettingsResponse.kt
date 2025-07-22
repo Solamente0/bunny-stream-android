@@ -38,7 +38,7 @@ data class PlayerSettingsResponse(
 
     // "playbackSpeeds": "0.5,0.75,1,1.25,1.5,1.75,2,3,4"
     @SerialName("playbackSpeeds")
-    val playbackSpeeds: String? , // "0.5,0.75,1,1.25,1.5,1.75,2,3,4"
+    val playbackSpeeds: String?, // "0.5,0.75,1,1.25,1.5,1.75,2,3,4"
 
     @SerialName("enableDRM")
     val drmEnabled: Boolean,
@@ -53,8 +53,15 @@ data class PlayerSettingsResponse(
     val seekPath: String,
 
     @SerialName("videoPlaylistUrl")
-    val videoUrl: String
-) {
+    val videoUrl: String,
+
+    @SerialName("resumePosition")
+    val resumePosition: Long? = 0L,
+
+    @SerialName("saveProgressInterval")
+    val saveProgressInterval: Long? = 30000L,
+
+    ) {
     fun toModel() = PlayerSettings(
         thumbnailUrl = thumbnailUrl,
         controls = controls,
@@ -70,7 +77,9 @@ data class PlayerSettingsResponse(
         vastTagUrl = vastTagUrl,
         captionsPath = captionsPath,
         seekPath = seekPath,
-        videoUrl = videoUrl
+        videoUrl = videoUrl,
+        resumePosition = resumePosition ?: 0L,
+        saveProgressInterval = saveProgressInterval ?: 30000L,
     )
 
     private fun parsePlaybackSpeeds(): List<Float> {

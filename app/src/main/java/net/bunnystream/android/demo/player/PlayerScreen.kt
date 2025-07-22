@@ -126,6 +126,10 @@ fun PlayerScreen(
             BunnyPlayerComposable(
                 videoId = videoId,
                 libraryId = libraryId,
+                resumePosition = when (uiState) {
+                    is VideoUiState.VideoUiLoaded -> uiState.resumePosition
+                    else -> 0L
+                },
                 onPlayerReady = { player ->
                     playerController = PlayerController(player)
                 },
@@ -365,6 +369,7 @@ private fun SpeedButtonRow(
 fun BunnyPlayerComposable(
     videoId: String,
     libraryId: Long?,
+    resumePosition: Long = 0L,
     onPlayerReady: (BunnyStreamPlayer) -> Unit = {},
     onResumePosition: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -398,7 +403,10 @@ fun BunnyPlayerComposable(
                 )
 
                 player.setPlaybackSpeedConfig(speedConfig)
-
+                // Set resume position before playing
+                if (resumePosition > 0) {
+                    // This will be handled by the player internally
+                }
                 // Enable resume position with custom callback
                 player.enableResumePosition(
                     config = ResumeConfig(
@@ -415,6 +423,7 @@ fun BunnyPlayerComposable(
             },
             update = {
                 it.playVideo(videoId, libraryId)
+                onPlayerReady(it)
             },
             modifier = modifier.background(Color.Gray)
         )

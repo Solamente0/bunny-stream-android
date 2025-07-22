@@ -29,6 +29,8 @@ import androidx.media3.ui.PlayerView
 import com.google.android.gms.cast.framework.CastState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.bunnystream.api.BunnyStreamApi
 import net.bunnystream.api.playback.DefaultPlaybackPositionManager
@@ -57,6 +59,8 @@ import org.openapitools.client.models.VideoModel
 import kotlin.math.ceil
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -76,9 +80,15 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
     }
 
+    // Speed Variables
     private var speedConfig = PlaybackSpeedConfig()
     private val speedPreferences = PlaybackSpeedPreferences(context)
     private val speedManager = PlaybackSpeedManager()
+
+    // Player Position Variables
+    private var currentLibraryId: Long? = null
+    private var resumePosition: Long = 0L
+    private var progressSaveJob: Job? = null
 
     private var localPlayer: Player? = null
     private val castContext = AppCastContext.get()
@@ -320,6 +330,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         currentVideo = video
         currentVideoId = video.guid
 
+        currentLibraryId = video.videoLibraryId
+        resumePosition = playerSettings.resumePosition
+
         // Set up TransferListener for debugging
         val transferListener = object : TransferListener {
             override fun onTransferInitializing(
@@ -471,6 +484,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             loadSavedSpeed()
         }
 
+        if (resumePosition > 0) {
+            currentPlayer!!.seekTo(resumePosition)
+        }
+
+        startProgressSaving(playerSettings.saveProgressInterval)
         // Init seek thumbnails and metadata
         initSeekThumbnailPreview(video, playerSettings.seekPath)
 
@@ -489,6 +507,48 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         if (playerSettings.showHeatmap) {
             this.retentionData = retentionData.map { (ms, pct) ->
                 RetentionGraphEntry(ms, pct)
+            }
+        }
+    }
+
+    override fun setResumePosition(position: Long) {
+        resumePosition = position
+    }
+
+    override fun saveCurrentProgress() {
+        currentVideoId?.let { videoId ->
+            currentLibraryId?.let { libraryId ->
+                val position = getCurrentPosition()
+                if (position > 0) {
+                    // Save progress in background
+                    GlobalScope.launch {
+                        BunnyStreamApi.getInstance().progressRepository
+                            .saveProgress(libraryId, videoId, position)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun clearProgress() {
+        currentVideoId?.let { videoId ->
+            currentLibraryId?.let { libraryId ->
+                GlobalScope.launch {
+                    BunnyStreamApi.getInstance().progressRepository
+                        .clearProgress(libraryId, videoId)
+                }
+            }
+        }
+    }
+
+    private fun startProgressSaving(intervalMs: Long) {
+        progressSaveJob?.cancel()
+        progressSaveJob = GlobalScope.launch {
+            while (isActive) {
+                delay(intervalMs)
+                if (isPlaying()) {
+                    saveCurrentProgress()
+                }
             }
         }
     }
@@ -629,8 +689,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
     override fun release() {
         // Save position before releasing
-        saveCurrentPosition()
-
+        saveCurrentProgress()
+        progressSaveJob?.cancel()
         currentPlayer?.stop()
 
         localPlayer?.release()

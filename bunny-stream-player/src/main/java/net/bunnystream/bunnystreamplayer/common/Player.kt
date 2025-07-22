@@ -107,4 +107,8 @@ interface BunnyPlayer {
     fun disableResumePosition()
     fun clearSavedPosition(videoId: String)
     fun setResumePositionListener(listener: ResumePositionListener)
+
+    fun setResumePosition(position: Long)
+    fun saveCurrentProgress()
+    fun clearProgress()
 }
