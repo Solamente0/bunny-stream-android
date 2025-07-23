@@ -3,6 +3,7 @@ package net.bunnystream.bunnystreamplayer.common
 import androidx.annotation.FloatRange
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
+import net.bunnystream.api.playback.PlaybackPosition
 import net.bunnystream.api.playback.PlaybackPositionManager
 import net.bunnystream.api.playback.ResumeConfig
 import net.bunnystream.api.playback.ResumePositionListener
@@ -29,6 +30,8 @@ interface BunnyPlayer {
     var autoPaused: Boolean
 
     var playerSettings: PlayerSettings?
+
+    var positionManager: PlaybackPositionManager?
 
     /* Releases the resources held by the player, such as codecs. */
     fun release()
@@ -108,6 +111,11 @@ interface BunnyPlayer {
     fun clearSavedPosition(videoId: String)
     fun setResumePositionListener(listener: ResumePositionListener)
 
+    fun clearAllSavedPositions()
+    fun getAllSavedPositions(callback: (List<PlaybackPosition>)-> Unit)
+    fun exportPositions(callback: (String) -> Unit)
+    fun importPositions(jsonData: String, callback: (Boolean) -> Unit)
+    fun cleanupExpiredPositions()
     fun setResumePosition(position: Long)
     fun saveCurrentProgress()
     fun clearProgress()

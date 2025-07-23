@@ -13,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.bunnystream.api.BunnyStreamApi
@@ -30,6 +32,7 @@ import net.bunnystream.player.databinding.ViewBunnyVideoPlayerBinding
 import org.openapitools.client.models.VideoModel
 import org.openapitools.client.models.VideoPlayDataModelVideo
 
+
 class BunnyStreamPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -38,11 +41,13 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "BunnyVideoPlayer"
+        private const val AUTO_SAVE_INTERVAL = 10_000L // 10 seconds
     }
 
     private var job: Job? = null
     private var scope: CoroutineScope? = null
     private var loadVideoJob: Job? = null
+    private var autoSaveJob: Job? = null // Add auto-save job
     private var pendingJob: (() -> Job)? = null
 
     private val binding = ViewBunnyVideoPlayerBinding.inflate(LayoutInflater.from(context), this)
@@ -61,6 +66,9 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
     // Resume position functionality
     private var resumePositionCallback: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null
+    private var currentVideoId: String? = null
+    private var currentLibraryId: Long? = null
+    private var resumeConfig: ResumeConfig = ResumeConfig()
 
     private val resumePositionListener = object : ResumePositionListener {
         override fun onResumePositionAvailable(videoId: String, position: PlaybackPosition) {
@@ -82,11 +90,34 @@ class BunnyStreamPlayer @JvmOverloads constructor(
             if (bunnyPlayer.autoPaused) {
                 bunnyPlayer.play()
             }
+            startAutoSave() // Resume auto-save when active
         }
 
         override fun onPause(owner: LifecycleOwner) {
             val autoPaused = bunnyPlayer.isPlaying()
             bunnyPlayer.pause(autoPaused)
+
+            // Save immediately on pause - use coroutine
+            scope?.launch {
+                saveCurrentPosition()
+            }
+            stopAutoSave()
+        }
+        override fun onStop(owner: LifecycleOwner) {
+            // Save when app goes to background - use coroutine
+            scope?.launch {
+                saveCurrentPosition()
+            }
+            stopAutoSave()
+        }
+
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            // Final save before destroy - use coroutine
+            scope?.launch {
+                saveCurrentPosition()
+            }
+            stopAutoSave()
         }
     }
 
@@ -94,10 +125,12 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         playerView.iconSet = iconSet
         playerView.fullscreenListener = object : BunnyPlayerView.FullscreenListener {
             override fun onFullscreenToggleClicked() {
+                saveCurrentPosition() // Save before fullscreen transition
                 playerView.bunnyPlayer = null
                 FullScreenPlayerActivity.show(context, iconSet) {
                     Log.d(TAG, "onFullscreenExited")
                     playerView.bunnyPlayer = bunnyPlayer
+                    startAutoSave() // Resume auto-save after returning from fullscreen
                 }
             }
         }
@@ -122,6 +155,8 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
             override fun onViewDetachedFromWindow(view: View) {
                 Log.d(TAG, "onViewDetachedFromWindow")
+                saveCurrentPosition() // Save on detach
+                stopAutoSave()
                 job?.cancel()
                 findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(lifecycleObserver)
             }
@@ -136,6 +171,12 @@ class BunnyStreamPlayer @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         Log.d(TAG, "onDetachedFromWindow")
+
+        // Save before detaching - use coroutine scope if available
+        scope?.launch {
+            saveCurrentPosition()
+        }
+        stopAutoSave()
         bunnyPlayer.stop()
     }
 
@@ -145,22 +186,28 @@ class BunnyStreamPlayer @JvmOverloads constructor(
     }
 
     /**
-     * Enable resume position functionality
+     * Enable resume position functionality with auto-save
      */
     fun enableResumePosition(
         config: ResumeConfig = ResumeConfig(),
         onResumePositionCallback: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null
     ) {
+        this.resumeConfig = config
         bunnyPlayer.enableResumePosition(config)
         this.resumePositionCallback = onResumePositionCallback
-    }
 
+        // Start auto-save if enabled in config
+        if (config.enableAutoSave) {
+            startAutoSave()
+        }
+    }
     /**
      * Disable resume position functionality
      */
     fun disableResumePosition() {
         bunnyPlayer.disableResumePosition()
         this.resumePositionCallback = null
+        stopAutoSave()
     }
 
     /**
@@ -170,9 +217,30 @@ class BunnyStreamPlayer @JvmOverloads constructor(
         bunnyPlayer.clearSavedPosition(videoId)
     }
 
+    /**
+     * Clear all saved positions
+     */
+    fun clearAllSavedPositions() {
+        scope?.launch {
+            bunnyPlayer.positionManager?.clearAllPositions()
+        }
+    }
+
+    /**
+     * Get all saved positions for debugging/management
+     */
+    fun getAllSavedPositions(callback: (List<PlaybackPosition>) -> Unit) {
+        scope?.launch {
+            val positions = bunnyPlayer.positionManager?.getAllPositions() ?: emptyList()
+            callback(positions)
+        }
+    }
+
     override fun playVideo(videoId: String, libraryId: Long?) {
         Log.d(TAG, "playVideo videoId=$videoId")
 
+        currentVideoId = videoId
+        currentLibraryId = libraryId
         val providedLibraryId = libraryId ?: BunnyStreamApi.libraryId
 
         if (!BunnyStreamApi.isInitialized()) {
@@ -182,6 +250,9 @@ class BunnyStreamPlayer @JvmOverloads constructor(
             )
             return
         }
+
+        // Save previous video position before switching
+        saveCurrentPosition()
 
         loadVideoJob?.cancel()
 
@@ -244,11 +315,15 @@ class BunnyStreamPlayer @JvmOverloads constructor(
     }
 
     override fun pause() {
+        scope?.launch {
+            saveCurrentPosition()
+        }
         bunnyPlayer.pause()
     }
 
     override fun play() {
         bunnyPlayer.play()
+        // Auto-save will start automatically via lifecycle observer
     }
 
     private suspend fun initializeVideo(video: VideoModel, playerSettings: PlayerSettings) {
@@ -272,6 +347,62 @@ class BunnyStreamPlayer @JvmOverloads constructor(
 
         bunnyPlayer.playVideo(binding.playerView, video, retentionData, playerSettings)
         playerView.bunnyPlayer = bunnyPlayer
+
+        // Start auto-save after video starts playing
+        if (resumeConfig.enableAutoSave) {
+            startAutoSave()
+        }
+    }
+
+    private fun startAutoSave() {
+        stopAutoSave() // Stop any existing auto-save job
+
+        autoSaveJob = scope?.launch {
+            while (isActive) {
+                delay(resumeConfig.saveInterval)
+                if (bunnyPlayer.isPlaying()) {
+                    saveCurrentPosition()
+                }
+            }
+        }
+        Log.d(TAG, "Auto-save started with interval: ${resumeConfig.saveInterval}ms")
+    }
+
+    private fun stopAutoSave() {
+        autoSaveJob?.cancel()
+        autoSaveJob = null
+        Log.d(TAG, "Auto-save stopped")
+    }
+
+    private fun saveCurrentPosition() {
+        currentVideoId?.let { videoId ->
+            scope?.launch {
+                try {
+                    val position = bunnyPlayer.getCurrentPosition()
+                    val duration = bunnyPlayer.getDuration()
+
+                    if (position > 0 && duration > 0) {
+                        bunnyPlayer.positionManager?.savePosition(videoId, position, duration)
+                        Log.d(TAG, "Position saved for $videoId: ${formatTime(position)}")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error saving current position", e)
+                }
+            }
+        }
+    }
+
+    private fun formatTime(millis: Long): String {
+        val totalSeconds = millis / 1000
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        return if (hours > 0) {
+            String.format("%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format("%d:%02d", minutes, seconds)
+        }
     }
 
     fun VideoPlayDataModelVideo.toVideoModel(): VideoModel = VideoModel(

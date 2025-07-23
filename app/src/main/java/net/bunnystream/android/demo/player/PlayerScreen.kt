@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.bunnystream.android.demo.App
 import net.bunnystream.android.demo.R
 import net.bunnystream.android.demo.ui.AppState
 import net.bunnystream.android.demo.ui.theme.BunnyStreamTheme
@@ -96,6 +97,9 @@ fun PlayerScreen(
     var resumePosition by remember { mutableStateOf<PlaybackPosition?>(null) }
     var resumeCallback by remember { mutableStateOf<((Boolean) -> Unit)?>(null) }
 
+    // Get resume position preferences
+    val resumePrefs = App.di.resumePositionPrefs
+
     Scaffold(
         topBar = {
             Surface(shadowElevation = 3.dp) {
@@ -138,6 +142,8 @@ fun PlayerScreen(
                     resumeCallback = callback
                     showResumeDialog = true
                 },
+                resumeConfig = resumePrefs.getResumeConfig(),
+                resumeEnabled = resumePrefs.isResumeEnabled(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
@@ -173,7 +179,7 @@ fun PlayerScreen(
     }
 
     // Resume Dialog
-    if (showResumeDialog && resumePosition != null) {
+    if (showResumeDialog && resumePosition != null && resumePrefs.isResumeEnabled()) {
         ResumeDialog(
             position = resumePosition!!,
             onResume = {
@@ -191,7 +197,6 @@ fun PlayerScreen(
         )
     }
 }
-
 @Composable
 fun ResumeDialog(
     position: PlaybackPosition,
@@ -372,10 +377,11 @@ fun BunnyPlayerComposable(
     resumePosition: Long = 0L,
     onPlayerReady: (BunnyStreamPlayer) -> Unit = {},
     onResumePosition: ((PlaybackPosition, (Boolean) -> Unit) -> Unit)? = null,
+    resumeConfig: ResumeConfig = ResumeConfig(),
+    resumeEnabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
-        // Preview placeholder
         Box(
             modifier
                 .background(Color.DarkGray)
@@ -403,20 +409,16 @@ fun BunnyPlayerComposable(
                 )
 
                 player.setPlaybackSpeedConfig(speedConfig)
-                // Set resume position before playing
-                if (resumePosition > 0) {
-                    // This will be handled by the player internally
+
+                // Enable resume position only if enabled in settings
+                if (resumeEnabled) {
+                    player.enableResumePosition(
+                        config = resumeConfig,
+                        onResumePositionCallback = onResumePosition
+                    )
+                } else {
+                    player.disableResumePosition()
                 }
-                // Enable resume position with custom callback
-                player.enableResumePosition(
-                    config = ResumeConfig(
-                        retentionDays = 7,
-                        minimumWatchTime = 30_000L, // 30 seconds
-                        resumeThreshold = 0.05f, // Don't resume if < 5% watched
-                        nearEndThreshold = 0.95f // Don't resume if > 95% watched
-                    ),
-                    onResumePositionCallback = onResumePosition
-                )
 
                 onPlayerReady(player)
                 player

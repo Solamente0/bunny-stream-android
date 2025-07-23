@@ -61,6 +61,7 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 
 @SuppressLint("UnsafeOptInUsageError")
 class DefaultBunnyPlayer private constructor(private val context: Context) : BunnyPlayer {
@@ -103,10 +104,12 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     override var autoPaused = false
 
     // Resume position functionality
-    private var positionManager: PlaybackPositionManager? = null
+    override var positionManager: PlaybackPositionManager? = null
     private var resumePositionListener: ResumePositionListener? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    private var autoSaveJob: Job? = null
+    private val autoSaveInterval = 10_000L // 10 seconds
     private var chapters = listOf<Chapter>()
         set(value) {
             field = value
@@ -248,10 +251,16 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     // Resume position methods
     override fun enableResumePosition(config: ResumeConfig) {
         positionManager = DefaultPlaybackPositionManager(context, config)
-    }
 
+        // Start auto-save if enabled
+        if (config.enableAutoSave) {
+            startAutoSavePosition(config.saveInterval)
+        }
+    }
     override fun disableResumePosition() {
         positionManager = null
+        resumePositionListener = null
+        stopAutoSavePosition()
     }
 
     override fun clearSavedPosition(videoId: String) {
@@ -261,9 +270,76 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
         }
     }
-
     override fun setResumePositionListener(listener: ResumePositionListener) {
         resumePositionListener = listener
+    }
+    override fun clearAllSavedPositions() {
+        positionManager?.let { manager ->
+            coroutineScope.launch {
+                manager.clearAllPositions()
+            }
+        }
+    }
+
+    override fun getAllSavedPositions(callback: (List<PlaybackPosition>) -> Unit) {
+        positionManager?.let { manager ->
+            coroutineScope.launch {
+                val positions = manager.getAllPositions()
+                withContext(Dispatchers.Main) {
+                    callback(positions)
+                }
+            }
+        } ?: callback(emptyList())
+    }
+
+    override fun exportPositions(callback: (String) -> Unit) {
+        positionManager?.let { manager ->
+            coroutineScope.launch {
+                val jsonData = manager.exportPositions()
+                withContext(Dispatchers.Main) {
+                    callback(jsonData)
+                }
+            }
+        } ?: callback("[]")
+    }
+
+    override fun importPositions(jsonData: String, callback: (Boolean) -> Unit) {
+        positionManager?.let { manager ->
+            coroutineScope.launch {
+                val success = manager.importPositions(jsonData)
+                withContext(Dispatchers.Main) {
+                    callback(success)
+                }
+            }
+        } ?: callback(false)
+    }
+
+    override fun cleanupExpiredPositions() {
+        positionManager?.let { manager ->
+            coroutineScope.launch {
+                manager.cleanupExpiredPositions()
+            }
+        }
+    }
+
+    private fun startAutoSavePosition(interval: Long = autoSaveInterval) {
+        stopAutoSavePosition()
+
+        autoSaveJob = coroutineScope.launch {
+            while (isActive) {
+                delay(interval)
+                if (isPlaying()) {
+                    saveCurrentPosition()
+                }
+            }
+        }
+        Log.d(TAG, "Auto-save position started with interval: ${interval}ms")
+    }
+
+    private fun stopAutoSavePosition() {
+        autoSaveJob?.cancel()
+        autoSaveJob = null
+        Log.d(TAG, "Auto-save position stopped")
     }
 
     private fun checkForSavedPosition(videoId: String) {
@@ -276,7 +352,6 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
         }
     }
-
     private fun saveCurrentPosition() {
         currentVideoId?.let { videoId ->
             positionManager?.let { manager ->
@@ -298,6 +373,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             }
         }
     }
+
+
 
     // Add configuration method
     override fun setPlaybackSpeedConfig(config: PlaybackSpeedConfig) {
@@ -325,6 +402,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
         playerSettings: PlayerSettings
     ) {
         Log.d(TAG, "playVideo(video=$video, retentionData=$retentionData, playerSettings=$playerSettings)")
+
+        // Save position of previous video before switching
+        saveCurrentPosition()
 
         this.playerSettings = playerSettings
         currentVideo = video
@@ -477,7 +557,11 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
 
         // Check for saved position before starting playback
         checkForSavedPosition(video.guid ?: "")
+        currentVideoId?.let { videoId ->
+            checkForSavedPosition(videoId)
+        }
 
+        // Start playback
         currentPlayer!!.playWhenReady = true
 
         if (speedConfig.rememberLastSpeed) {
@@ -488,7 +572,9 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
             currentPlayer!!.seekTo(resumePosition)
         }
 
+
         startProgressSaving(playerSettings.saveProgressInterval)
+        startAutoSavePosition()
         // Init seek thumbnails and metadata
         initSeekThumbnailPreview(video, playerSettings.seekPath)
 
@@ -688,8 +774,8 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     }
 
     override fun release() {
-        // Save position before releasing
-        saveCurrentProgress()
+        saveCurrentPosition()
+        stopAutoSavePosition()
         progressSaveJob?.cancel()
         currentPlayer?.stop()
 
@@ -705,30 +791,37 @@ class DefaultBunnyPlayer private constructor(private val context: Context) : Bun
     override fun play() {
         val current = currentPlayer?.currentPosition ?: 0
         val duration = currentPlayer?.duration ?: 0
-        // There can be few ms difference
         if(current >= duration) {
             currentPlayer?.seekTo(0)
         }
         currentPlayer?.play()
-    }
 
+        // Start auto-save when playing starts
+        positionManager?.let {
+            startAutoSavePosition()
+        }
+    }
     override fun pause(autoPaused: Boolean) {
         this.autoPaused = autoPaused
-        // Save position when pausing
         saveCurrentPosition()
+        stopAutoSavePosition()
         currentPlayer?.pause()
     }
 
     override fun stop() {
-        // Save position before stopping
         saveCurrentPosition()
+        stopAutoSavePosition()
         currentPlayer?.stop()
     }
 
     override fun seekTo(positionMs: Long) {
         currentPlayer?.seekTo(positionMs)
+        // Save new position after seek
+        coroutineScope.launch {
+            delay(1000) // Wait a bit for seek to complete
+            saveCurrentPosition()
+        }
     }
-
     override fun setVolume(volume: Float) {
         currentPlayer?.volume = volume
     }
